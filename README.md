@@ -1,2 +1,2 @@
 # JLNN
-JAX-LNN (JLNN)
+JAX Logical Neural Networks (JLNN)
