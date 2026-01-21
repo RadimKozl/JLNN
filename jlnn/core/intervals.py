@@ -123,3 +123,30 @@ def uncertainty(interval: jnp.ndarray) -> jnp.ndarray:
     # We use the previously defined abstractions get_upper and get_lower.
    
     return get_upper(interval) - get_lower(interval)
+
+
+def negate(interval: jnp.ndarray) -> jnp.ndarray:
+    """
+    Provede logickou negaci (NOT) nad pravdivostním intervalem.
+    
+    In interval logic JLNN, negation is defined by the relation:
+        NOT [L, U] = [1 - U, 1 - L].
+        
+    This calculation ensures that:
+        1. What was strong evidence for truth (high L) becomes strong evidence for falsehood (low U).
+        2. The degree of ignorance (interval width) remains unchanged.
+
+    Args:
+        interval (jnp.ndarray): Input tensor of intervals of the form (..., 2). 
+                            The last dimension contains the pair [Lower Bound, Upper Bound].
+
+    Returns:
+        jnp.ndarray: Negovaný intervalový tensor o tvaru (..., 2).
+    """    
+   
+    # Extracting boundaries using previously defined getters
+    lower = get_lower(interval)
+    upper = get_upper(interval)
+    
+    # Calculation of negation: lower limit of result is 1 - upper limit of input and vice versa
+    return create_interval(1.0 - upper, 1.0 - lower)
