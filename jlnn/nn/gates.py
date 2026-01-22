@@ -304,3 +304,56 @@ class WeightedImplication(nnx.Module):
             return logic.implies_reichenbach(weighted_a, weighted_b)
         else:
             raise ValueError(f"Unsupported implication method: {self.method}")
+        
+        
+class WeightedNot(nnx.Module):
+    """
+    Trainable weighted negation (NOT) gate for JLNN.
+
+    In interval logic, negation is defined as the inversion of truth limits: 
+    NOT [L, U] = [1 - U, 1 - L]. This class also introduces a trainable parameter 
+    weight, which allows the model to scale the influence of 
+    the input before the negation itself. 
+    This is useful in situations where the negated statement should be weakened 
+    or strengthened based on learned experience.
+
+    Semantics in JLNN:
+    - If the weight is 1.0, it is a standard Łukasiewicz negation.
+    - The operation correctly preserves epistemic uncertainty (interval width), 
+    it just maps it to the opposite side of the logical spectrum.
+    """
+    def __init__(self, rngs: nnx.Rngs):
+        """
+        Initializes the negation gate parameters.
+
+        Args:
+            rngs (nnx.Rngs): Random number generator for Flax NNX.
+        """
+        # Weight determines the strength (importance) of the negated input.
+        # Initialize to 1.0 for a neutral logical start.
+        self.weight = nnx.Param(jnp.array(1.0))
+
+    def __call__(self, x: jnp.ndarray) -> jnp.ndarray:
+        """
+        Performs a forward weighted negation calculation over an interval.
+
+        The calculation takes place in two steps:
+        1. Applying a weight to the input interval (clipped to 1.0).
+        2. Interchanging and subtracting limits from one (negation).
+
+        Args:
+            x (jnp.ndarray): Input interval tensor of form (..., 2).
+
+        Returns:
+            jnp.ndarray: The resulting negated truth interval [L, U].
+        """
+        # 1. Applying weight to interval limits.
+        # We use jnp.minimum so that the weighted input does not exceed the logical limit of 1.0.
+        weighted_x = intervals.create_interval(
+            jnp.minimum(1.0, intervals.get_lower(x) * self.weight.value),
+            jnp.minimum(1.0, intervals.get_upper(x) * self.weight.value)
+        )
+        
+        # 2. The negation of the interval itself: [L, U] -> [1 - U, 1 - L].
+        # Calls a function from jlnn.core.intervals.
+        return intervals.negate(weighted_x)
