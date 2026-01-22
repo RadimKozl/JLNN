@@ -4,19 +4,18 @@
 import jax
 import jax.numpy as jnp
 from flax import nnx
-from jlnn.core import intervals
+from jlnn.core import activations, intervals
 
 class LearnedPredicate(nnx.Module):
     """
-    Maps scalar input data to truth intervals [L, U].
+    Transforms real input data into truth intervals [L, U].
 
-    This class acts as the input layer of a JLNN network (grounding). 
+    This class serves as the input layer of the JLNN network (so-called grounding). 
     Using trainable parameters (slope and offset), 
-    it learns to define the semantics of logical statements over continuous data. 
-    For example, it can learn what specific value of 
-    a temperature sensor corresponds to the logical statement "it's hot".
+    it learns to define the semantics of logical statements over continuous data. For example, 
+    it can learn what specific value from a temperature sensor corresponds to the logical statement "it's hot".
 
-    It uses two independent sigmoidal functions to model the lower (L) 
+    It uses two independent ramp_sigmoid functions to model the lower (L) 
     and upper (U) bounds of truth, which allows the system to also express 
     the degree of uncertainty (ignorance) regarding a given feature.
     """
@@ -25,36 +24,36 @@ class LearnedPredicate(nnx.Module):
         Initializes the predicate parameters for each input flag.
 
         Args:
-            in_features (int): Number of input numeric features.
-            rngs (nnx.Rngs): Random number generator for Flax NNX initialization.
+            in_features (int): Number of numeric input features.
+            rngs (nnx.Rngs): Random number generator for Flax NNX.
         """
-        # Parameters for the lower bound (L) – defines the confirmed truth.
+        # Parameters for the lower limit (L) – defines the confirmed truth.
         self.slope_l = nnx.Param(jnp.ones((in_features,)))
-        self.bias_l = nnx.Param(jnp.zeros((in_features,)))
+        self.offset_l = nnx.Param(jnp.zeros((in_features,)))
         
-        # Parameters for upper bound (U) – defines the upper probability limit.
+        # Parameters for upper bound (U) – defines the upper limit of the probability.
+        # We initialize offset_u slightly lower than offset_l so that U > L at the beginning.
         self.slope_u = nnx.Param(jnp.ones((in_features,)))
-        self.bias_u = nnx.Param(jnp.zeros((in_features,)))
+        self.offset_u = nnx.Param(jnp.full((in_features,), -0.2))
 
     def __call__(self, x: jnp.ndarray) -> jnp.ndarray:
         """
         Transforms numeric inputs into logical intervals.
 
         Args:
-            x (jnp.ndarray): Input data (features) of the form (..., in_features).
+            x (jnp.ndarray): Input data of the shape (..., in_features).
 
         Returns:
             jnp.ndarray: An interval tensor of the form (..., in_features, 2), 
                         where the last dimension represents the pair [L, U].
         """
-        # Calculation using sigmoid (truncated linear functions are often used in LNNs,
-        # but sigmoid provides smoother gradients for learning stability in JAX).
-        lower = jax.nn.sigmoid(self.slope_l * x + self.bias_l)
-        upper = jax.nn.sigmoid(self.slope_u * x + self.bias_u)
+        # Calculation using ramp_sigmoid from core/activations.py
+        # This function provides a linear transition and saturation at 0.0 and 1.0.
+        lower = activations.ramp_sigmoid(x, self.slope_l.value, self.offset_l.value)
+        upper = activations.ramp_sigmoid(x, self.slope_u.value, self.offset_u.value)
         
-        # Ensuring logical consistency (L <= U).
-        # If L > U, it would mean a logical conflict.
-        real_upper = jnp.maximum(lower, upper)
+        # In JLNN, we do not perform jnp.maximum(lower, upper) inside the forward pass.
+        # We want any conflict (L > U) to be visible to contradiction_loss.
+        # The correction is handled by apply_constraints after each optimization step.
         
-        # Creating a standard JLNN interval
-        return intervals.create_interval(lower, real_upper)
+        return intervals.create_interval(lower, upper)
