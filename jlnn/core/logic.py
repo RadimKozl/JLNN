@@ -3,72 +3,76 @@
 # Imports 
 import jax
 import jax.numpy as jnp
-from jlnn.core import intervals
+from jlnn.core import intervals, activations
 
 # --- Łukasiewicz Logic (Optimistic / Linear) ---
 
-def weighted_and_lukasiewicz(ints: jnp.ndarray, weights: jnp.ndarray, beta: float) -> jnp.ndarray:
+def weighted_and_lukasiewicz(x: jnp.ndarray, weights: jnp.ndarray, beta: jnp.ndarray) -> jnp.ndarray:
     """
-    Weighted AND operator (Łukasiewicz t-norm) according to IBM LNN specification.
-    
-    Calculation: 1 - min(1, sum(w_i * (1 - x_i)) / beta)
-    
-    Args:
-        ints: Tensor of intervals of the form (..., N, 2), where N is the number of inputs.
-        weights: Weights of individual inputs of the form (N,). Should be >= 1.
-        beta: Threshold (bias) determining activation.
-        
-    Returns:
-        The resulting interval [L, U] is of the form (..., 2).
-    """
-    L = intervals.get_lower(ints)
-    U = intervals.get_upper(ints)
-    
-    # We use jnp.sum with axis=-1 so that the gate works for batches (multiple rows of data)
-    res_L = 1.0 - jnp.minimum(1.0, jnp.sum(weights * (1.0 - L), axis=-1) / beta)
-    res_U = 1.0 - jnp.minimum(1.0, jnp.sum(weights * (1.0 - U), axis=-1) / beta)
-    
-    return intervals.create_interval(res_L, res_U)
+    Calculates a weighted Łukasiewicz conjunction (AND) over truth intervals.
 
+    In LNN logic, conjunction is defined through "negative evidence". 
+    The closer the inputs are to falsehood (1 - x) and the higher their weight, 
+    the more they reduce the overall truth of the result. 
+    The parameter beta determines the threshold below which the result is considered absolutely false (0.0).
 
-def weighted_or_lukasiewicz(ints: jnp.ndarray, weights: jnp.ndarray, beta: float) -> jnp.ndarray:
-    """
-    Weighted OR operator (Łukasiewicz t-conorma) for interval logic.
-    
-    This operator aggregates the truth intervals of several inputs into 
-    a single output interval. Within LNN (Logical Neural Networks), 
-    a linear form is used, which allows for efficient gradient propagation.
-    
-    The calculation is performed independently for the lower (L) 
-    and upper (U) bounds according to the formula: 
-    f(x) = min(1, sum(w_i * x_i) / beta)
+    Interval semantics:
+    Because negation inverts limits, to calculate the upper limit of the result (U) 
+    we use the negation of the lower limits of the inputs (L), 
+    and to calculate the lower limit of the result (L) 
+    we use the negation of the upper limits of the inputs (U).
 
     Args:
-        ints (jnp.ndarray): Input tensor of intervals of the form (..., N, 2), 
-                        where N is the number of operator arguments 
-                        and the last dimension contains the pair [Lower Bound, Upper Bound].
-        weights (jnp.ndarray): A tensor of weights of the form (N,). 
-                        In accordance with LNN, weights should be >= 1 to ensure logical consistency.
-        beta (float): The threshold (bias) of the gate. 
-                        It determines the "sensitivity" of the OR gate - a lower beta means that 
-                        fewer true inputs are needed to achieve full truth (1.0).
+        x (jnp.ndarray): Input interval tensor of the form (..., num_inputs, 2).
+        weights (jnp.ndarray): A tensor of weights of the form (num_inputs,).
+        beta (jnp.ndarray): Scalar threshold parameter (bias).
 
     Returns:
-        jnp.ndarray: The resulting truth interval [L, U] of the form (..., 2).
+        jnp.ndarray: The resulting truth interval [L, U].
     """
+    # 1. Calculation of the sum of weighted negations (resistance) for both limits
+    # sum_l corresponds to sum(w * (1 - L_input)) -> affects the upper bound of the result
+    sum_l = jnp.sum(weights * (1.0 - intervals.get_lower(x)), axis=-1)
+    # sum_u equals sum(w * (1 - U_input)) -> affects the lower bound of the result
+    sum_u = jnp.sum(weights * (1.0 - intervals.get_upper(x)), axis=-1)
     
-    # Extracting boundaries using our intervals module
-    L = intervals.get_lower(ints)
-    U = intervals.get_upper(ints)
+    # 2. Application specific AND activation
+    # Res_u uses sum_l because less "certain truth" in the input limits the maximum truth of the output.
+    res_u = activations.lukasiewicz_and_activation(sum_l, beta)
+    res_l = activations.lukasiewicz_and_activation(sum_u, beta)
     
-    # Calculate the weighted sum over the last dimension of the arguments (axis=-1)
-    # This provides support for an arbitrary number of batch dimensions.
-    res_L = jnp.minimum(1.0, jnp.sum(weights * L, axis=-1) / beta)
-    res_U = jnp.minimum(1.0, jnp.sum(weights * U, axis=-1) / beta)
-    
-    # Reconstruction to format (..., 2)
-    return intervals.create_interval(res_L, res_U)
+    return intervals.create_interval(res_l, res_u)
 
+
+def weighted_or_lukasiewicz(x: jnp.ndarray, weights: jnp.ndarray, beta: jnp.ndarray) -> jnp.ndarray:
+    """
+    Calculates the weighted Łukasiewicz disjunction (OR) over truth intervals.
+
+    Disjunction in LNN acts as an accumulator of "positive evidence". 
+    Each true input increases the overall truth of the result depending on its weight. 
+    The beta parameter determines how much "evidence" is needed to reach absolute truth (1.0).
+
+    Interval semantics:
+    The OR operation preserves the orientation of the limits: the lower limits of the inputs determine 
+    the lower limit of the result, and the upper limits of the inputs determine the upper limit of the result.
+
+    Args:
+        x (jnp.ndarray): Input interval tensor of the form (..., num_inputs, 2).
+        weights (jnp.ndarray): A tensor of weights of the form (num_inputs,).
+        beta (jnp.ndarray): Scalar threshold parameter (bias).
+
+    Returns:
+        jnp.ndarray: The resulting truth interval [L, U].
+    """
+    # 1. Weighted sum of confirmed truth
+    sum_l = jnp.sum(weights * intervals.get_lower(x), axis=-1)
+    sum_u = jnp.sum(weights * intervals.get_upper(x), axis=-1)
+    
+    # 2. Application of specific OR activation (t-conorm)
+    res_l = activations.lukasiewicz_or_activation(sum_l, beta)
+    res_u = activations.lukasiewicz_or_activation(sum_u, beta)
+    
+    return intervals.create_interval(res_l, res_u)
 
 def implies_lukasiewicz(int_a: jnp.ndarray, int_b: jnp.ndarray, weights: jnp.ndarray, beta: float) -> jnp.ndarray:
     """
