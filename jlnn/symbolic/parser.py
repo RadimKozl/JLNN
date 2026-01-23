@@ -1,86 +1,88 @@
 #!/usr/bin/env python3
 
-import ast
+# Imports
+from lark import Lark
+import jax.numpy as jnp
 
-# Symbol mapping to JLNN gates
-SYMBOL_MAP = {
-    '&': 'WeightedAnd',          # Conjunction
-    '|': 'WeightedOr',           # Disjunction
-    '~': 'WeightedNot',          # Negation
-    '^': 'WeightedXor',          # Exclusive disjunction
-    '!&': 'WeightedNand',        # Negated conjunction
-    '!|': 'WeightedNor',         # Negated disjunction
-    '->': 'WeightedImplication'  # Implication
-}
+# Grammar definition supporting standard, extended, and future temporal operators.
+# The grammar is designed with operator precedence (binding) in mind.
+LNN_GRAMMAR = r"""
+    ?start: expr
+
+    ?expr: term
+         | expr "->" term    -> implication
+         | expr "<->" term   -> equivalence
+
+    ?term: factor
+         | term "|" factor   -> or
+         | term "^" factor   -> xor
+         | term "!|" factor  -> nor
+
+    ?factor: unary
+           | factor "&" unary  -> and
+           | factor "!&" unary -> nand
+
+    ?unary: "~" unary        -> not
+          | "G" unary        -> always
+          | "F" unary        -> eventually
+          | "X" unary        -> next
+          | atom
+
+    ?atom: NAME              -> variable
+         | "(" expr ")"
+
+    %import common.CNAME -> NAME
+    %import common.WS
+    %ignore WS
+"""
 
 class FormulaParser:
     """
-    Parses textual logical expressions and converts them to an AST structure for JLNN.
+    Advanced logical formula parser built on the Lark library.
 
-    This parser serves as a bridge between the symbolic notation of rules 
-    and the computational graph of the neural network. 
-    It supports standard logical operators as well 
-    as specific extended operators (NAND, NOR, Implication).
+    This module serves as a front-end for JLNN (Just-in-time Logical Neural Network). 
+    Its task is to transform the textual notation of rules into 
+    a structured tree (Concrete Syntax Tree), which can then be compiled into 
+    a JAX/NNX computational graph.
 
-    It uses the Python AST for safe parsing, performing pre-transformation of symbols that 
-    are not native to Python syntax.
+    Main advantages:
+    - Support for non-Python syntax: Direct use of operators like '->' 
+    (impliction) or '!&' (NAND) without the need for string preprocessing.
+    - Hierarchical reasoning: Properly defined operator precedence 
+    (e.g. conjunction has a stronger link than disjunction).
+    - Temporal logic preparation: Contains reserved tokens for 
+    linear temporal logic operators (G, F, X).
+
+    Grammarly supports:
+    - Binary: AND (&), OR (|), XOR (^), NAND (!&), NOR (!|), Implication (->).
+    - Unary: NOT (~), Always (G), Eventually (F), Next (X).
     """
-    
+
     def __init__(self):
-        """Initializes a parser instance."""
-        pass
-
-    def _preprocess_formula(self, formula: str) -> str:
         """
-        Transforms non-Python operators into temporary valid tokens.
+        Initializes a parser instance with the defined grammar LNN_GRAMMAR.
         
-        E.g. 'A -> B' changes to 'A >> B' (bit shift) to make it 
-        ast.parse was able to process it as a binary operation.
+        It uses the LALR(1) algorithm, which is optimal for deterministic logical grammars 
+        and provides high parsing speed during model initialization.
         """
-        f = formula.replace(" ", "")
-        # Transformation to maintain compatibility with the ast module
-        f = f.replace("->", ">>")  # Implication simulated as a bit shift right
-        f = f.replace("!&", "@")   # NAND simulated as matrix multiplication
-        f = f.replace("!|", "==")  # NOR simulated as comparison
-        return f
+        self.parser = Lark(LNN_GRAMMAR, parser='lalr')
 
-    def parse_to_ast(self, formula: str) -> ast.Expression:
+    def parse(self, formula: str):
         """
-        Converts a text string to a Python AST (Abstract Syntax Tree).
+        It parses the input string and builds a syntax tree.
 
         Args:
-            formula (str): A text string with a logical formula (e.g. "(A & B) | ~C").
+            formula (str): Text representation of a logical expression (e.g. "A & B -> ~C").
 
         Returns:
-            ast.Expression: The root node of the abstract syntax tree.
+            lark.Tree: Syntactic tree representing the structure of a formula.
 
         Raises:
-            ValueError: If the formula contains syntax errors.
+            ValueError: If the formula does not conform to the defined grammar 
+            or contains illegal characters.
         """
-        clean_formula = self._preprocess_formula(formula)
         try:
-            # 'eval' mode is ideal for parsing single-line expressions
-            tree = ast.parse(clean_formula, mode='eval')
-            return tree
-        except SyntaxError as e:
-            raise ValueError(f"Invalid logical formula: {formula}. Error: {e}")
-
-    def extract_variables(self, tree: ast.AST) -> list[str]:
-        """
-        It traverses the AST and extracts a list of all unique variable names.
-
-        These variables will subsequently be replaced in JLNN 
-        by instances of the LearnedPredicate class.
-
-        Args:
-            tree (ast.AST): Tree obtained by the parse_to_ast function.
-
-        Returns:
-            list[str]: Sorted list of unique identifiers (e.g. ['A', 'B']).
-        """
-        variables = set()
-        for node in ast.walk(tree):
-            # In AST mode 'eval', variables are represented by ast.Name nodes
-            if isinstance(node, ast.Name):
-                variables.add(node.id)
-        return sorted(list(variables))
+            return self.parser.parse(formula)
+        except Exception as e:
+            # Catching errors from Lark and transforming them into a more understandable exception
+            raise ValueError(f"Error parsing formula '{formula}': {e}")
