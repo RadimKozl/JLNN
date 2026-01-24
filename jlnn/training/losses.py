@@ -91,3 +91,61 @@ def total_lnn_loss(prediction: jnp.ndarray, target: jnp.ndarray, contradiction_w
     return mse + contradiction_weight * contra
 
 
+def logical_consistency_loss(model_output: jnp.ndarray, uncertainty_weight: float = 0.1) -> jnp.ndarray:
+    """
+    Komplexní ztrátová funkce pro vynucení logické konzistence a jistoty modelu.
+
+    Tato funkce kombinuje dva aspekty:
+    1. **Validita (Hinge Loss)**: Penalizuje situace, kdy spodní mez (L) překročí horní mez (U). 
+       V korektní LNN logice musí vždy platit L <= U.
+    2. **Jistota (Uncertainty)**: Minimalizuje šířku intervalu (U - L). Motivuje model k tomu, 
+       aby nezůstával v neutrálním stavu "nevím" (0, 1), ale směřoval k "pravda" (1, 1) nebo "nepravda" (0, 0).
+
+    Args:
+        model_output (jnp.ndarray): Výstupní tensor modelu s intervaly ve tvaru (..., 2).
+        uncertainty_weight (float): Koeficient určující sílu tlaku na snižování neurčitosti. 
+            Defaultní hodnota 0.1 zajišťuje, že primárním cílem zůstává validita a přesnost.
+
+    Returns:
+        jnp.ndarray: Skalární hodnota reprezentující celkovou nekonzistenci.
+    """
+    # Rozklad na spodní a horní mez pomocí core modulu
+    l = intervals.get_lower(model_output)
+    u = intervals.get_upper(model_output)
+    
+    # Penalizace za 'překřížení' (L > U). Pokud L <= U, hodnota je 0.
+    violation = jnp.mean(jnp.maximum(0.0, l - u))
+    
+    # Penalizace za neurčitost (šířka intervalu). Chceme, aby se meze k sobě blížily.
+    uncertainty = jnp.mean(u - l)
+    
+    return violation + uncertainty_weight * uncertainty
+
+
+def rule_violation_loss(antecedent: jnp.ndarray, consequent: jnp.ndarray) -> jnp.ndarray:
+    """
+    Penalizes violation of the semantics of logical implication (A -> B).
+
+    In neuro-symbolic learning, this is a key function for knowledge embedding. 
+    If a model claims that premise (A) is true (high lower bound) 
+    but at the same time claims that conclusion (B) 
+    is false (low upper bound), a logical conflict arises that penalizes this function.
+
+    This loss is defined as max(0, L(A) - U(B)).
+
+    Args:
+        antecedent (jnp.ndarray): Truth interval of the premise (A).
+        consequent (jnp.ndarray): Truth interval of the conclusion (B).
+
+    Returns:
+        jnp.ndarray: Average rule violation rate across the batch.
+    """
+    # L(A) represents the degree to which we are certain of the truth of the assumption
+    l_a = intervals.get_lower(antecedent)
+    # U(B) represents the maximum possible degree of truth of the conclusion
+    u_b = intervals.get_upper(consequent)
+    
+    # If L(A) > U(B), the rule is violated (the premise is more true than the conclusion can be)
+    return jnp.mean(jnp.maximum(0.0, l_a - u_b))
+
+
