@@ -320,7 +320,7 @@ class WeightedNot(nnx.Module):
     Semantics in JLNN:
     - If the weight is 1.0, it is a standard Łukasiewicz negation.
     - The operation correctly preserves epistemic uncertainty (interval width), 
-    it just maps it to the opposite side of the logical spectrum.
+        it just maps it to the opposite side of the logical spectrum.
     """
     def __init__(self, rngs: nnx.Rngs):
         """
