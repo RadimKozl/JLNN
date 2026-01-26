@@ -3,258 +3,163 @@
 # Imports
 import jax.numpy as jnp
 from flax import nnx
-from jlnn.core import logic, intervals
+from jlnn.nn import functional as F
 
 class WeightedOr(nnx.Module):
     """
-    Trainable weighted OR gate for LNN (Logical Neural Networks).
-
-    This gate implements a weighted version of the Łukasiewicz disjunction (t-conorms). 
-    Within the JLNN architecture, the weights and threshold (beta) are defined as optimizable parameters (nnx.Param), 
-    allowing the logic gate to learn the importance of individual inputs directly from the data.
-
-    The gate works with interval logic, 
-    where the operation is performed independently of the lower (L) and upper (U) truth limits.
+    Trainable weighted OR gate implemented using Łukasiewicz t-conorm.
+    
+    In the JLNN framework, this gate aggregates the truth intervals of the inputs 
+    and allows the model to learn the importance (weight) of each argument 
+    and the sensitivity threshold (beta) for the disjunction. 
+    The computation is delegated to a stateless function in the functional module.
     """
     def __init__(self, num_inputs: int, rngs: nnx.Rngs):
         """
-        Initializes the parameters of the weighted OR gate.
+        Initializes the OR gate parameters.
 
         Args:
-            num_inputs (int): Number of input logical arguments (dimension of the input layer).
-            rngs (nnx.Rngs): Random number generator required to initialize Flax NNX state.
+            num_inputs (int): Number of input logic signals.
+            rngs (nnx.Rngs): Random number generator for initializing NNX parameters.
         """
-        # The weights are initialized to 1.0, which corresponds to the standard logical sum.
-        # In LNN, it is recommended to keep weights >= 1 to maintain logical interpretability.
         self.weights = nnx.Param(jnp.ones((num_inputs,)))
-        
-        # Beta (threshold/bias) determines the sensitivity of the gate.
-        # A value of 1.0 indicates standard Łukasiewicz semantics.
         self.beta = nnx.Param(jnp.array(1.0))
 
     def __call__(self, x: jnp.ndarray) -> jnp.ndarray:
         """
-        Performs a forward pass of the weighted disjunction.
-
-        The calculation is performed according to the formula: f(x) = min(1, sum(w_i * x_i) / beta).
+        Performs a forward calculation of the weighted disjunction.
 
         Args:
-            x (jnp.ndarray): Input interval tensor of the form (..., num_inputs, 2). 
-                            The last dimension contains the pair [Lower Bound, Upper Bound].
+            x (jnp.ndarray): Input interval tensor of the form (..., num_inputs, 2).
 
         Returns:
-            jnp.ndarray: Output truth interval of the form (..., 2).
+            jnp.ndarray: The resulting aggregated truth interval [L, U].
         """
-        # Delegating computation to a low-level implementation in core.logic
-        return logic.weighted_or_lukasiewicz(x, self.weights, self.beta)
+        return F.weighted_or(x, self.weights.value, self.beta.value)
 
 
 class WeightedAnd(nnx.Module):
     """
-    Trainable weighted AND gate for LNN (Logical Neural Networks).
+    Trainable weighted AND gate implemented using Łukasiewicz's t-norm.
     
-    This gate implements a weighted version of the Łukasiewicz conjunction (t-norm). 
-    Within the JLNN architecture, it is used to aggregate conditions that must be met simultaneously. 
-    By using nnx.Param, the weights and threshold (beta) are optimizable, 
-    allowing the network to learn the relevance of individual inputs to the resulting conjunction.
-    
-    The gate directly operates on the truth intervals [L, U], thereby preserving information 
-    about uncertainty (epistemic uncertainty) across the computational graph.
+    This gate implements logical conjunction over intervals. 
+    The weight parameters allow the network to selectively suppress unimportant inputs, 
+    while the beta parameter controls the stringency of the logical product.
     """
     def __init__(self, num_inputs: int, rngs: nnx.Rngs):
         """
-        Initializes the parameters of the weighted AND gate.
+        Initializes the AND gate parameters.
 
         Args:
-            num_inputs (int): Number of input logical arguments (flags).
-            rngs (nnx.Rngs): Random number generator for initializing the Flax NNX state.
+            num_inputs (int): Number of input logic signals.
+            rngs (nnx.Rngs): Generator for NNX state.
         """
-        
-        # Weights are initialized to 1.0. A higher weight for a particular input
-        # means that its (false) truth has a stronger influence on the result of the conjunction.
         self.weights = nnx.Param(jnp.ones((num_inputs,)))
-        
-        # Beta (threshold) determines the stringency of the gate. Higher beta dampens the influence of
-        # negative evidence on the resulting truth.
         self.beta = nnx.Param(jnp.array(1.0))
 
     def __call__(self, x: jnp.ndarray) -> jnp.ndarray:
         """
         Performs a forward calculation of the weighted conjunction.
 
-        The calculation is carried out according to the formula: 1 - min(1, sum(w_i * (1 - x_i)) / beta).
-
         Args:
-            x (jnp.ndarray): Input interval tensor of the form (..., num_inputs, 2). 
-                            The last dimension contains the pair [Lower Bound, Upper Bound].
+            x (jnp.ndarray): Input interval tensor of the form (..., num_inputs, 2).
 
         Returns:
-            jnp.ndarray: Output truth interval of the form (..., 2).
+            jnp.ndarray: The resulting aggregated truth interval [L, U].
         """
-        # Calling a low-level function from jlnn.core.logic for efficient computation
-        return logic.weighted_and_lukasiewicz(x, self.weights, self.beta)
+        return F.weighted_and(x, self.weights.value, self.beta.value)
 
 
 class WeightedNand(nnx.Module):
     """
-    Trainable weighted NAND gate (Negated AND) for JLNN.
+    Weighted NAND gate (Negated AND).
     
-    In automation and industrial logic, NAND is one of the most versatile elements. 
-    In JLNN, it is implemented as a composition of a weighted AND gate and a logical negation operation.
-    
-    Interval semantics:
-    If an AND gate returns the interval [L, U], a NAND gate returns [1 - U, 1 - L].
-    This means that the high rate of confirmed truth in the conjunction changes to 
-    a high rate of confirmed falsehood in the NAND, 
-    while the width of the interval (indeterminacy) remains correctly preserved.
-    """    
+    Implements negation of conjunction. In JLNN, 
+    this operation is key for enforcing constraints, 
+    where we want to prevent two contradictory statements 
+    from being true at the same time.
+    """
     def __init__(self, num_inputs: int, rngs: nnx.Rngs):
-        """
-        Initializes the NAND gate using the internal WeightedAnd module.
-
-        Args:
-            num_inputs (int): Number of input logic signals.
-            rngs (nnx.Rngs): Random number generator for parameter initialization.
-        """
-        # NAND uses an internal trainable AND gate that manages weights and beta.
-        self.and_gate = WeightedAnd(num_inputs, rngs)
+        self.weights = nnx.Param(jnp.ones((num_inputs,)))
+        self.beta = nnx.Param(jnp.array(1.0))
 
     def __call__(self, x: jnp.ndarray) -> jnp.ndarray:
         """
-        Performs a weighted NAND calculation over the input intervals.
-
-        Args:
-            x (jnp.ndarray): Input interval tensor of the form (..., num_inputs, 2).
-
-        Returns:
-            jnp.ndarray: The resulting truth interval [L, U] of the form (..., 2).
-        """        
-        # 1. Calculation of weighted conjunction: [L_and, U_and]
-        res_and = self.and_gate(x)
-        
-        # 2. Applying negation: [1 - U_and, 1 - L_and]
-        # Uses the intervals.negate function to ensure correct semantic mapping.
-        return intervals.negate(res_and)
+        Computes a negated weighted conjunction using a functional interface.
+        """
+        return F.weighted_nand(x, self.weights.value, self.beta.value)
 
 
 class WeightedNor(nnx.Module):
     """
-    Trainable weighted NOR gate (Negated OR) for JLNN.
+    Weighted NOR gate (Negated OR).
     
-    In industrial automation, the NOR gate (Peirce operator) is indispensable for safety 
-    and monitoring circuits. In the JLNN framework, 
-    it is implemented as a composition of a weighted OR gate and a logical negation operation.
-    
-    Semantics in interval logic:
-    The calculation is as NOT(WeightedOr(x)). 
-    If the inner OR gate determines that there is at least one true input (high L), 
-    the output of the NOR gate will have a high confirmed falseness rate (low U).
-    
-    This implementation preserves epistemic uncertainty: the width of the resulting interval 
-    exactly corresponds to the degree of ignorance about the state of the input sensors.
+    This operator returns a high truth value only if 
+    all weighted inputs have a low truth value. 
+    It is often used to detect the absence of specific features in the data.
     """
     def __init__(self, num_inputs: int, rngs: nnx.Rngs):
-        """
-        Initializes a NOR gate using the internal WeightedOr module.
-
-        Args:
-            num_inputs (int): Number of input logic signals (e.g. sensors).
-            rngs (nnx.Rngs): Random number generator for initializing internal parameters.
-        """
-        # NOR uses an internal trainable OR gate that manages weights and beta.
-        # With Flax NNX, these parameters will be automatically found by the clip_weights function.        
-        self.or_gate = WeightedOr(num_inputs, rngs)
+        self.weights = nnx.Param(jnp.ones((num_inputs,)))
+        self.beta = nnx.Param(jnp.array(1.0))
 
     def __call__(self, x: jnp.ndarray) -> jnp.ndarray:
         """
-        Performs a weighted NOR calculation over the input intervals.
-
-        Args:
-            x (jnp.ndarray): Input interval tensor of the form (..., num_inputs, 2). 
-                            The last dimension contains the pair [Lower Bound, Upper Bound].
-
-        Returns:
-            jnp.ndarray: The resulting truth interval [L, U] of the form (..., 2).
+        Calculates the negated weighted disjunction.
         """
-        # 1. Calculation of weighted disjunction (Łukasiewicz t-conorm)        
-        res_or = self.or_gate(x)
-        # 2. Logická negace intervalu: [L, U] -> [1 - U, 1 - L]
-        return intervals.negate(res_or)
+        return F.weighted_nor(x, self.weights.value, self.beta.value)
+
 
 class WeightedXor(nnx.Module):
     """
-    Trainable weighted n-ary XOR gate (Exclusive OR) using Tree-reduction.
+    Trainable n-ary XOR gate (Exclusive OR) using tree reduction.
     
-    In JLNN, the n-ary XOR is implemented as a recursive binary tree of 2-input XORs.
-    This architecture ensures that the gate correctly computes the parity function:
-    the output is 'True' if an odd number of inputs are 'True'.
-
-    Key features:
-    - **Scalability**: Automatically adjusts its internal structure based on `num_inputs`.
-    - **Hierarchical Learning**: Each binary XOR node in the tree has its own 
-      trainable weights (OR, NAND, AND branches), allowing the network to learn 
-      complex parity relationships with specific input importance.
-    - **JAX Compatibility**: The tree structure is fully differentiable and 
-      optimized for accelerated hardware.
+    XOR is implemented in interval logic as a recursive binary tree. 
+    For n=2 it uses the composition (A OR B) AND (A NAND B). 
+    For n > 2 the inputs are divided and the results are combined using binary XOR operations. 
+    This structure allows learning complex parity functions with trainable weights at each node of the tree.
     """
-
     def __init__(self, num_inputs: int, rngs: nnx.Rngs):
         """
-        Initializes the n-ary XOR gate as a tree of binary XOR operations.
+        It builds a hierarchical structure of an XOR gate.
 
         Args:
-            num_inputs (int): Total number of input logical signals.
-            rngs (nnx.Rngs): Random number generator for parameter initialization.
+            num_inputs (int): Total number of inputs.
+            rngs (nnx.Rngs): Generator for initializing all internal gates.
         """
         if num_inputs < 2:
-            raise ValueError("XOR gate requires at least 2 inputs.")
-
+            raise ValueError("An XOR gate requires at least 2 inputs.")
         self.num_inputs = num_inputs
 
         if num_inputs == 2:
-            # Base case: standard binary XOR composition (A OR B) AND (A NAND B)
-            self.or_gate = WeightedOr(num_inputs=2, rngs=rngs)
-            self.nand_gate = WeightedNand(num_inputs=2, rngs=rngs)
-            self.final_and = WeightedAnd(num_inputs=2, rngs=rngs)
+            # Base case: parameters for internal logical composition XOR
+            self.weights_or = nnx.Param(jnp.ones((2,)))
+            self.weights_nand = nnx.Param(jnp.ones((2,)))
+            self.weights_and = nnx.Param(jnp.ones((2,)))
+            self.beta = nnx.Param(jnp.array(1.0))
             self.left_child = None
             self.right_child = None
         else:
-            # Recursive case: Tree-reduction
+            # Recursive case: splitting inputs and creating subtrees
             mid = num_inputs // 2
             self.left_child = WeightedXor(num_inputs=mid, rngs=rngs)
             self.right_child = WeightedXor(num_inputs=num_inputs - mid, rngs=rngs)
-            # The current node acts as a binary XOR combiner for its two children
             self.combiner = WeightedXor(num_inputs=2, rngs=rngs)
 
     def __call__(self, x: jnp.ndarray) -> jnp.ndarray:
         """
-        Performs a forward pass using recursive tree reduction.
-
-        Args:
-            x (jnp.ndarray): Input interval tensor of the form (..., num_inputs, 2).
-
-        Returns:
-            jnp.ndarray: Output truth interval [L, U] of the form (..., 2).
+        Performs a recursive parity calculation (XOR) over the tree structure.
         """
         if self.num_inputs == 2:
-            # Atomic binary XOR operation
-            res_or = self.or_gate(x)
-            res_nand = self.nand_gate(x)
+            # Atomic binary XOR operation using functional.py
+            res_or = F.weighted_or(x, self.weights_or.value, self.beta.value)
+            res_nand = F.weighted_nand(x, self.weights_nand.value, self.beta.value)
             combined = jnp.stack([res_or, res_nand], axis=-2)
-            return self.final_and(combined)
+            return F.weighted_and(combined, self.weights_and.value, self.beta.value)
         else:
-            # 1. Split inputs for the left and right subtrees
-            # x has shape (..., num_inputs, 2)
+            # Traversal of the reduction tree
             mid = self.num_inputs // 2
-            x_left = x[..., :mid, :]
-            x_right = x[..., mid:, :]
-
-            # 2. Recursive reduction
-            res_left = self.left_child(x_left)
-            res_right = self.right_child(x_right)
-
-            # 3. Combine results using a 2-input XOR at this level
-            # Shape of combined: (..., 2, 2)
+            res_left = self.left_child(x[..., :mid, :])
+            res_right = self.right_child(x[..., mid:, :])
             combined_results = jnp.stack([res_left, res_right], axis=-2)
             return self.combiner(combined_results)
 
@@ -263,119 +168,42 @@ class WeightedImplication(nnx.Module):
     """
     Trainable gate for logical implication (A -> B).
     
-    This gate implements the relationship between antecedent (premise A) 
-    and consequent (consequence B). Within JLNN, it supports multiple semantics, 
-    allowing the user to choose between optimistic (Łukasiewicz), pessimistic (Kleene-Dienes), 
-    or compromise (Reichenbach) approaches.
-    
-    The weights on the implication allow the model to learn the relevance 
-    of individual parts of the rule, while the beta parameter controls 
-    the strictness of the activation of the entire rule.
+    Allows modeling of causal relationships between statements. 
+    Supports multiple semantics (Łukasiewicz, Reichenbach, Kleene-Dienes) via the 'method' parameter. 
+    Weights allow setting different importance of antecedent and consequent.
     """
     def __init__(self, rngs: nnx.Rngs, method: str = 'lukasiewicz'):
         """
-        Initializes the parameters of the weighted implication.
-
         Args:
-            rngs (nnx.Rngs): Random number generator for Flax NNX.
-            method (str): Selected logical method. 
-                        Supported values: 'lukasiewicz', 'kleene_dienes', 'reichenbach'.
+            rngs (nnx.Rngs): Generator for parameters.
+            method (str): Selected logical semantics for implication.
         """
         self.method = method
-        
-        # An implication has 2 inputs: an antecedent (A) and a consequent (B).
-        # The weights are initialized to 1.0, which corresponds to the standard logical strength.
         self.weights = nnx.Param(jnp.ones((2,)))
-        # Beta determines the sensitivity threshold for activating the implication.
         self.beta = nnx.Param(jnp.array(1.0))
 
     def __call__(self, int_a: jnp.ndarray, int_b: jnp.ndarray) -> jnp.ndarray:
         """
-        Calculates the truth interval of an implication between two statements.
-
-        Args:
-            int_a (jnp.ndarray): Tensor for the antecedent (A) of the form (..., 2). 
-            int_b (jnp.ndarray): Tensor for the consequent (B) of the form (..., 2).
-
-        Returns:
-            jnp.ndarray: The resulting truth interval [L, U] of the form (..., 2).
-        
-        Raises:
-            ValueError: If an unsupported calculation method is set.
+        Calculates the truth interval of the implication.
         """
-        if self.method == 'lukasiewicz':
-            # Łukasiewicz uses internal weighted OR (¬A ∨ B).
-            return logic.implies_lukasiewicz(int_a, int_b, self.weights, self.beta)
-        
-        # For the Kleene-Dienes and Reichenbach methods, we apply weights as preprocessing.
-        # This scales the importance of the input before applying the logical function itself.
-        weighted_a = intervals.create_interval(
-            jnp.minimum(1.0, intervals.get_lower(int_a) * self.weights[0]),
-            jnp.minimum(1.0, intervals.get_upper(int_a) * self.weights[0])
+        return F.weighted_implication(
+            int_a, int_b, self.weights.value, self.beta.value, self.method
         )
-        weighted_b = intervals.create_interval(
-            jnp.minimum(1.0, intervals.get_lower(int_b) * self.weights[1]),
-            jnp.minimum(1.0, intervals.get_upper(int_b) * self.weights[1])
-        )
-
-        if self.method == 'kleene_dienes':
-            # max(1 - A, B)
-            return logic.implies_kleene_dienes(weighted_a, weighted_b)
-        elif self.method == 'reichenbach':
-            # 1 - A + (A * B)
-            return logic.implies_reichenbach(weighted_a, weighted_b)
-        else:
-            raise ValueError(f"Unsupported implication method: {self.method}")
         
         
 class WeightedNot(nnx.Module):
     """
-    Trainable weighted negation (NOT) gate for JLNN.
-
-    In interval logic, negation is defined as the inversion of truth limits: 
-    NOT [L, U] = [1 - U, 1 - L]. This class also introduces a trainable parameter 
-    weight, which allows the model to scale the influence of 
-    the input before the negation itself. 
-    This is useful in situations where the negated statement should be weakened 
-    or strengthened based on learned experience.
-
-    Semantics in JLNN:
-    - If the weight is 1.0, it is a standard Łukasiewicz negation.
-    - The operation correctly preserves epistemic uncertainty (interval width), 
-        it just maps it to the opposite side of the logical spectrum.
+    Trainable weighted negation (NOT) gate.
+    
+    The weight parameter allows the network to learn how strongly to invert a given input. 
+    This is useful in situations where negating a statement is only partially relevant 
+    or under certain conditions.
     """
     def __init__(self, rngs: nnx.Rngs):
-        """
-        Initializes the negation gate parameters.
-
-        Args:
-            rngs (nnx.Rngs): Random number generator for Flax NNX.
-        """
-        # Weight determines the strength (importance) of the negated input.
-        # Initialize to 1.0 for a neutral logical start.
         self.weight = nnx.Param(jnp.array(1.0))
 
     def __call__(self, x: jnp.ndarray) -> jnp.ndarray:
         """
-        Performs a forward weighted negation calculation over an interval.
-
-        The calculation takes place in two steps:
-        1. Applying a weight to the input interval (clipped to 1.0).
-        2. Interchanging and subtracting limits from one (negation).
-
-        Args:
-            x (jnp.ndarray): Input interval tensor of form (..., 2).
-
-        Returns:
-            jnp.ndarray: The resulting negated truth interval [L, U].
+        Applies a weighted negation to the input interval.
         """
-        # 1. Applying weight to interval limits.
-        # We use jnp.minimum so that the weighted input does not exceed the logical limit of 1.0.
-        weighted_x = intervals.create_interval(
-            jnp.minimum(1.0, intervals.get_lower(x) * self.weight.value),
-            jnp.minimum(1.0, intervals.get_upper(x) * self.weight.value)
-        )
-        
-        # 2. The negation of the interval itself: [L, U] -> [1 - U, 1 - L].
-        # Calls a function from jlnn.core.intervals.
-        return intervals.negate(weighted_x)
+        return F.weighted_not(x, self.weight.value)
