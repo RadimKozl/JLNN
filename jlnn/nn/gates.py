@@ -181,60 +181,82 @@ class WeightedNor(nnx.Module):
         # 2. Logická negace intervalu: [L, U] -> [1 - U, 1 - L]
         return intervals.negate(res_or)
 
-
 class WeightedXor(nnx.Module):
     """
-    Trainable weighted XOR gate (Exclusive OR) for JLNN.
+    Trainable weighted n-ary XOR gate (Exclusive OR) using Tree-reduction.
     
-    In automation, XOR is key for detecting mismatches (e.g. checking if two valves are in opposite states). 
-    In JLNN it is implemented using the composition: (A OR B) AND (A NAND B).
-    
-    Thanks to the use of internal weighted gates, 
-    this XOR can learn not only the classic logic table, 
-    but also "fuzzy" transitions and the importance 
-    of individual inputs for detecting exclusivity.
-    
-    The output interval correctly represents the degree of certainty 
-    that the inputs are in a different logical state.
+    In JLNN, the n-ary XOR is implemented as a recursive binary tree of 2-input XORs.
+    This architecture ensures that the gate correctly computes the parity function:
+    the output is 'True' if an odd number of inputs are 'True'.
+
+    Key features:
+    - **Scalability**: Automatically adjusts its internal structure based on `num_inputs`.
+    - **Hierarchical Learning**: Each binary XOR node in the tree has its own 
+      trainable weights (OR, NAND, AND branches), allowing the network to learn 
+      complex parity relationships with specific input importance.
+    - **JAX Compatibility**: The tree structure is fully differentiable and 
+      optimized for accelerated hardware.
     """
-    def __init__(self, rngs: nnx.Rngs):
+
+    def __init__(self, num_inputs: int, rngs: nnx.Rngs):
         """
-        Initializes the XOR gate using internal trainable modules.
+        Initializes the n-ary XOR gate as a tree of binary XOR operations.
 
         Args:
+            num_inputs (int): Total number of input logical signals.
             rngs (nnx.Rngs): Random number generator for parameter initialization.
         """
-                
-        # XOR is defined for 2 inputs in this basic version.
-        # We use previously defined gates, thus ensuring hierarchical
-        # learning of weights and thresholds (beta) in the entire XOR subgraph.
-        self.or_gate = WeightedOr(num_inputs=2, rngs=rngs)
-        self.nand_gate = WeightedNand(num_inputs=2, rngs=rngs)
-        
-        # Final aggregation of results from OR and NAND branches.
-        self.final_and = WeightedAnd(num_inputs=2, rngs=rngs)
+        if num_inputs < 2:
+            raise ValueError("XOR gate requires at least 2 inputs.")
+
+        self.num_inputs = num_inputs
+
+        if num_inputs == 2:
+            # Base case: standard binary XOR composition (A OR B) AND (A NAND B)
+            self.or_gate = WeightedOr(num_inputs=2, rngs=rngs)
+            self.nand_gate = WeightedNand(num_inputs=2, rngs=rngs)
+            self.final_and = WeightedAnd(num_inputs=2, rngs=rngs)
+            self.left_child = None
+            self.right_child = None
+        else:
+            # Recursive case: Tree-reduction
+            mid = num_inputs // 2
+            self.left_child = WeightedXor(num_inputs=mid, rngs=rngs)
+            self.right_child = WeightedXor(num_inputs=num_inputs - mid, rngs=rngs)
+            # The current node acts as a binary XOR combiner for its two children
+            self.combiner = WeightedXor(num_inputs=2, rngs=rngs)
 
     def __call__(self, x: jnp.ndarray) -> jnp.ndarray:
         """
-        Performs a forward weighted XOR calculation.
+        Performs a forward pass using recursive tree reduction.
 
         Args:
-            x (jnp.ndarray): Input interval tensor of the form (..., 2, 2). 
-                            The penultimate dimension must contain exactly two logical intervals.
+            x (jnp.ndarray): Input interval tensor of the form (..., num_inputs, 2).
+
         Returns:
             jnp.ndarray: Output truth interval [L, U] of the form (..., 2).
         """
-        
-        # 1. Parallel calculation of disjunction and negated conjunction
-        res_or = self.or_gate(x)
-        res_nand = self.nand_gate(x)
-        
-        # 2. Combine the partial results into a new tensor for the final AND gate.
-        # The stacking result has the form (..., 2, 2).
-        combined = jnp.stack([res_or, res_nand], axis=-2)
-        
-        # 3. Final conjunction indicating exclusivity
-        return self.final_and(combined)
+        if self.num_inputs == 2:
+            # Atomic binary XOR operation
+            res_or = self.or_gate(x)
+            res_nand = self.nand_gate(x)
+            combined = jnp.stack([res_or, res_nand], axis=-2)
+            return self.final_and(combined)
+        else:
+            # 1. Split inputs for the left and right subtrees
+            # x has shape (..., num_inputs, 2)
+            mid = self.num_inputs // 2
+            x_left = x[..., :mid, :]
+            x_right = x[..., mid:, :]
+
+            # 2. Recursive reduction
+            res_left = self.left_child(x_left)
+            res_right = self.right_child(x_right)
+
+            # 3. Combine results using a 2-input XOR at this level
+            # Shape of combined: (..., 2, 2)
+            combined_results = jnp.stack([res_left, res_right], axis=-2)
+            return self.combiner(combined_results)
 
 
 class WeightedImplication(nnx.Module):
