@@ -2,9 +2,10 @@
 
 # Imports
 import matplotlib.pyplot as plt
+import seaborn as sns
 import jax.numpy as jnp
 from jlnn.core import intervals
-from typing import Dict
+from typing import Dict, List, Optional
 
 def plot_truth_intervals(intervals_dict: Dict[str, jnp.ndarray], title: str = "JLNN Truth Intervals"):
     """
@@ -46,4 +47,40 @@ def plot_truth_intervals(intervals_dict: Dict[str, jnp.ndarray], title: str = "J
     ax.set_title(title)
     ax.grid(axis='x', linestyle='--', alpha=0.5)
     plt.tight_layout()
+    plt.show()
+    
+
+def plot_gate_weights(weights: jnp.ndarray, input_labels: List[str], gate_name: str = "Gate"):
+    """
+    Generates a heatmap to visualize the importance of each input for a specific gate.
+
+    In JLNN, weights (w >= 1.0) signify the relative importance of an antecedent. 
+    A higher weight means the model relies more heavily on that specific truth 
+    value to reach a logical conclusion.
+
+    Args:
+        weights (jnp.ndarray): Array of trained weights from a gate module.
+        input_labels (List[str]): Symbolic names for the input predicates (from metadata).
+        gate_name (str): Name of the gate being visualized.
+    """
+    plt.figure(figsize=(8, 6))
+    data = weights.reshape(1, -1)
+    sns.heatmap(data, annot=True, xticklabels=input_labels, yticklabels=[gate_name], cmap="YlGnBu")
+    plt.title(f"Learned Weight Importance for {gate_name}")
+    plt.xlabel("Input Predicates")
+    plt.show()
+
+def plot_training_log_loss(losses: List[float], title: str = "Training Convergence"):
+    """
+    Plots the loss curve over training iterations.
+    
+    Useful for monitoring how the logical constraints and truth values 
+    stabilize over time.
+    """
+    plt.plot(losses, label='Loss')
+    plt.title(title)
+    plt.xlabel('Epoch')
+    plt.ylabel('Loss Value')
+    plt.legend()
+    plt.grid(True, alpha=0.3)
     plt.show()
