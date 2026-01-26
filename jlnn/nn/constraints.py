@@ -34,7 +34,7 @@ def clip_weights(model: nnx.Module):
         if isinstance(param, nnx.Param):
             # We target weights across all gate types in gates.py
             # path[-1] represents the attribute name in the class definition
-            if path[-1] in ('weights', 'weight'):
+            if any(name in path[-1] for name in ('weights', 'weight')):
                 # Applying the maximum operation to trim the lower bound.
                 # In JAX, this operation is efficient and preserves the integrity of the calculation.
                 param.value = jnp.maximum(1.0, param.value)
