@@ -93,30 +93,30 @@ def total_lnn_loss(prediction: jnp.ndarray, target: jnp.ndarray, contradiction_w
 
 def logical_consistency_loss(model_output: jnp.ndarray, uncertainty_weight: float = 0.1) -> jnp.ndarray:
     """
-    Komplexní ztrátová funkce pro vynucení logické konzistence a jistoty modelu.
+    A complex loss function to enforce logical consistency and model certainty.
 
-    Tato funkce kombinuje dva aspekty:
-    1. **Validita (Hinge Loss)**: Penalizuje situace, kdy spodní mez (L) překročí horní mez (U). 
-       V korektní LNN logice musí vždy platit L <= U.
-    2. **Jistota (Uncertainty)**: Minimalizuje šířku intervalu (U - L). Motivuje model k tomu, 
+    This function combines two aspects:
+    1. **Validity (Hinge Loss)**: Penalizes situations where the lower bound (L) exceeds the upper bound (U). 
+       In correct LNN logic, L <= U must always hold.
+    2. **Certainty (Uncertainty)**: Minimizes the width of the interval (U - L). Encourages the model to move away from a neutral state of "don't know" (0, 1) towards a definitive "true" (1, 1) or "false" (0, 0).
        aby nezůstával v neutrálním stavu "nevím" (0, 1), ale směřoval k "pravda" (1, 1) nebo "nepravda" (0, 0).
 
     Args:
-        model_output (jnp.ndarray): Výstupní tensor modelu s intervaly ve tvaru (..., 2).
-        uncertainty_weight (float): Koeficient určující sílu tlaku na snižování neurčitosti. 
-            Defaultní hodnota 0.1 zajišťuje, že primárním cílem zůstává validita a přesnost.
+        model_output (jnp.ndarray): The model's output tensor with intervals of the form (..., 2).
+        uncertainty_weight (float): Coefficient determining the strength of the pressure to reduce uncertainty. 
+            Default value 0.1 ensures that validity and accuracy remain the primary goals.
 
     Returns:
-        jnp.ndarray: Skalární hodnota reprezentující celkovou nekonzistenci.
+        jnp.ndarray: Scalar value representing the total inconsistency.
     """
-    # Rozklad na spodní a horní mez pomocí core modulu
+    # Decomposition into lower and upper bounds using the core module
     l = intervals.get_lower(model_output)
     u = intervals.get_upper(model_output)
-    
-    # Penalizace za 'překřížení' (L > U). Pokud L <= U, hodnota je 0.
+
+    # Penalization for 'crossing' (L > U). If L <= U, the value is 0.
     violation = jnp.mean(jnp.maximum(0.0, l - u))
-    
-    # Penalizace za neurčitost (šířka intervalu). Chceme, aby se meze k sobě blížily.
+
+    # Penalization for uncertainty (interval width). We want the bounds to approach each other.
     uncertainty = jnp.mean(u - l)
     
     return violation + uncertainty_weight * uncertainty
