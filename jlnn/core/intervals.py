@@ -111,8 +111,8 @@ def uncertainty(interval: jnp.ndarray) -> jnp.ndarray:
         - Negative values: Indicate a logical contradiction (L > U).
 
     Args:
-        interval (jnp.ndarray): Tensor intervalů o tvaru (..., 2). 
-                            Poslední dimenze obsahuje dvojici [Lower Bound, Upper Bound].
+        interval (jnp.ndarray): A tensor of intervals of the form (..., 2). 
+                            The last dimension contains the pair [Lower Bound, Upper Bound].
 
     Returns:
         jnp.ndarray: A tensor containing the width of each interval of the shape (...). 
@@ -127,7 +127,7 @@ def uncertainty(interval: jnp.ndarray) -> jnp.ndarray:
 
 def negate(interval: jnp.ndarray) -> jnp.ndarray:
     """
-    Provede logickou negaci (NOT) nad pravdivostním intervalem.
+    Performs a logical negation (NOT) over a truth interval.
     
     In interval logic JLNN, negation is defined by the relation:
         NOT [L, U] = [1 - U, 1 - L].
@@ -141,7 +141,7 @@ def negate(interval: jnp.ndarray) -> jnp.ndarray:
                             The last dimension contains the pair [Lower Bound, Upper Bound].
 
     Returns:
-        jnp.ndarray: Negovaný intervalový tensor o tvaru (..., 2).
+        jnp.ndarray: Negated interval tensor of form (..., 2).
     """    
    
     # Extracting boundaries using previously defined getters

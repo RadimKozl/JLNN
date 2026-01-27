@@ -99,7 +99,7 @@ def logical_consistency_loss(model_output: jnp.ndarray, uncertainty_weight: floa
     1. **Validity (Hinge Loss)**: Penalizes situations where the lower bound (L) exceeds the upper bound (U). 
        In correct LNN logic, L <= U must always hold.
     2. **Certainty (Uncertainty)**: Minimizes the width of the interval (U - L). Encourages the model to move away from a neutral state of "don't know" (0, 1) towards a definitive "true" (1, 1) or "false" (0, 0).
-       aby nezůstával v neutrálním stavu "nevím" (0, 1), ale směřoval k "pravda" (1, 1) nebo "nepravda" (0, 0).
+       so that it does not remain in the neutral state "I don't know" (0, 1), but tends towards "true" (1, 1) or "false" (0, 0).
 
     Args:
         model_output (jnp.ndarray): The model's output tensor with intervals of the form (..., 2).
