@@ -13,7 +13,4 @@ Key Components:
 * **PredicateNode**: Represents input variables (leaves of the graph).
 * **NAryGateNode**: Zapouzdřuje n-ární hradla (AND, OR, XOR).
 
-.. autoclass:: JLNNModel
-   :members: __init__, __call__
-
-   Main class that unifies the process from a string formula to an executable model.
+Main class that unifies the process from a string formula to an executable model.

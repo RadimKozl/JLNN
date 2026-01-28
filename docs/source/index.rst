@@ -56,7 +56,7 @@ Key Components
    changelog
 
 Example of use
----------------
+----------------
 
 .. code-block:: python
 

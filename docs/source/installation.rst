@@ -45,7 +45,7 @@ If you want to contribute to JLNN or run tests, install the framework in editabl
     pip install -e ".[dev]"
 
 Verification of installation
------------------
+-----------------------------
 
 To verify that everything works correctly, you can perform a simple import in the Python console:
 
@@ -57,7 +57,7 @@ To verify that everything works correctly, you can perform a simple import in th
     print(f"Dostupná zařízení: {jax.devices()}")
 
 Support for OS
-----------
+---------------
 
 * **Linux**: Full support (recommended).
 * **macOS**: Support for Apple Silicon processors (M1/M2/M3) via Metal acceleration.

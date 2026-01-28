@@ -13,6 +13,3 @@ Key roles of the engine:
 * **JIT Compilation**: The ``infer`` method uses ``@nnx.jit`` to transform recursive logical calls into highly optimized code for GPU/TPU.
 * **Atomic Training**: The ``train_step`` method ensures that weight updates and subsequent logical projections (constraints) occur as a single indivisible operation.
 * **Abstraction**: A smooth interface for passing data in dictionary form (Dict) directly into symbolic predicates.
-
-.. autoclass:: JLNNEngine
-   :members: infer, train_step

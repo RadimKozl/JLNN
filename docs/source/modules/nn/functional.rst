@@ -17,16 +17,9 @@ Key features
 
 Overview of Gates
 -----------------
+Negation first applies a weight to the boundaries of the interval and then performs the inversion: :math:`[1-U_w, 1-L_w]`.
 
-.. autofunction:: weighted_and
-.. autofunction:: weighted_or
-.. autofunction:: weighted_not
-
-   Negation first applies a weight to the boundaries of the interval and then performs the inversion: :math:`[1-U_w, 1-L_w]`.
-
-.. autofunction:: weighted_implication
-
-   Supports multiple methods for calculating the truth of the rule :math:`A \to B`. The ``lukasiewicz`` method is recommended for consistency with weights and the :math:`\beta` threshold.
+Supports multiple methods for calculating the truth of the rule :math:`A \to B`. The ``lukasiewicz`` method is recommended for consistency with weights and the :math:`\beta` threshold.
 
 Advanced operations
 -------------------

@@ -1,10 +1,10 @@
 Utilities & Visualization (jlnn.utils)
-=====================================
+========================================
 
 Modul ``utils`` provides additional tools for working with the model, analyzing results, and visualizing learned knowledge.
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
 
    helpers
    metrics

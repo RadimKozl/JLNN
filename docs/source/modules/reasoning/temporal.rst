@@ -16,8 +16,3 @@ Implemented Operators:
 Use:
 --------
 Ideal for analyzing sensor data, where we seek persistent states (Always) or event detection (Eventually) in a sliding window.
-
-.. autoclass:: AlwaysNode
-   :members: forward
-.. autoclass:: EventuallyNode
-   :members: forward

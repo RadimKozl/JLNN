@@ -14,6 +14,3 @@ The function ``build_networkx_graph`` transforms the hierarchy of NNX modules in
 Import topology
 ----------------
 Thanks to the function ``from_networkx_to_jlnn``, it is possible to create a JLNN model directly from a NetworkX graph structure, allowing the construction of logical networks without needing to write textual formulas.
-
-.. autofunction:: build_networkx_graph
-.. autofunction:: from_networkx_to_jlnn

@@ -14,7 +14,4 @@ Mechanism of operation:
 2. Immediately applies projection using ``apply_constraints``.
 3. Gate weights are returned to the space :math:`w \geq 1` and predicate bounds are fixed.
 
-.. autoclass:: ProjectedOptimizer
-   :members: step
-
-   Wrapper over any ``optax`` optimizer. Ensures that the model satisfies logical axioms after each step.
+Wrapper over any ``optax`` optimizer. Ensures that the model satisfies logical axioms after each step.

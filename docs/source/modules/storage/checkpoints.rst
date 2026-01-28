@@ -14,8 +14,5 @@ Key Features:
 * **Compact storage**: Only ``nnx.Param`` type objects are stored (weights $w \ge 1$ and bias $\beta$).
 * **State integrity**: After loading a checkpoint, it is recommended to run :doc:`../nn/constraints`, to ensure logical consistency even after manual file modifications.
 
-.. autofunction:: save_checkpoint
-.. autofunction:: load_checkpoint
-
-   .. note::
-      When loading, the target model's structure (number of gates and inputs) must exactly match the saved state.
+.. note::
+   When loading, the target model's structure (number of gates and inputs) must exactly match the saved state.

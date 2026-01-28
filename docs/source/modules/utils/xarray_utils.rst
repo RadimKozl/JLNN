@@ -9,6 +9,3 @@ This module allows exporting model outputs to the ``xarray.Dataset`` format. Thi
 * **Labelled dimensions**: Access to data via predicate names instead of numerical indices.
 * **Advanced indexing**: Easy filtering of samples that exhibit high uncertainty.
 * **Serialization**: Easy saving of experimental results in NetCDF format.
-
-.. autofunction:: model_to_xarray
-.. autofunction:: extract_weights_to_xarray

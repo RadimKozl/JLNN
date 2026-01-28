@@ -21,14 +21,9 @@ Within **Logical Neural Networks (LNN)**, axiomatic conditions must be met for t
 Main Functions
 --------------
 
-.. autofunction:: apply_constraints
+This function should be called in each step of the training loop immediately after updating the weights:
 
-   This function should be called in each step of the training loop immediately after updating the weights:
+.. code-block:: python
 
-   .. code-block:: python
-
-      optimizer.update(grads)
-      apply_constraints(model)  # Ensuring logical integrity
-
-.. autofunction:: clip_weights
-.. autofunction:: clip_predicates
+   optimizer.update(grads)
+   apply_constraints(model)  # Ensuring logical integrity

@@ -14,6 +14,3 @@ A typical ``.json`` file contains:
 * **predicate_names**: List of names of input sensors/facts.
 * **logic_semantics**: Information about the used semantics (e.g., 'lukasiewicz').
 * **version**: Model version for tracking experiments.
-
-.. autofunction:: save_metadata
-.. autofunction:: load_metadata
