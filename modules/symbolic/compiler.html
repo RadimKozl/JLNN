@@ -1,0 +1,727 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../../">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html"><link rel="next" title="Graph &amp; NetworkX Integration" href="graph.html"><link rel="prev" title="Formula Parser" href="parser.html">
+
+    <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
+        <title>JLNN Compiler - JLNN v0.0.2 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../../index.html"><div class="brand">JLNN v0.0.2 documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
+  
+  <span class="sidebar-brand-text">JLNN v0.0.2 documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">User Guide:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../theory.html">Theoretical foundations of JLNN</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul class="current">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../core/index.html">Core Logic Engine (jlnn.core)</a><input aria-label="Toggle navigation of Core Logic Engine (jlnn.core)" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../core/activations.html">Activation Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../core/intervals.html">Interval Arithmetic</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../core/logic.html">Logical Kernels</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../export/index.html">Model Export &amp; Deployment (jlnn.export)</a><input aria-label="Toggle navigation of Model Export &amp; Deployment (jlnn.export)" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../export/data.html">Metadata &amp; State Export</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../export/onnx.html">ONNX Export</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../export/stablehlo.html">StableHLO Integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../export/torch_map.html">PyTorch Mapping</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../nn/index.html">Neural Network Components (jlnn.nn)</a><input aria-label="Toggle navigation of Neural Network Components (jlnn.nn)" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../nn/base.html">Base Logical Elements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../nn/constraints.html">Parameter Constraints</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../nn/functional.html">Functional Logic Kernels</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../nn/gates.html">Logical Gates (Stateful)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../nn/predicates.html">Learned Predicates</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../reasoning/index.html">Reasoning &amp; Inference Engine (jlnn.reasoning)</a><input aria-label="Toggle navigation of Reasoning &amp; Inference Engine (jlnn.reasoning)" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../reasoning/engine.html">JAX Execution Engine</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reasoning/inspector.html">Reasoning Inspector &amp; Audit</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reasoning/temporal.html">Temporal Logic Operators</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../storage/index.html">Model Storage &amp; Persistence (jlnn.storage)</a><input aria-label="Toggle navigation of Model Storage &amp; Persistence (jlnn.storage)" class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../storage/checkpoints.html">Model Checkpoints</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../storage/metadata.html">Model Metadata</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current has-children"><a class="reference internal" href="index.html">Symbolic Front-end (jlnn.symbolic)</a><input aria-label="Toggle navigation of Symbolic Front-end (jlnn.symbolic)" checked="" class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="parser.html">Formula Parser</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">JLNN Compiler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="graph.html">Graph &amp; NetworkX Integration</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../training/index.html">Training &amp; Optimization (jlnn.training)</a><input aria-label="Toggle navigation of Training &amp; Optimization (jlnn.training)" class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" role="switch" type="checkbox"/><label for="toctree-checkbox-7"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../training/losses.html">Logical Loss Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../training/optimizers.html">Projected Optimizers</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../utils/index.html">Utilities &amp; Visualization (jlnn.utils)</a><input aria-label="Toggle navigation of Utilities &amp; Visualization (jlnn.utils)" class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" role="switch" type="checkbox"/><label for="toctree-checkbox-8"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../utils/helpers.html">Helper Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../utils/metrics.html">Logical Metrics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../utils/visualize.html">Visualization Tools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../utils/xarray_utils.html">Xarray Integration</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">About the Project:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing to JLNN</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../changelog.html">Changelog</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="../../_sources/modules/symbolic/compiler.rst.txt" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="module-jlnn.symbolic.compiler">
+<span id="jlnn-compiler"></span><h1>JLNN Compiler<a class="headerlink" href="#module-jlnn.symbolic.compiler" title="Link to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="jlnn.symbolic.compiler.BinaryGateNode">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">jlnn.symbolic.compiler.</span></span><span class="sig-name descname"><span class="pre">BinaryGateNode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/jlnn/symbolic/compiler.html#BinaryGateNode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jlnn.symbolic.compiler.BinaryGateNode" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#jlnn.symbolic.compiler.Node" title="jlnn.symbolic.compiler.Node"><code class="xref py py-class docutils literal notranslate"><span class="pre">Node</span></code></a></p>
+<p>A computational node representing a binary logical operation in a JLNN graph.</p>
+<p>This node is used to connect two subtrees using a logic gate that requires exactly two inputs.
+In the Just-in-time Logical Neural Network architecture,
+this node is essential for operations where the semantics
+are defined by the relationship between the left (antecedent) and right (consequent) sides.</p>
+<p>Typical use cases:
+1. <strong>Implication (-&gt;)</strong>: Where the left side conditions the right side.
+2. <strong>Equivalence (&lt;-&gt;)</strong>: Expressing two-way logical agreement.
+3. <strong>Exclusive disjunction (XOR / ^)</strong>: Where the result depends on the difference of the inputs.</p>
+<p>Thanks to its fixed structure (left/right), this node allows for precise mapping of weights to specific inputs,
+which is especially critical for weighted implications defined in the parser as <cite>-&gt;[weight]</cite>.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="jlnn.symbolic.compiler.BinaryGateNode.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Array</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Array</span></span></span><a class="reference internal" href="../../_modules/jlnn/symbolic/compiler.html#BinaryGateNode.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jlnn.symbolic.compiler.BinaryGateNode.forward" title="Link to this definition">¶</a></dt>
+<dd><p>It recursively evaluates both subtrees and applies a binary logical function.</p>
+<p>The method runs the calculation for both the left and right branches in parallel
+(within the JAX graph) and passes the resulting truth intervals to the gate for processing.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>​​</strong> (<em>values</em>) – Dictionary of input data mapping variable names to JAX tensors.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>The resulting logical interval [L, U] of the form [batch_size, 2]</dt><dd><p>resulting from the interaction of both branches.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>jnp.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="jlnn.symbolic.compiler.JLNNCompiler">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">jlnn.symbolic.compiler.</span></span><span class="sig-name descname"><span class="pre">JLNNCompiler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rngs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Rngs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/jlnn/symbolic/compiler.html#JLNNCompiler"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jlnn.symbolic.compiler.JLNNCompiler" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Transformer</span></code></p>
+<p>A compiler transforming a syntax tree (CST) into a hierarchical NNX model.</p>
+<p>This class implements the Visitor design pattern, which recursively traverses
+the tree generated by the parser. However, instead of simply traversing,
+it performs “backsynthesizing”:
+1. <strong>Sheets</strong> (variables) are converted to <cite>PredicateNode</cite> instances.
+2. <strong>Branches</strong> (operators) are converted to the appropriate <cite>GateNode</cite> nodes.
+3. Insert <strong>Weights</strong> extracted from the text (e.g. 0.9) into the gate parameters.</p>
+<p>The result of the transformation is an object of type <cite>Node</cite>,
+which is the root of the entire computational graph and at the same time a standard <cite>flax.nnx.Module</cite>.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="jlnn.symbolic.compiler.JLNNCompiler.and_">
+<span class="sig-name descname"><span class="pre">and_</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">children</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#jlnn.symbolic.compiler.Node" title="jlnn.symbolic.compiler.Node"><span class="pre">Node</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#jlnn.symbolic.compiler.Node" title="jlnn.symbolic.compiler.Node"><span class="pre">Node</span></a></span></span><a class="reference internal" href="../../_modules/jlnn/symbolic/compiler.html#JLNNCompiler.and_"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jlnn.symbolic.compiler.JLNNCompiler.and_" title="Link to this definition">¶</a></dt>
+<dd><p>It builds a conjunctive node (Weighted AND).
+It allows n-ary connection of multiple subtrees into a single gate.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="jlnn.symbolic.compiler.JLNNCompiler.implication">
+<span class="sig-name descname"><span class="pre">implication</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">children</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#jlnn.symbolic.compiler.Node" title="jlnn.symbolic.compiler.Node"><span class="pre">Node</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#jlnn.symbolic.compiler.Node" title="jlnn.symbolic.compiler.Node"><span class="pre">Node</span></a></span></span><a class="reference internal" href="../../_modules/jlnn/symbolic/compiler.html#JLNNCompiler.implication"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jlnn.symbolic.compiler.JLNNCompiler.implication" title="Link to this definition">¶</a></dt>
+<dd><p>It constructs a standard binary implication (A -&gt; B).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="jlnn.symbolic.compiler.JLNNCompiler.not_">
+<span class="sig-name descname"><span class="pre">not_</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">children</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#jlnn.symbolic.compiler.Node" title="jlnn.symbolic.compiler.Node"><span class="pre">Node</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#jlnn.symbolic.compiler.Node" title="jlnn.symbolic.compiler.Node"><span class="pre">Node</span></a></span></span><a class="reference internal" href="../../_modules/jlnn/symbolic/compiler.html#JLNNCompiler.not_"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jlnn.symbolic.compiler.JLNNCompiler.not_" title="Link to this definition">¶</a></dt>
+<dd><p>Constructs a negation node (Weighted NOT).
+It is taking over one offspring.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="jlnn.symbolic.compiler.JLNNCompiler.or_">
+<span class="sig-name descname"><span class="pre">or_</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">children</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#jlnn.symbolic.compiler.Node" title="jlnn.symbolic.compiler.Node"><span class="pre">Node</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#jlnn.symbolic.compiler.Node" title="jlnn.symbolic.compiler.Node"><span class="pre">Node</span></a></span></span><a class="reference internal" href="../../_modules/jlnn/symbolic/compiler.html#JLNNCompiler.or_"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jlnn.symbolic.compiler.JLNNCompiler.or_" title="Link to this definition">¶</a></dt>
+<dd><p>Constructs a disjunctive node (Weighted OR).
+Aggregates any number of inputs into a single disjunctive gate.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="jlnn.symbolic.compiler.JLNNCompiler.variable">
+<span class="sig-name descname"><span class="pre">variable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tokens</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Token</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#jlnn.symbolic.compiler.Node" title="jlnn.symbolic.compiler.Node"><span class="pre">Node</span></a></span></span><a class="reference internal" href="../../_modules/jlnn/symbolic/compiler.html#JLNNCompiler.variable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jlnn.symbolic.compiler.JLNNCompiler.variable" title="Link to this definition">¶</a></dt>
+<dd><p>Processes the terminal node of a variable.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>tokens</strong> (<em>List</em><em>[</em><em>Token</em><em>]</em>) – A list of tokens from Lark, where the first is the variable name.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="jlnn.symbolic.compiler.JLNNCompiler.weighted_expr">
+<span class="sig-name descname"><span class="pre">weighted_expr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">children</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#jlnn.symbolic.compiler.Node" title="jlnn.symbolic.compiler.Node"><span class="pre">Node</span></a></span></span><a class="reference internal" href="../../_modules/jlnn/symbolic/compiler.html#JLNNCompiler.weighted_expr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jlnn.symbolic.compiler.JLNNCompiler.weighted_expr" title="Link to this definition">¶</a></dt>
+<dd><p>Processes a root expression with an optional fact weight (e.g. 0.9::A).</p>
+<p>If the expression contains a weight, this method captures it
+and can be used in the future for global calibration of the formula’s truthfulness.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="jlnn.symbolic.compiler.JLNNCompiler.weighted_implication">
+<span class="sig-name descname"><span class="pre">weighted_implication</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">children</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#jlnn.symbolic.compiler.Node" title="jlnn.symbolic.compiler.Node"><span class="pre">Node</span></a></span></span><a class="reference internal" href="../../_modules/jlnn/symbolic/compiler.html#JLNNCompiler.weighted_implication"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jlnn.symbolic.compiler.JLNNCompiler.weighted_implication" title="Link to this definition">¶</a></dt>
+<dd><p>It constructs a weighted implication with a specific rule strength.</p>
+<p>It uses a numeric value enclosed in square brackets (e.g. -&gt;[0.85])
+to directly initialize the gate weights.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>children</strong> – List [antecedent, weight, consequent].</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="jlnn.symbolic.compiler.JLNNModel">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">jlnn.symbolic.compiler.</span></span><span class="sig-name descname"><span class="pre">JLNNModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/jlnn/symbolic/compiler.html#JLNNModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jlnn.symbolic.compiler.JLNNModel" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
+<p>Complete Just-in-time Logical Neural Network (JLNN) model.</p>
+<p>This class represents a unifying wrapper that connects symbolic logic to
+a differentiable computational graph. The user defines the model using natural logical notation,
+which is automatically transformed into a hierarchical gate structure based on JAX.</p>
+<p>Main responsibilities:</p>
+<p>1. <strong>Orchestration</strong>: Controls the flow from the text formula through the syntax tree (Lark)
+to the instantiation of computing nodes (Node).</p>
+<p>2. <strong>State Management</strong>: Maintains references to all learnable predicates and logic gates,
+allowing Flax NNX to track parameters for optimization.</p>
+<p>3. <strong>Unified Inference</strong>: Provides a simple <cite>__call__</cite> interface for processing batch data
+(tensor dictionaries) in a single forward pass.</p>
+<p>The model is fully compatible with <cite>jax.jit</cite>, <cite>jax.grad</cite>
+and methods for applying logical constraints.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="jlnn.symbolic.compiler.NAryGateNode">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">jlnn.symbolic.compiler.</span></span><span class="sig-name descname"><span class="pre">NAryGateNode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/jlnn/symbolic/compiler.html#NAryGateNode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jlnn.symbolic.compiler.NAryGateNode" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#jlnn.symbolic.compiler.Node" title="jlnn.symbolic.compiler.Node"><code class="xref py py-class docutils literal notranslate"><span class="pre">Node</span></code></a></p>
+<p>A computational node representing a logical operation with a variable number of inputs.</p>
+<p>This node is used to efficiently group multiple conjunctions (AND),
+disjunctions (OR), or their negated variants (NAND, NOR) into a single operation.</p>
+<p>Main advantages:</p>
+<ul class="simple">
+<li><p><strong>Computational efficiency</strong>: Aggregating inputs into a single tensor (<cite>jnp.stack</cite>)
+allows for fast gate computation on GPU/TPU.</p></li>
+<li><p><strong>Structural clarity</strong>: Logical expressions of type ‘A &amp; B &amp; C &amp; D’
+are represented by a single node with four children instead of
+a cascade of three binary nodes.</p></li>
+<li><p><strong>Weight Flexibility</strong>: A gate inside this node (e.g. <cite>WeightedAnd</cite>)
+automatically adapts the number of its learnable weights to the number of descendants.</p></li>
+</ul>
+<p>Thanks to inheritance from <cite>nnx.Module</cite>, the weights assigned to individual inputs
+are automatically optimized during the training process.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="jlnn.symbolic.compiler.NAryGateNode.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Array</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Array</span></span></span><a class="reference internal" href="../../_modules/jlnn/symbolic/compiler.html#NAryGateNode.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jlnn.symbolic.compiler.NAryGateNode.forward" title="Link to this definition">¶</a></dt>
+<dd><p>Recursively evaluates all descendants and performs a bulk logical operation.</p>
+<p>The method first collects the truth intervals [L, U] from all descendants,
+folds them into a single data structure along the new axis, and passes the result to the gate.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>​​</strong> (<em>values</em>) – Dictionary of input data mapping variable names to JAX tensors.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>The resulting logical interval [L, U]</dt><dd><p>representing the aggregate truth of the entire group of operations.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>jnp.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="jlnn.symbolic.compiler.Node">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">jlnn.symbolic.compiler.</span></span><span class="sig-name descname"><span class="pre">Node</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/jlnn/symbolic/compiler.html#Node"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jlnn.symbolic.compiler.Node" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
+<p>Abstract base class for all nodes of the JLNN computational graph.</p>
+<p>This class defines a uniform interface for recursively evaluating compiler-generated logic trees.
+Each node in the graph represents either:</p>
+<ol class="arabic simple">
+<li><p><strong>List (Atom)</strong>: Instance of <cite>PredicateNode</cite> (input data transformed to truth).</p></li>
+<li><p><strong>Operation (Gate)</strong>: Instance of <cite>BinaryGateNode</cite> or <cite>NAryGateNode</cite> (logical connectors).</p></li>
+</ol>
+<p>Thanks to inheritance from <cite>nnx.Module</cite>, the entire resulting tree is perceived by the Flax library as
+a single hierarchical model. This allows:</p>
+<ul class="simple">
+<li><p><strong>Automatic parameter tracking</strong>: All weights and biases inside arbitrarily
+deeply embedded nodes are detectable to the optimizer.</p></li>
+<li><p><strong>Application of constraints</strong>: The <cite>apply_constraints</cite> function can recursively traverse
+the entire structure and fix gate weights.</p></li>
+<li><p><strong>JIT Compilation</strong>: The entire recursive traversal can be compiled
+using <cite>jax.jit</cite> for maximum performance on GPU/TPU.</p></li>
+</ul>
+<dl class="py method">
+<dt class="sig sig-object py" id="jlnn.symbolic.compiler.Node.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Array</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Array</span></span></span><a class="reference internal" href="../../_modules/jlnn/symbolic/compiler.html#Node.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jlnn.symbolic.compiler.Node.forward" title="Link to this definition">¶</a></dt>
+<dd><p>Recursively calculates the truth value of a given subtree (inference).</p>
+<p>The method implements a depth-first search. Each gate node first calls <cite>forward</cite>
+on its children and then applies its logical function (t-norm/t-conorm) to the results.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>​​</strong> (<em>values</em>) – Dictionary (map) of input data,
+where keys are variable names from a logical formula (e.g. ‘A’, ‘B’)
+and values ​​are JAX tensors (typically of the form [batch_size, features]).</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>Tensor of truth values ​​in the interval [0, 1] (LNN fuzzy logic).</dt><dd><p>The output usually has the form [batch_size], representing the truth value
+of the given (sub)formula for each instance in the batch.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>jnp.ndarray</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>NotImplementedError</strong> – If the method is called directly on the abstract class Node.
+    KeyError: If the input dictionary ‘values’ does not contain
+    a key required by the leaf node (predicate).</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="jlnn.symbolic.compiler.PredicateNode">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">jlnn.symbolic.compiler.</span></span><span class="sig-name descname"><span class="pre">PredicateNode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/jlnn/symbolic/compiler.html#PredicateNode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jlnn.symbolic.compiler.PredicateNode" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#jlnn.symbolic.compiler.Node" title="jlnn.symbolic.compiler.Node"><code class="xref py py-class docutils literal notranslate"><span class="pre">Node</span></code></a></p>
+<p>The terminal node (leaf) of a computational graph representing a learned logical predicate.</p>
+<p>This node serves as the data entry gateway into the logical network.</p>
+<p>Features:</p>
+<ul class="simple">
+<li><p><strong>Learning semantics</strong>: Thanks to the nested <cite>LearnedPredicate</cite>,
+the node learns how to interpret the input data to best fit the logical rules
+defined in the rest of the graph.</p></li>
+<li><p><strong>Knowledge Initialization</strong>: Supports setting an initial bias,
+which allows a priori expert knowledge to be inserted into the network
+(e.g. via <cite>0.9::A</cite> notation in the parser).</p></li>
+<li><p><strong>Variable Isolation</strong>: Each unique variable in a formula has its own <cite>PredicateNode</cite>,
+allowing independent learning of the interpretation for each symbol.</p></li>
+</ul>
+<dl class="py method">
+<dt class="sig sig-object py" id="jlnn.symbolic.compiler.PredicateNode.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Array</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Array</span></span></span><a class="reference internal" href="../../_modules/jlnn/symbolic/compiler.html#PredicateNode.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jlnn.symbolic.compiler.PredicateNode.forward" title="Link to this definition">¶</a></dt>
+<dd><p>It extracts the appropriate value from the inputs and performs logical grounding.</p>
+<p>Takes the tensor corresponding to <cite>self.name</cite> from the <cite>values</cite> dictionary
+and runs it through the sigmoidal predicate transform.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>​​</strong> (<em>values</em>) – Dictionary containing mappings
+of variable names to input JAX fields.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>Output tensor representing the logical interval [L, U].</dt><dd><p>The output has the form [batch_size, 2],
+where index 0 is the lower bound (L) and index 1 is the upper bound (U).</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>jnp.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="jlnn.symbolic.compiler.UnaryGateNode">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">jlnn.symbolic.compiler.</span></span><span class="sig-name descname"><span class="pre">UnaryGateNode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/jlnn/symbolic/compiler.html#UnaryGateNode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jlnn.symbolic.compiler.UnaryGateNode" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#jlnn.symbolic.compiler.Node" title="jlnn.symbolic.compiler.Node"><code class="xref py py-class docutils literal notranslate"><span class="pre">Node</span></code></a></p>
+<p>A computational node representing a unary logical operation in a JLNN graph.</p>
+<p>This node acts as a wrapper for unary gates that accept only one input logical interval.
+Within the Just-in-time Logical Neural Network architecture,
+it is necessary for implementing operations that modify the truth value of a subordinate expression.</p>
+<p>Main use cases:</p>
+<p>1. <strong>Logical Negation</strong>: Typically uses the <cite>WeightedNot</cite> gate to invert
+the truth interval [L, U] to [1-U, 1-L].</p>
+<p>2. <strong>Temporal operators</strong>: Serves as a basis for future implementation of the “Always” (G),
+“Sometimes” (F), or “Next” (X) operators, which are already reserved in the defined grammar.</p>
+<p>Thanks to encapsulation in <cite>nnx.Module</cite>, the parameters of the nested gate (e.g. the weights in <cite>WeightedNot</cite>)
+are fully trainable and subject to global constraints using <cite>apply_constraints</cite>.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="jlnn.symbolic.compiler.UnaryGateNode.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Array</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Array</span></span></span><a class="reference internal" href="../../_modules/jlnn/symbolic/compiler.html#UnaryGateNode.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jlnn.symbolic.compiler.UnaryGateNode.forward" title="Link to this definition">¶</a></dt>
+<dd><p>Recursively evaluates the child and applies the unary operation.</p>
+<p>The method first delves deeper into the graph by calling <cite>forward</cite>
+on the <cite>self.child</cite> object and then passes the obtained
+truth interval (tensor) to the assigned gate.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>​</strong> (<em>values</em>) – Dictionary of input data mapping variable names to JAX tensors.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The resulting transformed logical interval of the form [batch_size, 2].</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>jnp.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<p>The compiler recursively traverses the syntax tree from the parser and creates corresponding <strong>NNX modules</strong> for each node. The result is a hierarchical model that can be trained directly.</p>
+<section id="key-components">
+<h2>Key Components:<a class="headerlink" href="#key-components" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><strong>Node</strong>: Abstract base for all graph nodes. Ensures recursive <code class="docutils literal notranslate"><span class="pre">forward</span></code> calls.</p></li>
+<li><p><strong>PredicateNode</strong>: Represents input variables (leaves of the graph).</p></li>
+<li><p><strong>NAryGateNode</strong>: Zapouzdřuje n-ární hradla (AND, OR, XOR).</p></li>
+</ul>
+<p>Main class that unifies the process from a string formula to an executable model.</p>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="graph.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">Graph &amp; NetworkX Integration</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="parser.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Formula Parser</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2026, Ing. Radim Közl
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">JLNN Compiler</a><ul>
+<li><a class="reference internal" href="#jlnn.symbolic.compiler.BinaryGateNode"><code class="docutils literal notranslate"><span class="pre">BinaryGateNode</span></code></a><ul>
+<li><a class="reference internal" href="#jlnn.symbolic.compiler.BinaryGateNode.forward"><code class="docutils literal notranslate"><span class="pre">BinaryGateNode.forward()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#jlnn.symbolic.compiler.JLNNCompiler"><code class="docutils literal notranslate"><span class="pre">JLNNCompiler</span></code></a><ul>
+<li><a class="reference internal" href="#jlnn.symbolic.compiler.JLNNCompiler.and_"><code class="docutils literal notranslate"><span class="pre">JLNNCompiler.and_()</span></code></a></li>
+<li><a class="reference internal" href="#jlnn.symbolic.compiler.JLNNCompiler.implication"><code class="docutils literal notranslate"><span class="pre">JLNNCompiler.implication()</span></code></a></li>
+<li><a class="reference internal" href="#jlnn.symbolic.compiler.JLNNCompiler.not_"><code class="docutils literal notranslate"><span class="pre">JLNNCompiler.not_()</span></code></a></li>
+<li><a class="reference internal" href="#jlnn.symbolic.compiler.JLNNCompiler.or_"><code class="docutils literal notranslate"><span class="pre">JLNNCompiler.or_()</span></code></a></li>
+<li><a class="reference internal" href="#jlnn.symbolic.compiler.JLNNCompiler.variable"><code class="docutils literal notranslate"><span class="pre">JLNNCompiler.variable()</span></code></a></li>
+<li><a class="reference internal" href="#jlnn.symbolic.compiler.JLNNCompiler.weighted_expr"><code class="docutils literal notranslate"><span class="pre">JLNNCompiler.weighted_expr()</span></code></a></li>
+<li><a class="reference internal" href="#jlnn.symbolic.compiler.JLNNCompiler.weighted_implication"><code class="docutils literal notranslate"><span class="pre">JLNNCompiler.weighted_implication()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#jlnn.symbolic.compiler.JLNNModel"><code class="docutils literal notranslate"><span class="pre">JLNNModel</span></code></a></li>
+<li><a class="reference internal" href="#jlnn.symbolic.compiler.NAryGateNode"><code class="docutils literal notranslate"><span class="pre">NAryGateNode</span></code></a><ul>
+<li><a class="reference internal" href="#jlnn.symbolic.compiler.NAryGateNode.forward"><code class="docutils literal notranslate"><span class="pre">NAryGateNode.forward()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#jlnn.symbolic.compiler.Node"><code class="docutils literal notranslate"><span class="pre">Node</span></code></a><ul>
+<li><a class="reference internal" href="#jlnn.symbolic.compiler.Node.forward"><code class="docutils literal notranslate"><span class="pre">Node.forward()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#jlnn.symbolic.compiler.PredicateNode"><code class="docutils literal notranslate"><span class="pre">PredicateNode</span></code></a><ul>
+<li><a class="reference internal" href="#jlnn.symbolic.compiler.PredicateNode.forward"><code class="docutils literal notranslate"><span class="pre">PredicateNode.forward()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#jlnn.symbolic.compiler.UnaryGateNode"><code class="docutils literal notranslate"><span class="pre">UnaryGateNode</span></code></a><ul>
+<li><a class="reference internal" href="#jlnn.symbolic.compiler.UnaryGateNode.forward"><code class="docutils literal notranslate"><span class="pre">UnaryGateNode.forward()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#key-components">Key Components:</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../../_static/documentation_options.js?v=1812e922"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../_static/scripts/furo.js?v=46bd48cc"></script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    </body>
+</html>
