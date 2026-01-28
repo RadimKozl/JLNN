@@ -15,7 +15,7 @@ def model_to_xarray(gate_outputs: Dict[str, jnp.ndarray], predicate_names: List[
 
     Args:
         gate_outputs (Dict[str, jnp.ndarray]): Mapping of gate names to their output tensors 
-                                               of shape (batch, 2).
+            of shape (batch, 2).
         predicate_names (List[str]): List of labels for the dimension coordinates.
 
     Returns:

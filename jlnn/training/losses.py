@@ -20,7 +20,7 @@ def contradiction_loss(interval: jnp.ndarray) -> jnp.ndarray:
     
     Args:
         interval (jnp.ndarray): A tensor of intervals of the form (..., 2). 
-                            The last dimension contains the pair [Lower Bound, Upper Bound].
+            The last dimension contains the pair [Lower Bound, Upper Bound].
                             
     Returns:
         jnp.ndarray: A scalar value representing the average contradiction loss.
@@ -97,9 +97,9 @@ def logical_consistency_loss(model_output: jnp.ndarray, uncertainty_weight: floa
 
     This function combines two aspects:
     1. **Validity (Hinge Loss)**: Penalizes situations where the lower bound (L) exceeds the upper bound (U). 
-       In correct LNN logic, L <= U must always hold.
+    In correct LNN logic, L <= U must always hold.
     2. **Certainty (Uncertainty)**: Minimizes the width of the interval (U - L). Encourages the model to move away from a neutral state of "don't know" (0, 1) towards a definitive "true" (1, 1) or "false" (0, 0).
-       so that it does not remain in the neutral state "I don't know" (0, 1), but tends towards "true" (1, 1) or "false" (0, 0).
+    so that it does not remain in the neutral state "I don't know" (0, 1), but tends towards "true" (1, 1) or "false" (0, 0).
 
     Args:
         model_output (jnp.ndarray): The model's output tensor with intervals of the form (..., 2).

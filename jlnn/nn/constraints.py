@@ -60,11 +60,11 @@ def clip_predicates(model: nnx.Module):
     1. The function searches for all 'offset_u' parameters in the model graph.
     2. Dynamically searches for the corresponding 'offset_l' within the same module.
     3. If the gradient moves 'offset_u' above the 'offset_l' value, 
-        the function moves (projects) it back to the equality boundary.
+    the function moves (projects) it back to the equality boundary.
 
     Args:
         model (nnx.Module): An instance of the Flax NNX model for which input predicate consistency is required. 
-                        Modification is done in-place.
+            Modification is done in-place.
     """
     # We traverse the model graph and look for parameters affecting the upper bounds of the predicates
     for path, param in model.iter_graph():
@@ -99,11 +99,13 @@ def apply_constraints(model: nnx.Module):
 
     Main tasks of the function:
     1. Guarantees interpretability: Returns gate weights to the range >= 1.0,
-        ensuring that gates behave as t-norms/t-conorms.
+    ensuring that gates behave as t-norms/t-conorms.
+    
     2. Prevents logical conflicts: Adjusts predicate parameters so that L <= U always holds, 
-        thus eliminating the emergence of internal contradictions at the input data level.
+    thus eliminating the emergence of internal contradictions at the input data level.
+    
     3. Stabilizes learning: Keeps the model in the space of valid logical formulas, 
-        which prevents numerical instability in deep logical graphs.
+    which prevents numerical instability in deep logical graphs.
 
     Args:
         model (nnx.Module): An instance of 

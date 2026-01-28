@@ -37,8 +37,8 @@ class AlwaysNode(Node):
         Calculates the truth interval for the Globally operator.
 
         The input data 'values' is expected to be in the form (batch, time, features). 
-        The node first recursively obtains the truth values ​
-        ​from the child and then performs aggregation over the timeline.
+        The node first recursively obtains the truth values 
+        from the child and then performs aggregation over the timeline.
 
         Args:
             values ​​(Dict[str, jnp.ndarray]): Dictionary of input tensors.

@@ -88,11 +88,11 @@ def implies_lukasiewicz(int_a: jnp.ndarray, int_b: jnp.ndarray, weights: jnp.nda
 
     Args:
         int_a (jnp.ndarray): Tensor for the antecedent (presupposition A) of the form (..., 2). 
-                            The last dimension contains [Lower Bound, Upper Bound].
+            The last dimension contains [Lower Bound, Upper Bound].
         int_b (jnp.ndarray): Tensor for the consequent (consequent B) of the form (..., 2). 
-                            The last dimension contains [Lower Bound, Upper Bound].
+            The last dimension contains [Lower Bound, Upper Bound].
         weights (jnp.ndarray): Tensor of weights for an OR gate of the form (2,). 
-                            The first weight is applied to ¬A, the second to B. Typically initialized to [1, 1].
+            The first weight is applied to ¬A, the second to B. Typically initialized to [1, 1].
         beta (float): Threshold (bias) determining the stringency of the implication activation.
 
     Returns:
@@ -133,9 +133,9 @@ def implies_kleene_dienes(int_a: jnp.ndarray, int_b: jnp.ndarray) -> jnp.ndarray
         int_b (jnp.ndarray): Input interval for the consequent of the form (..., 2).
     Returns:
         jnp.ndarray: The resulting truth interval [L, U] of the form (..., 2). 
-                    The calculation is as follows:
-                        L_res = max(1 - U_a, L_b)
-                        U_res = max(1 - L_a, U_b)
+            The calculation is as follows:
+                L_res = max(1 - U_a, L_b)
+                U_res = max(1 - L_a, U_b)
     """
     
     # Calculating the negation of the antecedent (NOT A) in interval arithmetic    
@@ -171,10 +171,10 @@ def implies_reichenbach(int_a: jnp.ndarray, int_b: jnp.ndarray) -> jnp.ndarray:
 
     Returns:
         jnp.ndarray: The resulting truth interval [L, U] of the form (..., 2). 
-                    The calculation is performed with respect to interval arithmetic:
-                    L_res = 1 - U_a + (L_a * L_b)
-                    U_res = 1 - L_a + (U_a * U_b)
-                    The result is treated with the clip function to keep the values ​​in the range [0, 1].
+            The calculation is performed with respect to interval arithmetic:
+                L_res = 1 - U_a + (L_a * L_b)
+                U_res = 1 - L_a + (U_a * U_b)
+                The result is treated with the clip function to keep the values ​​in the range [0, 1].
     """    
     
     # Extract limits for both input intervals

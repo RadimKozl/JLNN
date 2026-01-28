@@ -15,17 +15,19 @@ class Node(nnx.Module):
     
     This class defines a uniform interface for recursively evaluating compiler-generated logic trees. 
     Each node in the graph represents either:
+
     1. **List (Atom)**: Instance of `PredicateNode` (input data transformed to truth).
     2. **Operation (Gate)**: Instance of `BinaryGateNode` or `NAryGateNode` (logical connectors).
 
     Thanks to inheritance from `nnx.Module`, the entire resulting tree is perceived by the Flax library as 
     a single hierarchical model. This allows:
+
     - **Automatic parameter tracking**: All weights and biases inside arbitrarily 
-                                    deeply embedded nodes are detectable to the optimizer.
+      deeply embedded nodes are detectable to the optimizer. 
     - **Application of constraints**: The `apply_constraints` function can recursively traverse 
-                                    the entire structure and fix gate weights.
+      the entire structure and fix gate weights. 
     - **JIT Compilation**: The entire recursive traversal can be compiled 
-                        using `jax.jit` for maximum performance on GPU/TPU.
+      using `jax.jit` for maximum performance on GPU/TPU. 
     """
 
     def forward(self, values: Dict[str, jnp.ndarray]) -> jnp.ndarray:
@@ -37,18 +39,18 @@ class Node(nnx.Module):
 
         Args:
             values ​​(Dict[str, jnp.ndarray]): Dictionary (map) of input data, 
-                                    where keys are variable names from a logical formula (e.g. 'A', 'B') 
-                                    and values ​​are JAX tensors (typically of the form [batch_size, features]).
+                where keys are variable names from a logical formula (e.g. 'A', 'B') 
+                and values ​​are JAX tensors (typically of the form [batch_size, features]).
 
         Returns:
             jnp.ndarray: Tensor of truth values ​​in the interval [0, 1] (LNN fuzzy logic). 
-                    The output usually has the form [batch_size], representing the truth value 
-                    of the given (sub)formula for each instance in the batch.
+                The output usually has the form [batch_size], representing the truth value 
+                of the given (sub)formula for each instance in the batch.
 
         Raises:
             NotImplementedError: If the method is called directly on the abstract class Node. 
-                        KeyError: If the input dictionary 'values' does not contain 
-                        a key required by the leaf node (predicate).
+                KeyError: If the input dictionary 'values' does not contain 
+                a key required by the leaf node (predicate).
         """
         raise NotImplementedError
 
@@ -57,19 +59,17 @@ class PredicateNode(Node):
     The terminal node (leaf) of a computational graph representing a learned logical predicate.
     
     This node serves as the data entry gateway into the logical network. 
-    Its main task is to take a raw numerical value (e.g., sensory data or probability) 
-    and transform it into a logical interval [L, U] (Lower and Upper bound) 
-    using the `LearnedPredicate` layer.
 
     Features:
+
     - **Learning semantics**: Thanks to the nested `LearnedPredicate`, 
-        the node learns how to interpret the input data to best fit the logical rules 
-        defined in the rest of the graph.
+      the node learns how to interpret the input data to best fit the logical rules 
+      defined in the rest of the graph. 
     - **Knowledge Initialization**: Supports setting an initial bias, 
-        which allows a priori expert knowledge to be inserted into the network 
-        (e.g. via `0.9::A` notation in the parser).
+      which allows a priori expert knowledge to be inserted into the network 
+      (e.g. via `0.9::A` notation in the parser). 
     - **Variable Isolation**: Each unique variable in a formula has its own `PredicateNode`, 
-        allowing independent learning of the interpretation for each symbol.
+      allowing independent learning of the interpretation for each symbol. 
     """
 
     def __init__(self, name: str, rngs: nnx.Rngs, initial_bias: float = 0.0):
@@ -80,7 +80,7 @@ class PredicateNode(Node):
             name (str): Variable identifier corresponding to the name in the logical formula (e.g. "A").
             rngs (nnx.Rngs): Random number generator for initializing predicate parameters.
             initial_bias (float): Initial bias value. Used to project fact weights from the parser 
-                        (e.g. from '0.9::A') into the initial state of the predicate.
+                (e.g. from '0.9::A') into the initial state of the predicate.
         """
         self.name = name
         # Initialize the learning layer itself from predicates.py
@@ -100,12 +100,12 @@ class PredicateNode(Node):
 
         Args:
             values ​​(Dict[str, jnp.ndarray]): Dictionary containing mappings 
-                                    of variable names to input JAX fields.
+                of variable names to input JAX fields.
 
         Returns:
             jnp.ndarray: Output tensor representing the logical interval [L, U]. 
-                    The output has the form [batch_size, 2], 
-                    where index 0 is the lower bound (L) and index 1 is the upper bound (U).
+                The output has the form [batch_size, 2], 
+                where index 0 is the lower bound (L) and index 1 is the upper bound (U).
         """
         # Get input for this specific variable
         x = values[self.name]
@@ -123,10 +123,12 @@ class UnaryGateNode(Node):
     it is necessary for implementing operations that modify the truth value of a subordinate expression.
 
     Main use cases:
+    
     1. **Logical Negation**: Typically uses the `WeightedNot` gate to invert 
-        the truth interval [L, U] to [1-U, 1-L].
+    the truth interval [L, U] to [1-U, 1-L].
+    
     2. **Temporal operators**: Serves as a basis for future implementation of the "Always" (G), 
-        "Sometimes" (F), or "Next" (X) operators, which are already reserved in the defined grammar.
+    "Sometimes" (F), or "Next" (X) operators, which are already reserved in the defined grammar.
 
     Thanks to encapsulation in `nnx.Module`, the parameters of the nested gate (e.g. the weights in `WeightedNot`) 
     are fully trainable and subject to global constraints using `apply_constraints`.
@@ -138,9 +140,9 @@ class UnaryGateNode(Node):
 
         Args:
             gate (nnx.Module): An instance of a unary gate (e.g. from the gates.py module) 
-                    that performs the actual mathematical calculation of the logical function.
+                that performs the actual mathematical calculation of the logical function.
             child (Node): A child node (descendant) in the logical 
-                    tree whose output will be processed by this gate.
+                tree whose output will be processed by this gate.
         """
         self.gate = gate
         self.child = child
@@ -224,21 +226,19 @@ class NAryGateNode(Node):
 
     This node is used to efficiently group multiple conjunctions (AND), 
     disjunctions (OR), or their negated variants (NAND, NOR) into a single operation. 
-    In the JLNN architecture, this approach is preferred over binary chaining because 
-    it reduces the depth of recursion and allows the gate to process all arguments 
-    at once using matrix operations.
 
     Main advantages:
+
     - **Computational efficiency**: Aggregating inputs into a single tensor (`jnp.stack`) 
-        allows for fast gate computation on GPU/TPU.
+      allows for fast gate computation on GPU/TPU. 
     - **Structural clarity**: Logical expressions of type 'A & B & C & D' 
-        are represented by a single node with four children instead of 
-        a cascade of three binary nodes.
+      are represented by a single node with four children instead of 
+      a cascade of three binary nodes. 
     - **Weight Flexibility**: A gate inside this node (e.g. `WeightedAnd`) 
-        automatically adapts the number of its learnable weights to the number of descendants.
+      automatically adapts the number of its learnable weights to the number of descendants. 
 
     Thanks to inheritance from `nnx.Module`, the weights assigned to individual inputs 
-    are automatically optimized during the training process.
+    are automatically optimized during the training process. 
     """
 
     def __init__(self, gate: nnx.Module, children: List[Node]):
@@ -247,9 +247,9 @@ class NAryGateNode(Node):
 
         Args:
             gate (nnx.Module): A bulk gate instance from the gates.py module that requires 
-                            a 'num_inputs' parameter (e.g. WeightedAnd, WeightedOr).
+                a 'num_inputs' parameter (e.g. WeightedAnd, WeightedOr).
             children (List[Node]): List of all child nodes (arguments) 
-                            whose truth values ​​enter the operation.
+                whose truth values ​​enter the operation.
         """
         self.gate = gate
         self.children = children
@@ -409,12 +409,15 @@ class JLNNModel(nnx.Module):
     which is automatically transformed into a hierarchical gate structure based on JAX.
 
     Main responsibilities:
+    
     1. **Orchestration**: Controls the flow from the text formula through the syntax tree (Lark) 
-            to the instantiation of computing nodes (Node).
+    to the instantiation of computing nodes (Node).
+    
     2. **State Management**: Maintains references to all learnable predicates and logic gates, 
-            allowing Flax NNX to track parameters for optimization.
+    allowing Flax NNX to track parameters for optimization.
+    
     3. **Unified Inference**: Provides a simple `__call__` interface for processing batch data 
-            (tensor dictionaries) in a single forward pass.
+    (tensor dictionaries) in a single forward pass.
 
     The model is fully compatible with `jax.jit`, `jax.grad` 
     and methods for applying logical constraints.
@@ -458,7 +461,7 @@ class JLNNModel(nnx.Module):
 
         Returns:
             jnp.ndarray: The resulting logical interval [L, U] for the entire formula. 
-                    The output format is typically [batch_size, 2].
+                The output format is typically [batch_size, 2].
         """
         # Run recursive forward pass from root node
         return self.root.forward(inputs)

@@ -17,9 +17,9 @@ def save_checkpoint(model: nnx.Module, filepath: Union[str, Path]):
 
     Args:
         model (nnx.Module): An instance of the logical model whose parameters 
-                        (including the weights w >= 1.0 enforced in constraints.py) are to be stored.
+            (including the weights w >= 1.0 enforced in constraints.py) are to be stored.
         filepath (Union[str, Path]): The path to the target file (usually with a .pkl extension). 
-                                If the directory does not exist, it will be created automatically.
+            If the directory does not exist, it will be created automatically.
 
     Example:
         >>> model = WeightedXor(num_inputs=4, rngs=nnx.Rngs(42))

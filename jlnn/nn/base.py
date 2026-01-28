@@ -19,9 +19,9 @@ class LogicalElement(nnx.Module):
 
     Attributes:
         weights (nnx.Param): Trainable weights for each input. 
-                            In LNN, they are initialized to 1.0 (neutral influence).
+            In LNN, they are initialized to 1.0 (neutral influence).
         beta (nnx.Param): Trainable gate bias, 
-                        determining the steepness of the logic activation.
+            determining the steepness of the logic activation.
 
     Raises:
         NotImplementedError: _description_
@@ -46,7 +46,7 @@ class LogicalElement(nnx.Module):
 
         Args:
             x (jnp.ndarray): Input interval tensor of the form (..., n_inputs, 2). 
-                            The last dimension contains [L, U].
+                The last dimension contains [L, U].
 
         Raises:
             jnp.ndarray: The resulting truth interval [L, U].

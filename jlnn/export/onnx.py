@@ -20,13 +20,13 @@ def export_to_stablehlo(model: nnx.Module, sample_input: jnp.ndarray):
     
     Args:
         model (nnx.Module): The trained JLNN model instance containing logic gates
-                           (WeightedAnd, WeightedOr, WeightedXor, etc.).
+            (WeightedAnd, WeightedOr, WeightedXor, etc.).
         sample_input (jnp.ndarray): A sample input tensor representing truth intervals
-                                   of shape (..., 2). Used for shape and dtype tracing.
+            of shape (..., 2). Used for shape and dtype tracing.
     
     Returns:
         jax.export.Exported: Exported StableHLO model artifact that can be serialized
-                            or executed.
+            or executed.
     
     Example:
         >>> model = MyJLNNModel(...)

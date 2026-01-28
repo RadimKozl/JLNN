@@ -25,15 +25,13 @@ def export_to_stablehlo(model: nnx.Module, sample_input: jnp.ndarray) -> jax.exp
     
     Args:
         model (nnx.Module): The logic-based neural network (Flax NNX) containing
-                           logical gates such as WeightedAnd, WeightedOr, etc.
+            logical gates such as WeightedAnd, WeightedOr, etc.
         sample_input (jnp.ndarray): Input data representing truth intervals 
-                                   (shape: [..., 2]) used to trace shapes and dtypes
-                                   during compilation.
+            (shape: [..., 2]) used to trace shapes and dtypes during compilation.
     
     Returns:
         jax.export.Exported: An object containing the StableHLO MLIR module 
-                            and serialized model state. Can be inspected via
-                            .mlir_module() or executed via .call().
+            and serialized model state. Can be inspected via .mlir_module() or executed via .call().
     
     References:
         - StableHLO Specification: https://openxla.org/stablehlo
@@ -104,9 +102,9 @@ def save_stablehlo_artifact(exported: jax.export.Exported, path: str):
     
     Args:
         exported (jax.export.Exported): The exported StableHLO model artifact
-                                       returned by export_to_stablehlo().
+            returned by export_to_stablehlo().
         path (str): Destination file path for the serialized artifact.
-                   Convention: use .stablehlo or .mlir extension.
+            Convention: use .stablehlo or .mlir extension.
     
     References:
         - OpenXLA StableHLO: https://openxla.org/stablehlo
@@ -145,7 +143,7 @@ def inspect_stablehlo_module(exported: jax.export.Exported, verbose: bool = Fals
     Args:
         exported (jax.export.Exported): The exported StableHLO model.
         verbose (bool): If True, prints the full MLIR module.
-                       If False, prints only a summary.
+            If False, prints only a summary.
     
     Example:
         >>> exported = export_to_stablehlo(model, sample_input)

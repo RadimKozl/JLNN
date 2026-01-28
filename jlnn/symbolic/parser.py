@@ -57,14 +57,15 @@ class FormulaParser:
 
     ### Supported semantics:
     1. **Fact weights (`0.9::A`)**: Allows you to define the initial truth value of the predicate. 
-                                In `predicates.py`, this value is used to 
-                                set the initial offsets of the sigmoid.
+    In `predicates.py`, this value is used to set the initial offsets of the sigmoid.
+    
     2. **Weighted rules (`->[0.85]`)**: Defines the strength of the logical connection between 
-                                the antecedent and consequent. This value maps directly to the `weights` parameter 
-                                in `WeightedImplication`.
+    the antecedent and consequent. This value maps directly to the `weights` parameter in `WeightedImplication`.
+    
     3. **Complete gate set**: Support for AND, OR, XOR, NAND, NOR.
+    
     4. **Temporal preparation**: The grammar contains reserved operators G (Always), 
-                                F (Eventually), and X (Next) for linear temporal logic (LTL).
+    F (Eventually), and X (Next) for linear temporal logic (LTL).
 
     The parser uses the LALR(1) algorithm for deterministic and lightning-fast 
     parsing during model initialization.

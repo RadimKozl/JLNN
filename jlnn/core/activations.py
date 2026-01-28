@@ -11,7 +11,8 @@ def identity_activation(x: jnp.ndarray) -> jnp.ndarray:
     
     This activation function is used in JLNN primarily as 
     a numerical safeguard in places where inputs already semantically represent truth values 
-    ​​(e.g., outputs from predicates or other gates). 
+    ​(e.g., outputs from predicates or other gates).
+    
     It ensures that minor numerical inaccuracies arising from floating point calculations 
     do not lead to values ​​outside the valid logical range.
     
@@ -37,8 +38,8 @@ def lukasiewicz_and_activation(sum_val: jnp.ndarray, beta: jnp.ndarray) -> jnp.n
     This function transforms the weighted sum of the logical negations 
     of the inputs into the resulting truth value. In LNN logic, 
     the beta parameter plays the role of a sensitivity threshold: 
-        if the weighted sum of the 'false's' on the inputs exceeds the beta value, 
-        the gate output linearly drops to zero.
+    if the weighted sum of the 'false's' on the inputs exceeds the beta value, 
+    the gate output linearly drops to zero.
 
     Mathematical relationship:
     f(s, β) = max(0, 1 - (s / β))
@@ -51,9 +52,9 @@ def lukasiewicz_and_activation(sum_val: jnp.ndarray, beta: jnp.ndarray) -> jnp.n
 
     Args:
         sum_val (jnp.ndarray): Weighted sum of the complements of the truth values ​​of the inputs.
-                            Typically calculated as sum(w * (1 - x)).
+            Typically calculated as sum(w * (1 - x)).
         beta (jnp.ndarray): Gate threshold (nnx.Param), determining the steepness
-                            and the breakpoint of the logic function.
+            and the breakpoint of the logic function.
 
     Returns:
         jnp.ndarray: Resulting truth value in the interval [0, 1].
@@ -89,9 +90,9 @@ def lukasiewicz_or_activation(sum_val: jnp.ndarray, beta: jnp.ndarray) -> jnp.nd
 
     Args:
         sum_val (jnp.ndarray): Weighted sum of the truth values ​​of the inputs.
-                            Calculated as sum(w * x).
+            Calculated as sum(w * x).
         beta (jnp.ndarray): Gate threshold (nnx.Param), 
-                            determining the saturation point logical truths.
+            determining the saturation point logical truths.
 
     Returns:
         jnp.ndarray: Resulting truth value in the interval [0, 1].
@@ -113,14 +114,14 @@ def ramp_sigmoid(x: jnp.ndarray, slope: float = 1.0, offset: float = 0.5) -> jnp
     Parameter semantics:
     - offset: Specifies the point on the X-axis where the truth is exactly 0.5 (midpoint).
     - slope: Determines the "stringency" of the predicate. 
-        A high slope means a fast transition between false and true (close to a step function).
+    A high slope means a fast transition between false and true (close to a step function).
 
     Args:
         x (jnp.ndarray): Input tensor of real numbers (e.g. temperature, pressure, distance).
         slope (float): Slope of the linear part. Affects the width of the transition area. 
-                    Default value is 1.0.
+            Default value is 1.0.
         offset (float): Shifts the function on the X-axis. Determines the decision boundary. 
-                    Default value is 0.5.
+            Default value is 0.5.
 
     Returns:
         jnp.ndarray: Truth value in the interval [0, 1].

@@ -15,11 +15,14 @@ class JLNNEngine:
     as JIT graph compilation and automatic differentiation. 
 
     In the Just-in-time Logical Neural Network architecture, the Engine plays the role of:
+    
     1. **Compiler**: Transforms recursive calls to logical nodes 
-        into highly efficient code for GPU/TPU.
+    into highly efficient code for GPU/TPU.
+    
     2. **Training Manager**: Implements an atomic training step that guarantees 
-        that the gradient update and subsequent logical projection (constraints) 
-        will occur as one inseparable operation.
+    that the gradient update and subsequent logical projection (constraints) 
+    will occur as one inseparable operation.
+    
     3. **Abstraction**: Hides the complexity of state management in NNX from the end user.
     """
     
@@ -58,10 +61,13 @@ class JLNNEngine:
         Performs one atomic learning step (forward, backward, update, project).
 
         This method is the heart of the training process. Within one JIT block:
+        
         1. Calculates the forward pass and the loss function value.
+        
         2. Use autograd to determine gradients for all trainable parameters.
+        
         3. Passes the gradients to an optimizer (e.g. ProjectedOptimizer), 
-            which updates the weights and immediately applies logical constraints.
+        which updates the weights and immediately applies logical constraints.
 
         Args:
             inputs (Dict[str, jnp.ndarray]): Training data (predicate inputs).

@@ -45,7 +45,7 @@ class LearnedPredicate(nnx.Module):
 
         Returns:
             jnp.ndarray: An interval tensor of the form (..., in_features, 2), 
-                        where the last dimension represents the pair [L, U].
+                where the last dimension represents the pair [L, U].
         """
         # Calculation using ramp_sigmoid from core/activations.py
         # This function provides a linear transition and saturation at 0.0 and 1.0.

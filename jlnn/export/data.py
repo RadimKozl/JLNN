@@ -83,7 +83,7 @@ def extract_logic_parameters(model: nnx.Module) -> Dict[str, Any]:
 
     Returns:
         Dict[str, Any]: A nested dictionary containing framework metadata 
-                        and the recursive gate structure.
+            and the recursive gate structure.
     """
     return {
         "metadata": {

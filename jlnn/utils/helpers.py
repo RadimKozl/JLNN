@@ -3,7 +3,7 @@
 # Imports
 import jax.numpy as jnp
 
-def scalar_to_interval(x: jnp.ndarray) -> jnp.ndarray:
+def scalar_to_interval(x: jnp.ndarray) -> jnp.ndarray:   
     """
     Converts standard [0, 1] probability scalars into precise [L, U] intervals.
     
@@ -14,12 +14,11 @@ def scalar_to_interval(x: jnp.ndarray) -> jnp.ndarray:
         x (jnp.ndarray): Tensor of scalar truth values.
         
     Returns:
-        jnp.ndarray: Tensor of intervals with shape (*x.shape, 2).
+        jnp.ndarray: Tensor of intervals with shape ``(*x.shape, 2)``.
     """
     return jnp.stack([x, x], axis=-1)
 
 def is_precise(interval: jnp.ndarray, epsilon: float = 1e-5) -> bool:
-    """
-    Checks if an interval has collapsed into a single point (L ≈ U).
+    """Checks if an interval has collapsed into a single point (L ≈ U).
     """
     return float(jnp.abs(interval[..., 0] - interval[..., 1])) < epsilon

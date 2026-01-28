@@ -16,7 +16,7 @@ def plot_truth_intervals(intervals_dict: Dict[str, jnp.ndarray], title: str = "J
     
     Args:
         intervals_dict (Dict[str, jnp.ndarray]): Mapping of gate/predicate names 
-                                                 to their [L, U] interval arrays.
+            to their [L, U] interval arrays.
         title (str): The chart title.
     """
     names = list(intervals_dict.keys())

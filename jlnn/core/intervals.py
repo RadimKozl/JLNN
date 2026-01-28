@@ -17,12 +17,12 @@ def create_interval(lower: jnp.ndarray, upper: jnp.ndarray) -> jnp.ndarray:
     Args:
         lower (jnp.ndarray): Tensor containing lower truth bounds (0.0 to 1.0). Can have any shape.
         upper (jnp.ndarray): Tensor containing upper truth limits (0.0 to 1.0). 
-                            Must have the same shape as the 'lower' parameter.
+            Must have the same shape as the 'lower' parameter.
 
     Returns:
         jnp.ndarray: The resulting interval tensor of the form (..., 2), 
-                    where the last dimension contains the pair [L, U]. 
-                    This format is optimized for efficient use in JAX transformations such as vmap and jit.
+            where the last dimension contains the pair [L, U]. 
+            This format is optimized for efficient use in JAX transformations such as vmap and jit.
     """
     return jnp.stack([lower, upper], axis=-1)
 
@@ -37,11 +37,11 @@ def get_lower(interval: jnp.ndarray) -> jnp.ndarray:
 
     Args:
         interval (jnp.ndarray): A tensor of intervals of the form (..., 2). 
-                            The last dimension is assumed to contain the pair [L, U].
+            The last dimension is assumed to contain the pair [L, U].
 
     Returns:
         jnp.ndarray: A tensor containing only the lower bounds (L). 
-                    The resulting shape is (...,), one dimension less than the input.
+            The resulting shape is (...,), one dimension less than the input.
     """
     
     # Using the ellipsis (...) ensures that the function works for any
@@ -58,11 +58,11 @@ def get_upper(interval: jnp.ndarray) -> jnp.ndarray:
 
     Args:
         interval (jnp.ndarray): A tensor of intervals of the form (..., 2). 
-                            The last dimension is assumed to contain the pair [L, U].
+            The last dimension is assumed to contain the pair [L, U].
 
     Returns:
         jnp.ndarray: A tensor containing only upper bounds (U). 
-                    The resulting shape is (...,), one dimension less than the input tensor.
+            The resulting shape is (...,), one dimension less than the input tensor.
     """    
     # Index 1 selects the Upper Bound from the last dimension.
     # The ellipsis (...) ensures compatibility with any number of batch dimensions.
@@ -84,11 +84,11 @@ def check_contradiction(interval: jnp.ndarray) -> jnp.ndarray:
 
     Args:
         interval (jnp.ndarray): Input tensor of intervals of the form (..., 2). 
-                            The last dimension is assumed to contain the pair [Lower Bound, Upper Bound].
+            The last dimension is assumed to contain the pair [Lower Bound, Upper Bound].
 
     Returns:
         jnp.ndarray: Boolean tensor (or float tensor 1.0/0.0 in JAX) of the form (...). 
-                A value of True (1.0) indicates that a conflict occurred in the given interval (L > U).
+            A value of True (1.0) indicates that a conflict occurred in the given interval (L > U).
     """    
     
     # We use previously defined helper functions for extracting limits.
@@ -112,11 +112,11 @@ def uncertainty(interval: jnp.ndarray) -> jnp.ndarray:
 
     Args:
         interval (jnp.ndarray): A tensor of intervals of the form (..., 2). 
-                            The last dimension contains the pair [Lower Bound, Upper Bound].
+            The last dimension contains the pair [Lower Bound, Upper Bound].
 
     Returns:
         jnp.ndarray: A tensor containing the width of each interval of the shape (...). 
-                    The resulting shape has one less dimension than the input tensor.
+            The resulting shape has one less dimension than the input tensor.
     """        
     
     # Calculation of the difference between the upper (U) and lower (L) limits.
@@ -138,7 +138,7 @@ def negate(interval: jnp.ndarray) -> jnp.ndarray:
 
     Args:
         interval (jnp.ndarray): Input tensor of intervals of the form (..., 2). 
-                            The last dimension contains the pair [Lower Bound, Upper Bound].
+            The last dimension contains the pair [Lower Bound, Upper Bound].
 
     Returns:
         jnp.ndarray: Negated interval tensor of form (..., 2).
