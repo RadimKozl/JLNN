@@ -288,42 +288,28 @@
         <article role="main" id="furo-main-content">
           <h1>Source code for jlnn.reasoning.engine</h1><div class="highlight"><pre>
 <span></span><span class="ch">#!/usr/bin/env python3</span>
-
-<span class="c1"># Imports</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">jax</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">flax</span><span class="w"> </span><span class="kn">import</span> <span class="n">nnx</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">jax.numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">jnp</span>
 
 <div class="viewcode-block" id="JLNNEngine">
 <a class="viewcode-back" href="../../../modules/reasoning/engine.html#jlnn.reasoning.engine.JLNNEngine">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">JLNNEngine</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">JLNNEngine</span><span class="p">(</span><span class="n">nnx</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Computational and optimization core of the JLNN framework.</span>
-<span class="sd">    </span>
-<span class="sd">    This class serves as an orchestrator for running a model in a JAX environment. </span>
-<span class="sd">    Its main purpose is to encapsulate low-level operations such </span>
-<span class="sd">    as JIT graph compilation and automatic differentiation. </span>
+<span class="sd">    The orchestration engine for JLNN models, handling JIT compilation and training logic.</span>
 
-<span class="sd">    In the Just-in-time Logical Neural Network architecture, the Engine plays the role of:</span>
-<span class="sd">    </span>
-<span class="sd">    1. **Compiler**: Transforms recursive calls to logical nodes </span>
-<span class="sd">    into highly efficient code for GPU/TPU.</span>
-<span class="sd">    </span>
-<span class="sd">    2. **Training Manager**: Implements an atomic training step that guarantees </span>
-<span class="sd">    that the gradient update and subsequent logical projection (constraints) </span>
-<span class="sd">    will occur as one inseparable operation.</span>
-<span class="sd">    </span>
-<span class="sd">    3. **Abstraction**: Hides the complexity of state management in NNX from the end user.</span>
+<span class="sd">    This class wraps a logical model to provide optimized inference and training </span>
+<span class="sd">    steps. By inheriting from nnx.Module, it ensures that JAX can correctly </span>
+<span class="sd">    trace the model state during compilation.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    
+
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="n">nnx</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Initializes the engine for a specific model instance.</span>
+<span class="sd">        Initializes the engine with a specific logical model.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            model (nnx.Module): An instance of JLNNModel </span>
-<span class="sd">                (or other NNX module) that the engine will serve.</span>
+<span class="sd">            model (nnx.Module): The compiled LNN formula or neural logic network.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span>
 
@@ -332,18 +318,14 @@
     <span class="nd">@nnx</span><span class="o">.</span><span class="n">jit</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">infer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        It performs high-performance, compiled inference on input data.</span>
-
-<span class="sd">        Thanks to the @nnx.jit decorator, an optimized computational graph </span>
-<span class="sd">        is created on the first call. Each subsequent call with data </span>
-<span class="sd">        of the same shape is then executed in the accelerator&#39;s native code.</span>
+<span class="sd">        Executes a JIT-compiled forward pass.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            inputs (Dict[str, jnp.ndarray]): Mapping predicate names </span>
-<span class="sd">            to input tensors (including batch dimension).</span>
+<span class="sd">            inputs (Dict[str, jnp.ndarray]): Dictionary mapping predicate names </span>
+<span class="sd">                to input arrays of shape (batch, time/feature).</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            jnp.ndarray: Truth intervals [L, U] for the root node of the model.</span>
+<span class="sd">            jnp.ndarray: Truth intervals of shape (batch, time/feature, 2).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span></div>
 
@@ -352,40 +334,25 @@
 <a class="viewcode-back" href="../../../modules/reasoning/engine.html#jlnn.reasoning.engine.JLNNEngine.train_step">[docs]</a>
     <span class="nd">@nnx</span><span class="o">.</span><span class="n">jit</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">train_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span> <span class="n">targets</span><span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> 
-                   <span class="n">optimizer</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">loss_fn</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+                   <span class="n">optimizer</span><span class="p">:</span> <span class="n">nnx</span><span class="o">.</span><span class="n">Optimizer</span><span class="p">,</span> <span class="n">loss_fn</span><span class="p">:</span> <span class="n">Callable</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Performs one atomic learning step (forward, backward, update, project).</span>
-
-<span class="sd">        This method is the heart of the training process. Within one JIT block:</span>
-<span class="sd">        </span>
-<span class="sd">        1. Calculates the forward pass and the loss function value.</span>
-<span class="sd">        </span>
-<span class="sd">        2. Use autograd to determine gradients for all trainable parameters.</span>
-<span class="sd">        </span>
-<span class="sd">        3. Passes the gradients to an optimizer (e.g. ProjectedOptimizer), </span>
-<span class="sd">        which updates the weights and immediately applies logical constraints.</span>
+<span class="sd">        Performs an atomic training step: Forward -&gt; Loss -&gt; Backward -&gt; Update.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            inputs (Dict[str, jnp.ndarray]): Training data (predicate inputs).</span>
-<span class="sd">            targets (jnp.ndarray): Target truth intervals (labels).</span>
-<span class="sd">            optimizer (Any): An instance of an NNX-compatible optimizer</span>
-<span class="sd">                        (typically ProjectedOptimizer from jlnn.training).</span>
-<span class="sd">            loss_fn (Any): Function for computing the loss (e.g. total_lnn_loss).</span>
+<span class="sd">            inputs: Model input features.</span>
+<span class="sd">            targets: Target truth intervals.</span>
+<span class="sd">            optimizer: Flax NNX optimizer instance.</span>
+<span class="sd">            loss_fn: Scalar-valued loss function.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            jnp.ndarray: The value of the loss function for the current step (before the update).</span>
+<span class="sd">            jnp.ndarray: The loss value for the current step.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">def</span><span class="w"> </span><span class="nf">compute_loss</span><span class="p">(</span><span class="n">model</span><span class="p">):</span>
-            <span class="c1"># Internal functions for nnx.value_and_grad</span>
             <span class="n">preds</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">loss_fn</span><span class="p">(</span><span class="n">preds</span><span class="p">,</span> <span class="n">targets</span><span class="p">)</span>
 
-        <span class="c1"># Calculate loss and gradients in one pass</span>
         <span class="n">loss</span><span class="p">,</span> <span class="n">grads</span> <span class="o">=</span> <span class="n">nnx</span><span class="o">.</span><span class="n">value_and_grad</span><span class="p">(</span><span class="n">compute_loss</span><span class="p">)(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">)</span>
-        
-        <span class="c1"># Updating model weights and enforcing logical axioms</span>
         <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">grads</span><span class="p">)</span>
-        
         <span class="k">return</span> <span class="n">loss</span></div>
 </div>
 

@@ -297,37 +297,23 @@
 <span id="jax-execution-engine"></span><h1>JAX Execution Engine<a class="headerlink" href="#module-jlnn.reasoning.engine" title="Link to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="jlnn.reasoning.engine.JLNNEngine">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">jlnn.reasoning.engine.</span></span><span class="sig-name descname"><span class="pre">JLNNEngine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Module</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/jlnn/reasoning/engine.html#JLNNEngine"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jlnn.reasoning.engine.JLNNEngine" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Computational and optimization core of the JLNN framework.</p>
-<p>This class serves as an orchestrator for running a model in a JAX environment.
-Its main purpose is to encapsulate low-level operations such
-as JIT graph compilation and automatic differentiation.</p>
-<p>In the Just-in-time Logical Neural Network architecture, the Engine plays the role of:</p>
-<p>1. <strong>Compiler</strong>: Transforms recursive calls to logical nodes
-into highly efficient code for GPU/TPU.</p>
-<p>2. <strong>Training Manager</strong>: Implements an atomic training step that guarantees
-that the gradient update and subsequent logical projection (constraints)
-will occur as one inseparable operation.</p>
-<ol class="arabic simple" start="3">
-<li><p><strong>Abstraction</strong>: Hides the complexity of state management in NNX from the end user.</p></li>
-</ol>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">jlnn.reasoning.engine.</span></span><span class="sig-name descname"><span class="pre">JLNNEngine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/jlnn/reasoning/engine.html#JLNNEngine"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jlnn.reasoning.engine.JLNNEngine" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
+<p>The orchestration engine for JLNN models, handling JIT compilation and training logic.</p>
+<p>This class wraps a logical model to provide optimized inference and training
+steps. By inheriting from nnx.Module, it ensures that JAX can correctly
+trace the model state during compilation.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="jlnn.reasoning.engine.JLNNEngine.infer">
 <span class="sig-name descname"><span class="pre">infer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inputs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Array</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Array</span></span></span><a class="reference internal" href="../../_modules/jlnn/reasoning/engine.html#JLNNEngine.infer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jlnn.reasoning.engine.JLNNEngine.infer" title="Link to this definition">¶</a></dt>
-<dd><p>It performs high-performance, compiled inference on input data.</p>
-<p>Thanks to the &#64;nnx.jit decorator, an optimized computational graph
-is created on the first call. Each subsequent call with data
-of the same shape is then executed in the accelerator’s native code.</p>
+<dd><p>Executes a JIT-compiled forward pass.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>inputs</strong> (<em>Dict</em><em>[</em><em>str</em><em>, </em><em>jnp.ndarray</em><em>]</em>) – Mapping predicate names</p></li>
-<li><p><strong>tensors</strong> (<em>to input</em>)</p></li>
-</ul>
+<dd class="field-odd"><p><strong>inputs</strong> (<em>Dict</em><em>[</em><em>str</em><em>, </em><em>jnp.ndarray</em><em>]</em>) – Dictionary mapping predicate names
+to input arrays of shape (batch, time/feature).</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Truth intervals [L, U] for the root node of the model.</p>
+<dd class="field-even"><p>Truth intervals of shape (batch, time/feature, 2).</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>jnp.ndarray</p>
@@ -337,27 +323,19 @@ of the same shape is then executed in the accelerator’s native code.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="jlnn.reasoning.engine.JLNNEngine.train_step">
-<span class="sig-name descname"><span class="pre">train_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inputs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Array</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">targets</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss_fn</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Array</span></span></span><a class="reference internal" href="../../_modules/jlnn/reasoning/engine.html#JLNNEngine.train_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jlnn.reasoning.engine.JLNNEngine.train_step" title="Link to this definition">¶</a></dt>
-<dd><p>Performs one atomic learning step (forward, backward, update, project).</p>
-<p>This method is the heart of the training process. Within one JIT block:</p>
-<ol class="arabic simple">
-<li><p>Calculates the forward pass and the loss function value.</p></li>
-<li><p>Use autograd to determine gradients for all trainable parameters.</p></li>
-</ol>
-<p>3. Passes the gradients to an optimizer (e.g. ProjectedOptimizer),
-which updates the weights and immediately applies logical constraints.</p>
+<span class="sig-name descname"><span class="pre">train_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inputs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Array</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">targets</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optimizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss_fn</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Array</span></span></span><a class="reference internal" href="../../_modules/jlnn/reasoning/engine.html#JLNNEngine.train_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jlnn.reasoning.engine.JLNNEngine.train_step" title="Link to this definition">¶</a></dt>
+<dd><p>Performs an atomic training step: Forward -&gt; Loss -&gt; Backward -&gt; Update.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>inputs</strong> (<em>Dict</em><em>[</em><em>str</em><em>, </em><em>jnp.ndarray</em><em>]</em>) – Training data (predicate inputs).</p></li>
-<li><p><strong>targets</strong> (<em>jnp.ndarray</em>) – Target truth intervals (labels).</p></li>
-<li><p><strong>optimizer</strong> (<em>Any</em>) – An instance of an NNX-compatible optimizer
-(typically ProjectedOptimizer from jlnn.training).</p></li>
-<li><p><strong>loss_fn</strong> (<em>Any</em>) – Function for computing the loss (e.g. total_lnn_loss).</p></li>
+<li><p><strong>inputs</strong> – Model input features.</p></li>
+<li><p><strong>targets</strong> – Target truth intervals.</p></li>
+<li><p><strong>optimizer</strong> – Flax NNX optimizer instance.</p></li>
+<li><p><strong>loss_fn</strong> – Scalar-valued loss function.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>The value of the loss function for the current step (before the update).</p>
+<dd class="field-even"><p>The loss value for the current step.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>jnp.ndarray</p>

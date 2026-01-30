@@ -298,74 +298,15 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="jlnn.reasoning.inspector.get_rule_report">
 <span class="sig-prename descclassname"><span class="pre">jlnn.reasoning.inspector.</span></span><span class="sig-name descname"><span class="pre">get_rule_report</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inputs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Array</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="../../_modules/jlnn/reasoning/inspector.html#get_rule_report"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jlnn.reasoning.inspector.get_rule_report" title="Link to this definition">¶</a></dt>
-<dd><p>It creates a brief textual summary of the inference result in human language.</p>
-<p>Based on the resulting interval [L, U], it classifies the system state
-into categories according to LNN semantics (True, False, Unknown, Conflict).</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>model</strong> – Model to evaluate.</p></li>
-<li><p><strong>inputs</strong> – Input data.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>String containing the interpretation of the result and the numerical interval.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>str</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="jlnn.reasoning.inspector.print_logic_summary">
-<span class="sig-prename descclassname"><span class="pre">jlnn.reasoning.inspector.</span></span><span class="sig-name descname"><span class="pre">print_logic_summary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inputs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Array</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/jlnn/reasoning/inspector.html#print_logic_summary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jlnn.reasoning.inspector.print_logic_summary" title="Link to this definition">¶</a></dt>
-<dd><p>Generates and prints a readable logical reasoning report to the console.</p>
-<p>The output is formatted as a table that displays the hierarchical structure
-of the calculation from root to leaves. It allows for a quick visual check
-of the ‘thought flow’ of the model and identification of
-nodes with high uncertainty (large difference between L and U).</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>model</strong> – A JLNNModel instance containing the compiled root.</p></li>
-<li><p><strong>inputs</strong> – Test or production data for inspection.</p></li>
-</ul>
-</dd>
-</dl>
+<dd><p>Generates a human-readable interpretation of the model’s output.</p>
+<p>Refined to handle neural predicates that shift ‘False’ inputs
+toward the center (e.g., [0.52, 0.73]).</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="jlnn.reasoning.inspector.trace_reasoning">
 <span class="sig-prename descclassname"><span class="pre">jlnn.reasoning.inspector.</span></span><span class="sig-name descname"><span class="pre">trace_reasoning</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../symbolic/compiler.html#jlnn.symbolic.compiler.Node" title="jlnn.symbolic.compiler.Node"><span class="pre">Node</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">inputs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Array</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../_modules/jlnn/reasoning/inspector.html#trace_reasoning"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jlnn.reasoning.inspector.trace_reasoning" title="Link to this definition">¶</a></dt>
-<dd><p>It recursively traverses the computational graph (tree) and extracts activations for each logical node.</p>
-<p>This function performs an in-depth analysis (instrospection) of the forward pass.
-For each node in the hierarchy, it captures the resulting truth interval [L, U].
-This is essential for auditing the model, tuning the logic rules,
-and understanding why the model reached a given conclusion.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>node</strong> (<a class="reference internal" href="../symbolic/compiler.html#jlnn.symbolic.compiler.Node" title="jlnn.symbolic.compiler.Node"><em>Node</em></a>) – The root node or subtree of the compiled JLNN model.</p></li>
-<li><p><strong>inputs</strong> (<em>Dict</em><em>[</em><em>str</em><em>, </em><em>jnp.ndarray</em><em>]</em>) – A dictionary of input data,</p></li>
-<li><p><strong>predicates.</strong> (<em>where the keys correspond to the names</em><em> of </em><em>the</em>)</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><dl class="simple">
-<dt>List of activation records. Each record contains:</dt><dd><ul class="simple">
-<li><p>’name’: Node identifier (e.g. predicate name or gate type).</p></li>
-<li><p>’type’: Node class (for structural overview).</p></li>
-<li><p>’interval’: Average truth interval [L, U] calculated over batch.</p></li>
-</ul>
-</dd>
-</dl>
-</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>List[Dict[str, Any]]</p>
-</dd>
-</dl>
+<dd><p>Recursively audits the logical graph to capture activations for every node.</p>
 </dd></dl>
 
 <p>Module for inspecting and auditing the model. Allows users to look “under the hood” and understand why the model reached a particular conclusion.</p>
@@ -435,7 +376,6 @@ and understanding why the model reached a given conclusion.</p>
             <ul>
 <li><a class="reference internal" href="#">Reasoning Inspector &amp; Audit</a><ul>
 <li><a class="reference internal" href="#jlnn.reasoning.inspector.get_rule_report"><code class="docutils literal notranslate"><span class="pre">get_rule_report()</span></code></a></li>
-<li><a class="reference internal" href="#jlnn.reasoning.inspector.print_logic_summary"><code class="docutils literal notranslate"><span class="pre">print_logic_summary()</span></code></a></li>
 <li><a class="reference internal" href="#jlnn.reasoning.inspector.trace_reasoning"><code class="docutils literal notranslate"><span class="pre">trace_reasoning()</span></code></a></li>
 <li><a class="reference internal" href="#functions-for-explainability">Functions for Explainability:</a></li>
 </ul>

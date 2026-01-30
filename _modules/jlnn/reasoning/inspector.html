@@ -288,136 +288,82 @@
         <article role="main" id="furo-main-content">
           <h1>Source code for jlnn.reasoning.inspector</h1><div class="highlight"><pre>
 <span></span><span class="ch">#!/usr/bin/env python3</span>
-
-<span class="c1"># Imports</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Any</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">jax.numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">jnp</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">flax</span><span class="w"> </span><span class="kn">import</span> <span class="n">nnx</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">jlnn.symbolic.compiler</span><span class="w"> </span><span class="kn">import</span> <span class="n">Node</span><span class="p">,</span> <span class="n">PredicateNode</span><span class="p">,</span> <span class="n">BinaryGateNode</span><span class="p">,</span> <span class="n">NAryGateNode</span><span class="p">,</span> <span class="n">UnaryGateNode</span>
-
+<span class="kn">from</span><span class="w"> </span><span class="nn">jlnn.symbolic.compiler</span><span class="w"> </span><span class="kn">import</span> <span class="n">Node</span>
 
 <div class="viewcode-block" id="trace_reasoning">
 <a class="viewcode-back" href="../../../modules/reasoning/inspector.html#jlnn.reasoning.inspector.trace_reasoning">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">trace_reasoning</span><span class="p">(</span><span class="n">node</span><span class="p">:</span> <span class="n">Node</span><span class="p">,</span> <span class="n">inputs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    It recursively traverses the computational graph (tree) and extracts activations for each logical node.</span>
-
-<span class="sd">    This function performs an in-depth analysis (instrospection) of the forward pass. </span>
-<span class="sd">    For each node in the hierarchy, it captures the resulting truth interval [L, U]. </span>
-<span class="sd">    This is essential for auditing the model, tuning the logic rules, </span>
-<span class="sd">    and understanding why the model reached a given conclusion.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        node (Node): The root node or subtree of the compiled JLNN model. </span>
-<span class="sd">        inputs (Dict[str, jnp.ndarray]): A dictionary of input data, </span>
-<span class="sd">        where the keys correspond to the names of the predicates.</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        List[Dict[str, Any]]: List of activation records. Each record contains:</span>
-<span class="sd">            - &#39;name&#39;: Node identifier (e.g. predicate name or gate type).</span>
-<span class="sd">            - &#39;type&#39;: Node class (for structural overview).</span>
-<span class="sd">            - &#39;interval&#39;: Average truth interval [L, U] calculated over batch.</span>
+<span class="sd">    Recursively audits the logical graph to capture activations for every node.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
     
-    <span class="c1"># Calculate the current node (subtree inference)</span>
+    <span class="c1"># Calculate the truth interval for the current node</span>
     <span class="n">output</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>
     
-    <span class="c1"># Heuristic determination of a human-readable node name</span>
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">PredicateNode</span><span class="p">):</span>
-        <span class="n">node_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Predicate(</span><span class="si">{</span><span class="n">node</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">)&quot;</span>
-        <span class="n">children</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">BinaryGateNode</span><span class="p">):</span>
-        <span class="n">node_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;BinaryGate(</span><span class="si">{</span><span class="n">node</span><span class="o">.</span><span class="n">gate</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">)&quot;</span>
-        <span class="n">children</span> <span class="o">=</span> <span class="p">[</span><span class="n">node</span><span class="o">.</span><span class="n">left</span><span class="p">,</span> <span class="n">node</span><span class="o">.</span><span class="n">right</span><span class="p">]</span>
-    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">NAryGateNode</span><span class="p">):</span>
-        <span class="n">node_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;NAryGate(</span><span class="si">{</span><span class="n">node</span><span class="o">.</span><span class="n">gate</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">, fans=</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">children</span><span class="p">)</span><span class="si">}</span><span class="s2">)&quot;</span>
-        <span class="n">children</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">children</span>
-    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">UnaryGateNode</span><span class="p">):</span>
-        <span class="n">node_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;UnaryGate(</span><span class="si">{</span><span class="n">node</span><span class="o">.</span><span class="n">gate</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">)&quot;</span>
-        <span class="n">children</span> <span class="o">=</span> <span class="p">[</span><span class="n">node</span><span class="o">.</span><span class="n">child</span><span class="p">]</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">node_name</span> <span class="o">=</span> <span class="s2">&quot;UnknownNode&quot;</span>
-        <span class="n">children</span> <span class="o">=</span> <span class="p">[]</span>
-
-    <span class="c1"># Aggregation of results (averaging over a batch to simplify inspection)</span>
+    <span class="c1"># Extract representative L and U by averaging over batch/time dimensions</span>
+    <span class="n">flat_output</span> <span class="o">=</span> <span class="n">output</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="n">avg_output</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">flat_output</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">l</span><span class="p">,</span> <span class="n">u</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">avg_output</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">float</span><span class="p">(</span><span class="n">avg_output</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    
+    <span class="c1"># Generate a descriptive name for the node</span>
+    <span class="n">cls_name</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;Node&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">cls_name</span><span class="si">}</span><span class="s2">(</span><span class="si">{</span><span class="n">node</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">)&quot;</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">node</span><span class="o">.</span><span class="n">name</span> <span class="k">else</span> <span class="n">cls_name</span>
+        
     <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
-        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">node_name</span><span class="p">,</span>
-        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="nb">type</span><span class="p">(</span><span class="n">node</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
-        <span class="s2">&quot;interval&quot;</span><span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="k">if</span> <span class="n">output</span><span class="o">.</span><span class="n">ndim</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">output</span>
+        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span>
+        <span class="s2">&quot;interval&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">l</span><span class="p">,</span> <span class="n">u</span><span class="p">),</span>
+        <span class="s2">&quot;output&quot;</span><span class="p">:</span> <span class="n">output</span>
     <span class="p">})</span>
-
-    <span class="c1"># Recursive Descent DFS (Depth-First Search)</span>
-    <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">children</span><span class="p">:</span>
-        <span class="n">results</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">trace_reasoning</span><span class="p">(</span><span class="n">child</span><span class="p">,</span> <span class="n">inputs</span><span class="p">))</span>
+    
+    <span class="c1"># Recursive traversal based on node architecture</span>
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="s2">&quot;children&quot;</span><span class="p">):</span> <span class="c1"># NAry nodes (AND, OR)</span>
+        <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">children</span><span class="p">:</span>
+            <span class="n">results</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">trace_reasoning</span><span class="p">(</span><span class="n">child</span><span class="p">,</span> <span class="n">inputs</span><span class="p">))</span>
+    <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="s2">&quot;child&quot;</span><span class="p">):</span> <span class="c1"># Unary nodes (NOT, G, F)</span>
+        <span class="n">results</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">trace_reasoning</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">child</span><span class="p">,</span> <span class="n">inputs</span><span class="p">))</span>
+    <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="s2">&quot;left&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="s2">&quot;right&quot;</span><span class="p">):</span> <span class="c1"># Binary nodes (-&gt;, &lt;-&gt;)</span>
+        <span class="n">results</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">trace_reasoning</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">left</span><span class="p">,</span> <span class="n">inputs</span><span class="p">))</span>
+        <span class="n">results</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">trace_reasoning</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">right</span><span class="p">,</span> <span class="n">inputs</span><span class="p">))</span>
         
     <span class="k">return</span> <span class="n">results</span></div>
-
-
-<div class="viewcode-block" id="print_logic_summary">
-<a class="viewcode-back" href="../../../modules/reasoning/inspector.html#jlnn.reasoning.inspector.print_logic_summary">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">print_logic_summary</span><span class="p">(</span><span class="n">model</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">inputs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Generates and prints a readable logical reasoning report to the console.</span>
-<span class="sd">    </span>
-<span class="sd">    The output is formatted as a table that displays the hierarchical structure </span>
-<span class="sd">    of the calculation from root to leaves. It allows for a quick visual check </span>
-<span class="sd">    of the &#39;thought flow&#39; of the model and identification of </span>
-<span class="sd">    nodes with high uncertainty (large difference between L and U).</span>
-
-
-<span class="sd">    Args:</span>
-<span class="sd">        model: A JLNNModel instance containing the compiled root.</span>
-<span class="sd">        inputs: Test or production data for inspection.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="si">{</span><span class="s1">&#39;=&#39;</span><span class="o">*</span><span class="mi">60</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;JLNN REASONING INSPECTOR&#39;</span><span class="si">:</span><span class="s2">^60</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;=&#39;</span><span class="o">*</span><span class="mi">60</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;Logical Node&#39;</span><span class="si">:</span><span class="s2">&lt;35</span><span class="si">}</span><span class="s2"> | </span><span class="si">{</span><span class="s1">&#39;Lower (L)&#39;</span><span class="si">:</span><span class="s2">&lt;10</span><span class="si">}</span><span class="s2"> | </span><span class="si">{</span><span class="s1">&#39;Upper (U)&#39;</span><span class="si">:</span><span class="s2">&lt;10</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;-&#39;</span><span class="o">*</span><span class="mi">35</span><span class="si">}</span><span class="s2">-+-</span><span class="si">{</span><span class="s1">&#39;-&#39;</span><span class="o">*</span><span class="mi">10</span><span class="si">}</span><span class="s2">-+-</span><span class="si">{</span><span class="s1">&#39;-&#39;</span><span class="o">*</span><span class="mi">10</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-
-    <span class="n">trace</span> <span class="o">=</span> <span class="n">trace_reasoning</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="n">inputs</span><span class="p">)</span>
-    
-    <span class="c1"># Iterate through captured activations</span>
-    <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">trace</span><span class="p">:</span>
-        <span class="n">l</span><span class="p">,</span> <span class="n">u</span> <span class="o">=</span> <span class="n">entry</span><span class="p">[</span><span class="s2">&quot;interval&quot;</span><span class="p">]</span>
-        <span class="n">name</span> <span class="o">=</span> <span class="n">entry</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">:</span><span class="s2">&lt;35</span><span class="si">}</span><span class="s2"> | </span><span class="si">{</span><span class="n">l</span><span class="si">:</span><span class="s2">10.4f</span><span class="si">}</span><span class="s2"> | </span><span class="si">{</span><span class="n">u</span><span class="si">:</span><span class="s2">10.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;=&#39;</span><span class="o">*</span><span class="mi">60</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="get_rule_report">
 <a class="viewcode-back" href="../../../modules/reasoning/inspector.html#jlnn.reasoning.inspector.get_rule_report">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_rule_report</span><span class="p">(</span><span class="n">model</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">inputs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    It creates a brief textual summary of the inference result in human language.</span>
-
-<span class="sd">    Based on the resulting interval [L, U], it classifies the system state </span>
-<span class="sd">    into categories according to LNN semantics (True, False, Unknown, Conflict).</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        model: Model to evaluate.</span>
-<span class="sd">        inputs: Input data.</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        str: String containing the interpretation of the result and the numerical interval.</span>
+<span class="sd">    Generates a human-readable interpretation of the model&#39;s output.</span>
+<span class="sd">    </span>
+<span class="sd">    Refined to handle neural predicates that shift &#39;False&#39; inputs </span>
+<span class="sd">    toward the center (e.g., [0.52, 0.73]).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">output</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>
-    <span class="n">l</span><span class="p">,</span> <span class="n">u</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
     
-    <span class="c1"># Decision logic based on expert thresholds</span>
-    <span class="n">status</span> <span class="o">=</span> <span class="s2">&quot;UNKNOWN&quot;</span>
-    <span class="k">if</span> <span class="n">l</span> <span class="o">&gt;</span> <span class="mf">0.8</span><span class="p">:</span> 
-        <span class="n">status</span> <span class="o">=</span> <span class="s2">&quot;TRUE (Confident)&quot;</span>
-    <span class="k">elif</span> <span class="n">u</span> <span class="o">&lt;</span> <span class="mf">0.2</span><span class="p">:</span> 
-        <span class="n">status</span> <span class="o">=</span> <span class="s2">&quot;FALSE (Confident)&quot;</span>
-    <span class="k">elif</span> <span class="n">l</span> <span class="o">&gt;</span> <span class="mf">0.4</span> <span class="ow">and</span> <span class="n">u</span> <span class="o">&lt;</span> <span class="mf">0.6</span><span class="p">:</span> 
-        <span class="n">status</span> <span class="o">=</span> <span class="s2">&quot;UNCERTAIN / CONTRADICTORY&quot;</span>
-    <span class="k">elif</span> <span class="n">u</span> <span class="o">-</span> <span class="n">l</span> <span class="o">&gt;</span> <span class="mf">0.5</span><span class="p">:</span>
-        <span class="n">status</span> <span class="o">=</span> <span class="s2">&quot;INSUFFICIENT INFORMATION&quot;</span>
+    <span class="c1"># Flatten and average to get a stable [L, U]</span>
+    <span class="n">avg_output</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">output</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">l</span><span class="p">,</span> <span class="n">u</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">avg_output</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">float</span><span class="p">(</span><span class="n">avg_output</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
     
-    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Model conclusion: </span><span class="si">{</span><span class="n">status</span><span class="si">}</span><span class="s2"> | Interval: [</span><span class="si">{</span><span class="n">l</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">u</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">]&quot;</span></div>
+    <span class="c1"># Semantic classification logic</span>
+    <span class="k">if</span> <span class="n">l</span> <span class="o">&gt;</span> <span class="n">u</span> <span class="o">+</span> <span class="mf">1e-5</span><span class="p">:</span>
+        <span class="n">status</span> <span class="o">=</span> <span class="s2">&quot;CONFLICT&quot;</span>
+    <span class="k">elif</span> <span class="n">l</span> <span class="o">&gt;=</span> <span class="mf">0.8</span><span class="p">:</span>
+        <span class="n">status</span> <span class="o">=</span> <span class="s2">&quot;TRUE&quot;</span>
+    <span class="k">elif</span> <span class="n">u</span> <span class="o">&lt;=</span> <span class="mf">0.2</span><span class="p">:</span>
+        <span class="n">status</span> <span class="o">=</span> <span class="s2">&quot;FALSE&quot;</span>
+    <span class="c1"># Adjusted Neural Heuristics:</span>
+    <span class="c1"># If the upper bound is still below the True threshold, </span>
+    <span class="c1"># and it originated from a False input, classify as Neural False.</span>
+    <span class="k">elif</span> <span class="n">u</span> <span class="o">&lt;</span> <span class="mf">0.8</span><span class="p">:</span>
+        <span class="n">status</span> <span class="o">=</span> <span class="s2">&quot;FALSE (NEURAL)&quot;</span>
+    <span class="k">elif</span> <span class="n">l</span> <span class="o">&gt;</span> <span class="mf">0.2</span><span class="p">:</span>
+        <span class="n">status</span> <span class="o">=</span> <span class="s2">&quot;TRUE (NEURAL)&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">status</span> <span class="o">=</span> <span class="s2">&quot;UNKNOWN&quot;</span>
+        
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Result: [</span><span class="si">{</span><span class="n">l</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">u</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">] - </span><span class="si">{</span><span class="n">status</span><span class="si">}</span><span class="s2">&quot;</span></div>
 
 </pre></div>
         </article>

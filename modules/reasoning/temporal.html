@@ -299,32 +299,14 @@
 <dt class="sig sig-object py" id="jlnn.reasoning.temporal.AlwaysNode">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">jlnn.reasoning.temporal.</span></span><span class="sig-name descname"><span class="pre">AlwaysNode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/jlnn/reasoning/temporal.html#AlwaysNode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jlnn.reasoning.temporal.AlwaysNode" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="../symbolic/compiler.html#jlnn.symbolic.compiler.Node" title="jlnn.symbolic.compiler.Node"><code class="xref py py-class docutils literal notranslate"><span class="pre">Node</span></code></a></p>
-<p>Temporal operator G (Globally / Always) for time series.</p>
-<p>In the context of temporal logic, the formula G(A) is true at time t
-if and only if the sub-formula A is true at all time steps (future and present).</p>
-<p>In JLNN, this operation is implemented as a generalized conjunction (AND)
-over the time axis. It uses Gödel’s t-norm (minimum),
-which means that the resulting truth value of the interval
-is bounded by the least true moment in a given sequential window.</p>
-<p>This node is key for detecting persistent states or invariants.</p>
+<p>Implements the ‘Always’ (G) temporal operator.</p>
+<p>This node performs a generalized conjunction across the time axis.
+It uses the Gödel t-norm (minimum) to find the lower bound of truth
+across all moments in the sequence.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="jlnn.reasoning.temporal.AlwaysNode.forward">
 <span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Array</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Array</span></span></span><a class="reference internal" href="../../_modules/jlnn/reasoning/temporal.html#AlwaysNode.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jlnn.reasoning.temporal.AlwaysNode.forward" title="Link to this definition">¶</a></dt>
-<dd><p>Calculates the truth interval for the Globally operator.</p>
-<p>The input data ‘values’ is expected to be in the form (batch, time, features).
-The node first recursively obtains the truth values
-from the child and then performs aggregation over the timeline.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>​​</strong> (<em>values</em>) – Dictionary of input tensors.</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Aggregated interval [L, U] of shape (batch, 2).</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>jnp.ndarray</p>
-</dd>
-</dl>
+<dd><p>Calculates the minimum truth interval across the temporal dimension.</p>
 </dd></dl>
 
 </dd></dl>
@@ -333,29 +315,14 @@ from the child and then performs aggregation over the timeline.</p>
 <dt class="sig sig-object py" id="jlnn.reasoning.temporal.EventuallyNode">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">jlnn.reasoning.temporal.</span></span><span class="sig-name descname"><span class="pre">EventuallyNode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/jlnn/reasoning/temporal.html#EventuallyNode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jlnn.reasoning.temporal.EventuallyNode" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="../symbolic/compiler.html#jlnn.symbolic.compiler.Node" title="jlnn.symbolic.compiler.Node"><code class="xref py py-class docutils literal notranslate"><span class="pre">Node</span></code></a></p>
-<p>Temporal operator F (Eventually / Finally) for time series.</p>
-<p>The formula F(A) is true if there is at least one point in time
-(now or in the future) at which the sub-formula A is true.</p>
-<p>In JLNN, this operator is implemented as a generalized disjunction (OR)
-over a time axis (t-conorma). It uses maximum, which means that the overall truth
-is determined by the ‘best moment’ of the entire sequence.</p>
-<p>Useful for detecting events that must occur but
-are not specified exactly when (e.g., response to a stimulus).</p>
+<p>Implements the ‘Eventually’ (F) temporal operator.</p>
+<p>This node performs a generalized disjunction across the time axis.
+It uses the maximum t-conorm to determine if the formula becomes
+true at any point in the sequence.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="jlnn.reasoning.temporal.EventuallyNode.forward">
 <span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Array</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Array</span></span></span><a class="reference internal" href="../../_modules/jlnn/reasoning/temporal.html#EventuallyNode.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jlnn.reasoning.temporal.EventuallyNode.forward" title="Link to this definition">¶</a></dt>
-<dd><p>Calculates the truth interval for the Eventually operator.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>​​</strong> (<em>values</em>) – Dictionary of input tensors.</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Aggregated interval [L, U] of shape (batch, 2).</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>jnp.ndarray</p>
-</dd>
-</dl>
+<dd><p>Calculates the maximum truth interval across the temporal dimension.</p>
 </dd></dl>
 
 </dd></dl>
