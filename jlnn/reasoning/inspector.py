@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+
+# Imports
 from typing import Dict, List, Any
 import jax.numpy as jnp
 from jlnn.symbolic.compiler import Node
@@ -6,6 +8,22 @@ from jlnn.symbolic.compiler import Node
 def trace_reasoning(node: Node, inputs: Dict[str, jnp.ndarray]) -> List[Dict[str, Any]]:
     """
     Recursively audits the logical graph to capture activations for every node.
+
+    This function performs a deep introspection of the forward pass by traversing 
+    the compiled logical tree. For each node, it captures the resulting 
+    truth interval $[L, U]$, which is essential for Explainable AI (XAI) tasks, 
+    rule auditing, and debugging model conclusions.
+
+    Args:
+        node: The root node or subtree of a compiled JLNN model.
+        inputs: A dictionary mapping predicate names to input tensors 
+            of shape (batch, [time], features).
+
+    Returns:
+        A list of dictionaries, where each entry represents a node's state:
+            - 'name': The descriptive identifier of the node.
+            - 'interval': The average truth interval (L, U) across the batch.
+            - 'output': The raw JAX array containing full activation data.
     """
     results = []
     
@@ -41,10 +59,21 @@ def trace_reasoning(node: Node, inputs: Dict[str, jnp.ndarray]) -> List[Dict[str
 
 def get_rule_report(model: Any, inputs: Dict[str, jnp.ndarray]) -> str:
     """
-    Generates a human-readable interpretation of the model's output.
-    
-    Refined to handle neural predicates that shift 'False' inputs 
-    toward the center (e.g., [0.52, 0.73]).
+    Generates a human-readable semantic interpretation of the model's output.
+
+    This utility classifies the resulting truth interval $[L, U]$ into qualitative 
+    categories based on LNN semantics (TRUE, FALSE, UNKNOWN, CONFLICT). 
+    It includes specific heuristics for neural predicates that may shift truth 
+    values toward the center of the $[0, 1]$ spectrum during initialization 
+    or training.
+
+    Args:
+        model: The JLNN model or LNNFormula to evaluate.
+        inputs: Input data dictionary for the predicates.
+
+    Returns:
+        A formatted string containing the numerical interval and its 
+        semantic classification (e.g., "Result: [0.52, 0.73] - FALSE (NEURAL)").
     """
     output = model(inputs)
     
@@ -60,7 +89,7 @@ def get_rule_report(model: Any, inputs: Dict[str, jnp.ndarray]) -> str:
     elif u <= 0.2:
         status = "FALSE"
     # Adjusted Neural Heuristics:
-    # If the upper bound is still below the True threshold, 
+    # If the upper bound is still below the True threshold,
     # and it originated from a False input, classify as Neural False.
     elif u < 0.8:
         status = "FALSE (NEURAL)"
