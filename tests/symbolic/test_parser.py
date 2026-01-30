@@ -7,8 +7,10 @@ from lark import Tree, Token
 
 def test_parser_basic_and_or():
     """
-    Verifies that the parser correctly builds a syntax tree for basic 
-    conjunction and disjunction.
+    Verifies that the parser correctly constructs a syntax tree for compound logic.
+    
+    This test checks if the parser respects operator precedence (AND before OR)
+    and successfully generates the hierarchical Tree structure.
     """
     parser = FormulaParser()
     tree = parser.parse("A & B | C")
@@ -19,7 +21,7 @@ def test_parser_basic_and_or():
     # But based on the error, it seems weighted_expr is the root
     # Navigate through the tree to find the 'or' node
     def find_node_by_data(node, target_data):
-        """Recursively search for a node with specific data"""
+        """Recursively search the Lark Tree for a specific node type."""
         if isinstance(node, Tree):
             if node.data == target_data:
                 return node
@@ -32,21 +34,22 @@ def test_parser_basic_and_or():
     or_node = find_node_by_data(tree, "or")
     assert or_node is not None, f"'or' node not found in tree. Root: {tree.data}"
     
-    # Verify that OR has an AND as one of its children (precedence check)
+    # Precedence check: The 'and' operation should be nested as a child or sibling of 'or'
     and_node = find_node_by_data(tree, "and")
     assert and_node is not None, "'and' node not found - precedence might be wrong"
 
 def test_parser_weighted_implication():
     """
-    Checks if the parser correctly extracts weights from the 
-    special '->[number]' notation.
+    Checks the parser's ability to extract weights from the custom '->[number]' syntax.
+    
+    Ensures that both the implication structure and the numerical parameter 
+    are correctly identified as part of a 'weighted_implication' node.
     """
     parser = FormulaParser()
     tree = parser.parse("A ->[0.5] B")
     
-    # Find the weighted_implication node
     def find_node_by_data(node, target_data):
-        """Recursively search for a node with specific data"""
+        """Recursively search for a node with specific data identifier."""
         if isinstance(node, Tree):
             if node.data == target_data:
                 return node
@@ -59,9 +62,8 @@ def test_parser_weighted_implication():
     impl_node = find_node_by_data(tree, "weighted_implication")
     assert impl_node is not None, "weighted_implication node not found in tree"
     
-    # Search for a NUMBER token anywhere in the tree
     def find_number_token(node):
-        """Recursively find a NUMBER token"""
+        """Recursively locate a Token of type NUMBER."""
         if isinstance(node, Token) and node.type == "NUMBER":
             return node
         if isinstance(node, Tree):
@@ -76,7 +78,11 @@ def test_parser_weighted_implication():
     assert float(number_token.value) == 0.5, f"Expected 0.5, got {number_token.value}"
 
 def test_parser_invalid_syntax():
-    """Ensures the parser raises a ValueError for mathematically invalid strings."""
+    """
+    Ensures that the parser correctly identifies and rejects syntactically invalid strings.
+    
+    A ValueError should be raised when encountering unknown operators or malformed expressions.
+    """
     parser = FormulaParser()
     with pytest.raises(ValueError):
-        parser.parse("A &&& B")  # Invalid operator
+        parser.parse("A &&& B")  # Triggering an error with an invalid operator sequence
