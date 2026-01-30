@@ -148,7 +148,7 @@ class JLNNCompiler(Transformer):
         self.rngs = rngs
         self.predicates: Dict[str, predicates.LearnedPredicate] = {}
 
-    def variable(self, tokens):
+    def variable(self, tokens: List[Token]) -> PredicateNode:
         """Transforms a variable token into a PredicateNode, ensuring weight sharing if name repeats."""
         name = str(tokens[0])
         if name not in self.predicates:
@@ -156,27 +156,27 @@ class JLNNCompiler(Transformer):
             self.predicates[name] = node
         return self.predicates[name]
 
-    def and_(self, children):
+    def and_(self, children: List[Node]) -> NAryGateNode:
         """Constructs a WeightedAnd gate node."""
         gate = gates.WeightedAnd(num_inputs=len(children), rngs=self.rngs)
         return NAryGateNode(gate, children)
     
-    def or_(self, children):
+    def or_(self, children: List[Node]) -> NAryGateNode:
         """Constructs a WeightedOr gate node."""
         gate = gates.WeightedOr(num_inputs=len(children), rngs=self.rngs)
         return NAryGateNode(gate, children)
     
-    def not_(self, children):
+    def not_(self, children: List[Node]) -> UnaryGateNode:
         """Constructs a WeightedNot gate node."""
         gate = gates.WeightedNot(rngs=self.rngs)
         return UnaryGateNode(gate, children[0])
 
-    def implication(self, children):
+    def implication(self, children: List[Node]) -> BinaryGateNode:
         """Constructs a WeightedImplication gate node (A -> B)."""
         gate = gates.WeightedImplication(rngs=self.rngs)
         return BinaryGateNode(gate, children[0], children[1])
 
-    def weighted_expr(self, children):
+    def weighted_expr(self, children: List[Any]) -> Node:
         """Root rule processor; returns the final compiled node structure."""
         return children[-1]
 
