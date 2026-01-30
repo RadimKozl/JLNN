@@ -1,5 +1,12 @@
 #!/usr/bin/env python3
 
+"""
+This module provides a parser for Logical Neural Networks (LNN) formulas.
+It utilizes the Lark library to transform logical expressions into a parse tree,
+supporting standard logic gates, temporal operators, and weighted expressions.
+"""
+
+# Imports
 from lark import Lark
 
 LNN_GRAMMAR = r"""
@@ -38,10 +45,33 @@ LNN_GRAMMAR = r"""
 """
 
 class FormulaParser:
+    """
+    A wrapper class for the Lark LALR parser configured with LNN grammar.
+    
+    This parser handles operator precedence and associativity for logical 
+    operators, including support for weighted implications and temporal 
+    logic operators like Always (G), Eventually (F), and Next (X).
+    """
     def __init__(self):
+        """
+        Initializes the FormulaParser by compiling the LNN grammar 
+        using the LALR parsing algorithm.
+        """
         self.parser = Lark(LNN_GRAMMAR, parser='lalr')
 
     def parse(self, formula: str):
+        """
+        Parses a string representation of a logical formula into a Lark Tree.
+
+        Args:
+            formula (str): The logical expression to be parsed (e.g., "A & B -> C").
+
+        Returns:
+            lark.Tree: A parse tree representing the hierarchical structure of the formula.
+
+        Raises:
+            ValueError: If the input formula does not conform to the LNN grammar rules.
+        """
         try:
             return self.parser.parse(formula)
         except Exception as e:
