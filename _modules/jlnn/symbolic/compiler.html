@@ -471,7 +471,7 @@
 
 <div class="viewcode-block" id="JLNNCompiler.variable">
 <a class="viewcode-back" href="../../../modules/symbolic/compiler.html#jlnn.symbolic.compiler.JLNNCompiler.variable">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tokens</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tokens</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Token</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">PredicateNode</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Transforms a variable token into a PredicateNode, ensuring weight sharing if name repeats.&quot;&quot;&quot;</span>
         <span class="n">name</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">tokens</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
         <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">predicates</span><span class="p">:</span>
@@ -482,7 +482,7 @@
 
 <div class="viewcode-block" id="JLNNCompiler.and_">
 <a class="viewcode-back" href="../../../modules/symbolic/compiler.html#jlnn.symbolic.compiler.JLNNCompiler.and_">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">and_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">children</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">and_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">children</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Node</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">NAryGateNode</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Constructs a WeightedAnd gate node.&quot;&quot;&quot;</span>
         <span class="n">gate</span> <span class="o">=</span> <span class="n">gates</span><span class="o">.</span><span class="n">WeightedAnd</span><span class="p">(</span><span class="n">num_inputs</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">children</span><span class="p">),</span> <span class="n">rngs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">rngs</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">NAryGateNode</span><span class="p">(</span><span class="n">gate</span><span class="p">,</span> <span class="n">children</span><span class="p">)</span></div>
@@ -490,7 +490,7 @@
     
 <div class="viewcode-block" id="JLNNCompiler.or_">
 <a class="viewcode-back" href="../../../modules/symbolic/compiler.html#jlnn.symbolic.compiler.JLNNCompiler.or_">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">or_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">children</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">or_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">children</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Node</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">NAryGateNode</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Constructs a WeightedOr gate node.&quot;&quot;&quot;</span>
         <span class="n">gate</span> <span class="o">=</span> <span class="n">gates</span><span class="o">.</span><span class="n">WeightedOr</span><span class="p">(</span><span class="n">num_inputs</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">children</span><span class="p">),</span> <span class="n">rngs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">rngs</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">NAryGateNode</span><span class="p">(</span><span class="n">gate</span><span class="p">,</span> <span class="n">children</span><span class="p">)</span></div>
@@ -498,7 +498,7 @@
     
 <div class="viewcode-block" id="JLNNCompiler.not_">
 <a class="viewcode-back" href="../../../modules/symbolic/compiler.html#jlnn.symbolic.compiler.JLNNCompiler.not_">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">not_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">children</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">not_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">children</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Node</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">UnaryGateNode</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Constructs a WeightedNot gate node.&quot;&quot;&quot;</span>
         <span class="n">gate</span> <span class="o">=</span> <span class="n">gates</span><span class="o">.</span><span class="n">WeightedNot</span><span class="p">(</span><span class="n">rngs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">rngs</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">UnaryGateNode</span><span class="p">(</span><span class="n">gate</span><span class="p">,</span> <span class="n">children</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span></div>
@@ -506,7 +506,7 @@
 
 <div class="viewcode-block" id="JLNNCompiler.implication">
 <a class="viewcode-back" href="../../../modules/symbolic/compiler.html#jlnn.symbolic.compiler.JLNNCompiler.implication">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">implication</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">children</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">implication</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">children</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Node</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">BinaryGateNode</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Constructs a WeightedImplication gate node (A -&gt; B).&quot;&quot;&quot;</span>
         <span class="n">gate</span> <span class="o">=</span> <span class="n">gates</span><span class="o">.</span><span class="n">WeightedImplication</span><span class="p">(</span><span class="n">rngs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">rngs</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">BinaryGateNode</span><span class="p">(</span><span class="n">gate</span><span class="p">,</span> <span class="n">children</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">children</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span></div>
@@ -514,7 +514,7 @@
 
 <div class="viewcode-block" id="JLNNCompiler.weighted_expr">
 <a class="viewcode-back" href="../../../modules/symbolic/compiler.html#jlnn.symbolic.compiler.JLNNCompiler.weighted_expr">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">weighted_expr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">children</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">weighted_expr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">children</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Node</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Root rule processor; returns the final compiled node structure.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">children</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span></div>
 </div>
