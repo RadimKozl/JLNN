@@ -295,52 +295,6 @@
         <article role="main" id="furo-main-content">
           <section id="module-jlnn.symbolic.parser">
 <span id="formula-parser"></span><h1>Formula Parser<a class="headerlink" href="#module-jlnn.symbolic.parser" title="Link to this heading">¶</a></h1>
-<dl class="py class">
-<dt class="sig sig-object py" id="jlnn.symbolic.parser.FormulaParser">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">jlnn.symbolic.parser.</span></span><span class="sig-name descname"><span class="pre">FormulaParser</span></span><a class="reference internal" href="../../_modules/jlnn/symbolic/parser.html#FormulaParser"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jlnn.symbolic.parser.FormulaParser" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>An advanced parser for weighted neuro-symbolic logic in the JAX ecosystem.</p>
-<p>This class transforms textual logical formulas into an abstract syntax tree (AST),
-which in JLNN serves as a blueprint for building a computational graph.
-Unlike standard parsers, it allows you to insert numerical parameters into
-the text to initialize the network weights.</p>
-<p>### Supported semantics:
-1. <strong>Fact weights (`0.9::A`)</strong>: Allows you to define the initial truth value of the predicate.
-In <cite>predicates.py</cite>, this value is used to set the initial offsets of the sigmoid.</p>
-<p>2. <strong>Weighted rules (`-&gt;[0.85]`)</strong>: Defines the strength of the logical connection between
-the antecedent and consequent. This value maps directly to the <cite>weights</cite> parameter in <cite>WeightedImplication</cite>.</p>
-<ol class="arabic simple" start="3">
-<li><p><strong>Complete gate set</strong>: Support for AND, OR, XOR, NAND, NOR.</p></li>
-</ol>
-<p>4. <strong>Temporal preparation</strong>: The grammar contains reserved operators G (Always),
-F (Eventually), and X (Next) for linear temporal logic (LTL).</p>
-<p>The parser uses the LALR(1) algorithm for deterministic and lightning-fast
-parsing during model initialization.</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="jlnn.symbolic.parser.FormulaParser.parse">
-<span class="sig-name descname"><span class="pre">parse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">formula</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/jlnn/symbolic/parser.html#FormulaParser.parse"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jlnn.symbolic.parser.FormulaParser.parse" title="Link to this definition">¶</a></dt>
-<dd><p>Converts a text formula into a structured syntax tree.</p>
-<p>This tree (Lark Tree) is then processed by a compiler,
-which creates a corresponding JAX/NNX module (gateway) for each node.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>formula</strong> (<em>str</em>) – A logical expression, e.g. “0.7::(A &amp; B) -&gt;[0.9] C”.</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Syntax tree with extracted identifiers and numbers.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>lark.Tree</p>
-</dd>
-<dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>ValueError</strong> – If the formula violates grammar rules
-    or contains invalid numeric literals.</p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
 <p>This module uses the <strong>Lark</strong> library to transform string definitions of rules into syntactic trees (CST).</p>
 <section id="lnn-grammar">
 <h2>LNN Grammar<a class="headerlink" href="#lnn-grammar" title="Link to this heading">¶</a></h2>
@@ -407,10 +361,6 @@ which creates a corresponding JAX/NNX module (gateway) for each node.</p>
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">Formula Parser</a><ul>
-<li><a class="reference internal" href="#jlnn.symbolic.parser.FormulaParser"><code class="docutils literal notranslate"><span class="pre">FormulaParser</span></code></a><ul>
-<li><a class="reference internal" href="#jlnn.symbolic.parser.FormulaParser.parse"><code class="docutils literal notranslate"><span class="pre">FormulaParser.parse()</span></code></a></li>
-</ul>
-</li>
 <li><a class="reference internal" href="#lnn-grammar">LNN Grammar</a></li>
 </ul>
 </li>
