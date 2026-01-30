@@ -299,40 +299,19 @@
 <dt class="sig sig-object py" id="jlnn.nn.gates.WeightedAnd">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">jlnn.nn.gates.</span></span><span class="sig-name descname"><span class="pre">WeightedAnd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/jlnn/nn/gates.html#WeightedAnd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jlnn.nn.gates.WeightedAnd" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
-<p>Trainable weighted AND gate implemented using Łukasiewicz’s t-norm.</p>
-<p>This gate implements logical conjunction over intervals.
-The weight parameters allow the network to selectively suppress unimportant inputs,
-while the beta parameter controls the stringency of the logical product.</p>
+<p>Trainable weighted AND gate implemented using Łukasiewicz t-norm.</p>
+<p>This gate performs a fuzzy conjunction where weights determine how much
+each input contributes to the “negative evidence” against the truth.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="jlnn.nn.gates.WeightedAnd.__call__">
 <span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Array</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Array</span></span></span><a class="reference internal" href="../../_modules/jlnn/nn/gates.html#WeightedAnd.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jlnn.nn.gates.WeightedAnd.__call__" title="Link to this definition">¶</a></dt>
-<dd><p>Performs a forward calculation of the weighted conjunction.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>x</strong> (<em>jnp.ndarray</em>) – Input interval tensor of the form (…, num_inputs, 2).</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>The resulting aggregated truth interval [L, U].</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>jnp.ndarray</p>
-</dd>
-</dl>
+<dd><p>Computes the weighted Łukasiewicz conjunction.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="jlnn.nn.gates.WeightedAnd.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_inputs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rngs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Rngs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/jlnn/nn/gates.html#WeightedAnd.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jlnn.nn.gates.WeightedAnd.__init__" title="Link to this definition">¶</a></dt>
-<dd><p>Initializes the AND gate parameters.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>num_inputs</strong> (<em>int</em>) – Number of input logic signals.</p></li>
-<li><p><strong>rngs</strong> (<em>nnx.Rngs</em>) – Generator for NNX state.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
+<dd></dd></dl>
 
 </dd></dl>
 
@@ -340,28 +319,19 @@ while the beta parameter controls the stringency of the logical product.</p>
 <dt class="sig sig-object py" id="jlnn.nn.gates.WeightedImplication">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">jlnn.nn.gates.</span></span><span class="sig-name descname"><span class="pre">WeightedImplication</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/jlnn/nn/gates.html#WeightedImplication"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jlnn.nn.gates.WeightedImplication" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
-<p>Trainable gate for logical implication (A -&gt; B).</p>
-<p>Allows modeling of causal relationships between statements.
-Supports multiple semantics (Łukasiewicz, Reichenbach, Kleene-Dienes) via the ‘method’ parameter.
-Weights allow setting different importance of antecedent and consequent.</p>
+<p>Trainable implication gate (A -&gt; B).</p>
+<p>Supports multiple semantics (Łukasiewicz, Reichenbach, Kleene-Dienes).
+Ideal for modeling expert-driven rules within the neural architecture.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="jlnn.nn.gates.WeightedImplication.__call__">
 <span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">int_a</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">int_b</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Array</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Array</span></span></span><a class="reference internal" href="../../_modules/jlnn/nn/gates.html#WeightedImplication.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jlnn.nn.gates.WeightedImplication.__call__" title="Link to this definition">¶</a></dt>
-<dd><p>Calculates the truth interval of the implication.</p>
+<dd><p>Call self as a function.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="jlnn.nn.gates.WeightedImplication.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rngs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Rngs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'lukasiewicz'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/jlnn/nn/gates.html#WeightedImplication.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jlnn.nn.gates.WeightedImplication.__init__" title="Link to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>rngs</strong> (<em>nnx.Rngs</em>) – Generator for parameters.</p></li>
-<li><p><strong>method</strong> (<em>str</em>) – Selected logical semantics for implication.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
+<dd></dd></dl>
 
 </dd></dl>
 
@@ -370,14 +340,12 @@ Weights allow setting different importance of antecedent and consequent.</p>
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">jlnn.nn.gates.</span></span><span class="sig-name descname"><span class="pre">WeightedNand</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/jlnn/nn/gates.html#WeightedNand"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jlnn.nn.gates.WeightedNand" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
 <p>Weighted NAND gate (Negated AND).</p>
-<p>Implements negation of conjunction. In JLNN,
-this operation is key for enforcing constraints,
-where we want to prevent two contradictory statements
-from being true at the same time.</p>
+<p>Useful for enforcing constraints where two contradictory statements
+should not be simultaneously true.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="jlnn.nn.gates.WeightedNand.__call__">
 <span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Array</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Array</span></span></span><a class="reference internal" href="../../_modules/jlnn/nn/gates.html#WeightedNand.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jlnn.nn.gates.WeightedNand.__call__" title="Link to this definition">¶</a></dt>
-<dd><p>Computes a negated weighted conjunction using a functional interface.</p>
+<dd><p>Call self as a function.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -392,13 +360,11 @@ from being true at the same time.</p>
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">jlnn.nn.gates.</span></span><span class="sig-name descname"><span class="pre">WeightedNor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/jlnn/nn/gates.html#WeightedNor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jlnn.nn.gates.WeightedNor" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
 <p>Weighted NOR gate (Negated OR).</p>
-<p>This operator returns a high truth value only if
-all weighted inputs have a low truth value.
-It is often used to detect the absence of specific features in the data.</p>
+<p>Evaluates to high truth only if all weighted inputs are close to falsehood.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="jlnn.nn.gates.WeightedNor.__call__">
 <span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Array</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Array</span></span></span><a class="reference internal" href="../../_modules/jlnn/nn/gates.html#WeightedNor.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jlnn.nn.gates.WeightedNor.__call__" title="Link to this definition">¶</a></dt>
-<dd><p>Calculates the negated weighted disjunction.</p>
+<dd><p>Call self as a function.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -413,13 +379,11 @@ It is often used to detect the absence of specific features in the data.</p>
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">jlnn.nn.gates.</span></span><span class="sig-name descname"><span class="pre">WeightedNot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/jlnn/nn/gates.html#WeightedNot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jlnn.nn.gates.WeightedNot" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
 <p>Trainable weighted negation (NOT) gate.</p>
-<p>The weight parameter allows the network to learn how strongly to invert a given input.
-This is useful in situations where negating a statement is only partially relevant
-or under certain conditions.</p>
+<p>Allows the model to learn the degree of inversion for a specific statement.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="jlnn.nn.gates.WeightedNot.__call__">
 <span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Array</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Array</span></span></span><a class="reference internal" href="../../_modules/jlnn/nn/gates.html#WeightedNot.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jlnn.nn.gates.WeightedNot.__call__" title="Link to this definition">¶</a></dt>
-<dd><p>Applies a weighted negation to the input interval.</p>
+<dd><p>Call self as a function.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -434,20 +398,41 @@ or under certain conditions.</p>
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">jlnn.nn.gates.</span></span><span class="sig-name descname"><span class="pre">WeightedOr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/jlnn/nn/gates.html#WeightedOr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jlnn.nn.gates.WeightedOr" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
 <p>Trainable weighted OR gate implemented using Łukasiewicz t-conorm.</p>
-<p>In the JLNN framework, this gate aggregates the truth intervals of the inputs
-and allows the model to learn the importance (weight) of each argument
-and the sensitivity threshold (beta) for the disjunction.
-The computation is delegated to a stateless function in the functional module.</p>
+<p>In the JLNN framework, this gate aggregates truth intervals from multiple inputs.
+It learns the relative importance of each input through weights and adjusts
+the activation threshold via the beta parameter.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="jlnn.nn.gates.WeightedOr.weights">
+<span class="sig-name descname"><span class="pre">weights</span></span><a class="headerlink" href="#jlnn.nn.gates.WeightedOr.weights" title="Link to this definition">¶</a></dt>
+<dd><p>Importance weights for each input signal.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>nnx.Param</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="jlnn.nn.gates.WeightedOr.beta">
+<span class="sig-name descname"><span class="pre">beta</span></span><a class="headerlink" href="#jlnn.nn.gates.WeightedOr.beta" title="Link to this definition">¶</a></dt>
+<dd><p>Sensitivity threshold (bias) of the disjunction.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>nnx.Param</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="jlnn.nn.gates.WeightedOr.__call__">
 <span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Array</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Array</span></span></span><a class="reference internal" href="../../_modules/jlnn/nn/gates.html#WeightedOr.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jlnn.nn.gates.WeightedOr.__call__" title="Link to this definition">¶</a></dt>
-<dd><p>Performs a forward calculation of the weighted disjunction.</p>
+<dd><p>Executes the weighted OR operation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>x</strong> (<em>jnp.ndarray</em>) – Input interval tensor of the form (…, num_inputs, 2).</p>
+<dd class="field-odd"><p><strong>x</strong> (<em>jnp.ndarray</em>) – Input interval tensor of shape (…, num_inputs, 2).</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>The resulting aggregated truth interval [L, U].</p>
+<dd class="field-even"><p>The resulting truth interval [L, U].</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>jnp.ndarray</p>
@@ -458,16 +443,7 @@ The computation is delegated to a stateless function in the functional module.</
 <dl class="py method">
 <dt class="sig sig-object py" id="jlnn.nn.gates.WeightedOr.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_inputs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rngs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Rngs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/jlnn/nn/gates.html#WeightedOr.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jlnn.nn.gates.WeightedOr.__init__" title="Link to this definition">¶</a></dt>
-<dd><p>Initializes the OR gate parameters.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>num_inputs</strong> (<em>int</em>) – Number of input logic signals.</p></li>
-<li><p><strong>rngs</strong> (<em>nnx.Rngs</em>) – Random number generator for initializing NNX parameters.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
+<dd></dd></dl>
 
 </dd></dl>
 
@@ -475,30 +451,22 @@ The computation is delegated to a stateless function in the functional module.</
 <dt class="sig sig-object py" id="jlnn.nn.gates.WeightedXor">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">jlnn.nn.gates.</span></span><span class="sig-name descname"><span class="pre">WeightedXor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/jlnn/nn/gates.html#WeightedXor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jlnn.nn.gates.WeightedXor" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
-<p>Trainable n-ary XOR gate (Exclusive OR) using tree reduction.</p>
-<p>XOR is implemented in interval logic as a recursive binary tree.
-For n=2 it uses the composition (A OR B) AND (A NAND B).
-For n &gt; 2 the inputs are divided and the results are combined using binary XOR operations.
-This structure allows learning complex parity functions with trainable weights at each node of the tree.</p>
+<p>Trainable n-ary XOR gate implemented via recursive tree reduction.</p>
+<p>XOR in interval logic is non-trivial. For n=2, it uses the logical
+composition: (A OR B) AND (A NAND B). For n &gt; 2, it recursively builds
+a binary tree of XOR operations.</p>
+<p>This hierarchical structure allows the network to learn complex parity-like
+functions with independent weights at each node.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="jlnn.nn.gates.WeightedXor.__call__">
 <span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Array</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Array</span></span></span><a class="reference internal" href="../../_modules/jlnn/nn/gates.html#WeightedXor.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jlnn.nn.gates.WeightedXor.__call__" title="Link to this definition">¶</a></dt>
-<dd><p>Performs a recursive parity calculation (XOR) over the tree structure.</p>
+<dd><p>Call self as a function.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="jlnn.nn.gates.WeightedXor.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_inputs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rngs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Rngs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/jlnn/nn/gates.html#WeightedXor.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jlnn.nn.gates.WeightedXor.__init__" title="Link to this definition">¶</a></dt>
-<dd><p>It builds a hierarchical structure of an XOR gate.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>num_inputs</strong> (<em>int</em>) – Total number of inputs.</p></li>
-<li><p><strong>rngs</strong> (<em>nnx.Rngs</em>) – Generator for initializing all internal gates.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
+<dd></dd></dl>
 
 </dd></dl>
 
@@ -613,6 +581,8 @@ This structure allows learning complex parity functions with trainable weights a
 </ul>
 </li>
 <li><a class="reference internal" href="#jlnn.nn.gates.WeightedOr"><code class="docutils literal notranslate"><span class="pre">WeightedOr</span></code></a><ul>
+<li><a class="reference internal" href="#jlnn.nn.gates.WeightedOr.weights"><code class="docutils literal notranslate"><span class="pre">WeightedOr.weights</span></code></a></li>
+<li><a class="reference internal" href="#jlnn.nn.gates.WeightedOr.beta"><code class="docutils literal notranslate"><span class="pre">WeightedOr.beta</span></code></a></li>
 <li><a class="reference internal" href="#jlnn.nn.gates.WeightedOr.__call__"><code class="docutils literal notranslate"><span class="pre">WeightedOr.__call__()</span></code></a></li>
 <li><a class="reference internal" href="#jlnn.nn.gates.WeightedOr.__init__"><code class="docutils literal notranslate"><span class="pre">WeightedOr.__init__()</span></code></a></li>
 </ul>

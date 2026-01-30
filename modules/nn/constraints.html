@@ -298,22 +298,13 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="jlnn.nn.constraints.apply_constraints">
 <span class="sig-prename descclassname"><span class="pre">jlnn.nn.constraints.</span></span><span class="sig-name descname"><span class="pre">apply_constraints</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Module</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/jlnn/nn/constraints.html#apply_constraints"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jlnn.nn.constraints.apply_constraints" title="Link to this definition">¶</a></dt>
-<dd><p>Aggregates and applies all logical and structural constraints to the model parameters.</p>
-<p>This function represents a critical point in the JLNN training loop,
-implementing a method called ‘Projected Gradient Descent’.
-It must be called immediately after each parameter update by an optimizer (e.g. Optax),
-but before the next forward pass.</p>
-<p>Main tasks of the function:
-1. Guarantees interpretability: Returns gate weights to the range &gt;= 1.0,
-ensuring that gates behave as t-norms/t-conorms.</p>
-<p>2. Prevents logical conflicts: Adjusts predicate parameters so that L &lt;= U always holds,
-thus eliminating the emergence of internal contradictions at the input data level.</p>
-<p>3. Stabilizes learning: Keeps the model in the space of valid logical formulas,
-which prevents numerical instability in deep logical graphs.</p>
+<dd><p>Top-level function to aggregate and apply all logical and structural constraints.</p>
+<p>This should be called immediately after the optimizer’s update step
+but before the next forward pass. It keeps the model within the
+feasible space of logical formulas.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>model</strong> (<em>nnx.Module</em>) – An instance of
-a Flax NNX model to which the constraints apply throughout the parameter tree.</p>
+<dd class="field-odd"><p><strong>model</strong> (<em>nnx.Module</em>) – The Flax NNX model to be constrained.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -321,26 +312,13 @@ a Flax NNX model to which the constraints apply throughout the parameter tree.</
 <dl class="py function">
 <dt class="sig sig-object py" id="jlnn.nn.constraints.clip_predicates">
 <span class="sig-prename descclassname"><span class="pre">jlnn.nn.constraints.</span></span><span class="sig-name descname"><span class="pre">clip_predicates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Module</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/jlnn/nn/constraints.html#clip_predicates"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jlnn.nn.constraints.clip_predicates" title="Link to this definition">¶</a></dt>
-<dd><p>Ensures logical integrity and consistency of LearnedPredicate parameters.</p>
-<p>This function enforces an axiomatic relationship between the lower (L) and upper (U)
-bounds of the truth interval directly at the level of the ramp_sigmoid activation parameters.
-In the JLNN framework, the lower bound represents the confirmed truth
-and the upper bound represents the maximum possible truth; therefore, by definition, L &lt;= U must hold.</p>
-<p>In the function used f(x) = clip(slope * (x - offset) + 0.5, 0, 1),
-the ‘offset’ parameter plays the role of a decision boundary on the X-axis.
-A smaller offset value means that the function starts to rise earlier (at lower input values).
-In order to maintain the integrity of the interval,
-the upper bound (U) must always “cover” the lower bound (L),
-which mathematically requires the condition: offset_u &lt;= offset_l.</p>
-<p>Mechanism of operation:
-1. The function searches for all ‘offset_u’ parameters in the model graph.
-2. Dynamically searches for the corresponding ‘offset_l’ within the same module.
-3. If the gradient moves ‘offset_u’ above the ‘offset_l’ value,
-the function moves (projects) it back to the equality boundary.</p>
+<dd><p>Ensures logical consistency in grounding layers (predicates) by maintaining L &lt;= U.</p>
+<p>For a LearnedPredicate, the lower bound (L) must never exceed the upper bound (U).
+This is achieved by adjusting the offset parameters such that the transition
+for the upper bound does not lag behind the lower bound.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>model</strong> (<em>nnx.Module</em>) – An instance of the Flax NNX model for which input predicate consistency is required.
-Modification is done in-place.</p>
+<dd class="field-odd"><p><strong>model</strong> (<em>nnx.Module</em>) – The Flax NNX model containing LearnedPredicate modules.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -348,24 +326,17 @@ Modification is done in-place.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="jlnn.nn.constraints.clip_weights">
 <span class="sig-prename descclassname"><span class="pre">jlnn.nn.constraints.</span></span><span class="sig-name descname"><span class="pre">clip_weights</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Module</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/jlnn/nn/constraints.html#clip_weights"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jlnn.nn.constraints.clip_weights" title="Link to this definition">¶</a></dt>
-<dd><p>Ensures that all trainable weights in logic gates are &gt;= 1.0.</p>
-<p>In Logical Neural Networks (LNN) and Łukasiewicz logic,
-strict adherence to the condition w &gt;= 1.0 is necessary
-to preserve the semantic interpretability of t-norms and t-conorms.
-If the weights were to fall below this limit,
-the gates would lose their logical identity and start behaving like standard neurons,
-making it impossible to translate the network back into a set of symbolic rules.</p>
-<p>This function implements the ‘Projected Gradient Descent’ method.
-After each parameter update (when the gradient may shift the weights into an invalid space)
-it projects the weights back to the allowed region [1.0, inf).</p>
-<p>The function automatically detects:
-- ‘weights’: Collective weights for AND, OR, NAND, NOR, XOR gates.
-- ‘weight’: Individual weight for unary operations like NOT.</p>
+<dd><p>Ensures that all trainable weights in logic gates satisfy the condition w &gt;= 1.0.</p>
+<p>In Logical Neural Networks (LNN) using Łukasiewicz semantics, maintaining
+weights &gt;= 1.0 is crucial for the interpretability of t-norms and t-conorms.
+If weights fall below this threshold, gates lose their identity as logical
+operators and behave like standard neural nodes.</p>
+<p>This function implements a ‘Projected Gradient Descent’ step by projecting
+violating weights back to the valid domain [1.0, inf).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>model</strong> (<em>nnx.Module</em>) – An instance of the Flax NNX model.
-The function iterates through the entire parameter graph
-and modifies the nnx.Param values ​​in-place.</p>
+<dd class="field-odd"><p><strong>model</strong> (<em>nnx.Module</em>) – The Flax NNX model/module to be constrained.
+The function traverses the entire graph and updates parameters in-place.</p>
 </dd>
 </dl>
 </dd></dl>

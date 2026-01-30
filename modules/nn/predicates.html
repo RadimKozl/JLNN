@@ -299,14 +299,55 @@
 <dt class="sig sig-object py" id="jlnn.nn.predicates.LearnedPredicate">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">jlnn.nn.predicates.</span></span><span class="sig-name descname"><span class="pre">LearnedPredicate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/jlnn/nn/predicates.html#LearnedPredicate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jlnn.nn.predicates.LearnedPredicate" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
-<p>Transforms real input data into truth intervals [L, U].</p>
-<p>This class serves as the input layer of the JLNN network (so-called grounding).
-Using trainable parameters (slope and offset),
-it learns to define the semantics of logical statements over continuous data. For example,
-it can learn what specific value from a temperature sensor corresponds to the logical statement “it’s hot”.</p>
-<p>It uses two independent ramp_sigmoid functions to model the lower (L)
-and upper (U) bounds of truth, which allows the system to also express
-the degree of uncertainty (ignorance) regarding a given feature.</p>
+<p>Grounding layer that transforms real-valued input data into truth intervals [L, U].</p>
+<p>In Logical Neural Networks (LNN), predicates act as the interface between
+numeric data and logical formulas. This class learns the semantic mapping
+(grounding) by adjusting slopes and offsets of activation functions to
+produce fuzzy truth values.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="jlnn.nn.predicates.LearnedPredicate.slope_l">
+<span class="sig-name descname"><span class="pre">slope_l</span></span><a class="headerlink" href="#jlnn.nn.predicates.LearnedPredicate.slope_l" title="Link to this definition">¶</a></dt>
+<dd><p>Steepness of the lower bound activation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>nnx.Param</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="jlnn.nn.predicates.LearnedPredicate.offset_l">
+<span class="sig-name descname"><span class="pre">offset_l</span></span><a class="headerlink" href="#jlnn.nn.predicates.LearnedPredicate.offset_l" title="Link to this definition">¶</a></dt>
+<dd><p>Horizontal shift for the lower bound activation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>nnx.Param</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="jlnn.nn.predicates.LearnedPredicate.slope_u">
+<span class="sig-name descname"><span class="pre">slope_u</span></span><a class="headerlink" href="#jlnn.nn.predicates.LearnedPredicate.slope_u" title="Link to this definition">¶</a></dt>
+<dd><p>Steepness of the upper bound activation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>nnx.Param</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="jlnn.nn.predicates.LearnedPredicate.offset_u">
+<span class="sig-name descname"><span class="pre">offset_u</span></span><a class="headerlink" href="#jlnn.nn.predicates.LearnedPredicate.offset_u" title="Link to this definition">¶</a></dt>
+<dd><p>Horizontal shift for the upper bound activation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>nnx.Param</p>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 </section>
@@ -367,7 +408,13 @@ the degree of uncertainty (ignorance) regarding a given feature.</p>
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">Learned Predicates</a><ul>
-<li><a class="reference internal" href="#jlnn.nn.predicates.LearnedPredicate"><code class="docutils literal notranslate"><span class="pre">LearnedPredicate</span></code></a></li>
+<li><a class="reference internal" href="#jlnn.nn.predicates.LearnedPredicate"><code class="docutils literal notranslate"><span class="pre">LearnedPredicate</span></code></a><ul>
+<li><a class="reference internal" href="#jlnn.nn.predicates.LearnedPredicate.slope_l"><code class="docutils literal notranslate"><span class="pre">LearnedPredicate.slope_l</span></code></a></li>
+<li><a class="reference internal" href="#jlnn.nn.predicates.LearnedPredicate.offset_l"><code class="docutils literal notranslate"><span class="pre">LearnedPredicate.offset_l</span></code></a></li>
+<li><a class="reference internal" href="#jlnn.nn.predicates.LearnedPredicate.slope_u"><code class="docutils literal notranslate"><span class="pre">LearnedPredicate.slope_u</span></code></a></li>
+<li><a class="reference internal" href="#jlnn.nn.predicates.LearnedPredicate.offset_u"><code class="docutils literal notranslate"><span class="pre">LearnedPredicate.offset_u</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>

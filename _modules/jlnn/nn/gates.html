@@ -299,22 +299,18 @@
 <span class="k">class</span><span class="w"> </span><span class="nc">WeightedOr</span><span class="p">(</span><span class="n">nnx</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Trainable weighted OR gate implemented using Łukasiewicz t-conorm.</span>
-<span class="sd">    </span>
-<span class="sd">    In the JLNN framework, this gate aggregates the truth intervals of the inputs </span>
-<span class="sd">    and allows the model to learn the importance (weight) of each argument </span>
-<span class="sd">    and the sensitivity threshold (beta) for the disjunction. </span>
-<span class="sd">    The computation is delegated to a stateless function in the functional module.</span>
+
+<span class="sd">    In the JLNN framework, this gate aggregates truth intervals from multiple inputs.</span>
+<span class="sd">    It learns the relative importance of each input through weights and adjusts</span>
+<span class="sd">    the activation threshold via the beta parameter.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        weights (nnx.Param): Importance weights for each input signal.</span>
+<span class="sd">        beta (nnx.Param): Sensitivity threshold (bias) of the disjunction.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 <div class="viewcode-block" id="WeightedOr.__init__">
 <a class="viewcode-back" href="../../../modules/nn/gates.html#jlnn.nn.gates.WeightedOr.__init__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_inputs</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">rngs</span><span class="p">:</span> <span class="n">nnx</span><span class="o">.</span><span class="n">Rngs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Initializes the OR gate parameters.</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            num_inputs (int): Number of input logic signals.</span>
-<span class="sd">            rngs (nnx.Rngs): Random number generator for initializing NNX parameters.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">weights</span> <span class="o">=</span> <span class="n">nnx</span><span class="o">.</span><span class="n">Param</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">num_inputs</span><span class="p">,)))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">beta</span> <span class="o">=</span> <span class="n">nnx</span><span class="o">.</span><span class="n">Param</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="mf">1.0</span><span class="p">))</span></div>
 
@@ -323,15 +319,17 @@
 <a class="viewcode-back" href="../../../modules/nn/gates.html#jlnn.nn.gates.WeightedOr.__call__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Performs a forward calculation of the weighted disjunction.</span>
+<span class="sd">        Executes the weighted OR operation.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            x (jnp.ndarray): Input interval tensor of the form (..., num_inputs, 2).</span>
+<span class="sd">            x (jnp.ndarray): Input interval tensor of shape (..., num_inputs, 2).</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            jnp.ndarray: The resulting aggregated truth interval [L, U].</span>
+<span class="sd">            jnp.ndarray: The resulting truth interval [L, U].</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">F</span><span class="o">.</span><span class="n">weighted_or</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">beta</span><span class="o">.</span><span class="n">value</span><span class="p">)</span></div>
+        <span class="c1"># Note: Using [...] for parameter access ensures compatibility with NNX </span>
+        <span class="c1"># and avoids DeprecationWarnings associated with the .value property.</span>
+        <span class="k">return</span> <span class="n">F</span><span class="o">.</span><span class="n">weighted_or</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">[</span><span class="o">...</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">beta</span><span class="p">[</span><span class="o">...</span><span class="p">])</span></div>
 </div>
 
 
@@ -340,22 +338,14 @@
 <a class="viewcode-back" href="../../../modules/nn/gates.html#jlnn.nn.gates.WeightedAnd">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">WeightedAnd</span><span class="p">(</span><span class="n">nnx</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Trainable weighted AND gate implemented using Łukasiewicz&#39;s t-norm.</span>
-<span class="sd">    </span>
-<span class="sd">    This gate implements logical conjunction over intervals. </span>
-<span class="sd">    The weight parameters allow the network to selectively suppress unimportant inputs, </span>
-<span class="sd">    while the beta parameter controls the stringency of the logical product.</span>
+<span class="sd">    Trainable weighted AND gate implemented using Łukasiewicz t-norm.</span>
+
+<span class="sd">    This gate performs a fuzzy conjunction where weights determine how much</span>
+<span class="sd">    each input contributes to the &quot;negative evidence&quot; against the truth.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 <div class="viewcode-block" id="WeightedAnd.__init__">
 <a class="viewcode-back" href="../../../modules/nn/gates.html#jlnn.nn.gates.WeightedAnd.__init__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_inputs</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">rngs</span><span class="p">:</span> <span class="n">nnx</span><span class="o">.</span><span class="n">Rngs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Initializes the AND gate parameters.</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            num_inputs (int): Number of input logic signals.</span>
-<span class="sd">            rngs (nnx.Rngs): Generator for NNX state.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">weights</span> <span class="o">=</span> <span class="n">nnx</span><span class="o">.</span><span class="n">Param</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">num_inputs</span><span class="p">,)))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">beta</span> <span class="o">=</span> <span class="n">nnx</span><span class="o">.</span><span class="n">Param</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="mf">1.0</span><span class="p">))</span></div>
 
@@ -363,16 +353,8 @@
 <div class="viewcode-block" id="WeightedAnd.__call__">
 <a class="viewcode-back" href="../../../modules/nn/gates.html#jlnn.nn.gates.WeightedAnd.__call__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Performs a forward calculation of the weighted conjunction.</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            x (jnp.ndarray): Input interval tensor of the form (..., num_inputs, 2).</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            jnp.ndarray: The resulting aggregated truth interval [L, U].</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">F</span><span class="o">.</span><span class="n">weighted_and</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">beta</span><span class="o">.</span><span class="n">value</span><span class="p">)</span></div>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Computes the weighted Łukasiewicz conjunction.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">F</span><span class="o">.</span><span class="n">weighted_and</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">[</span><span class="o">...</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">beta</span><span class="p">[</span><span class="o">...</span><span class="p">])</span></div>
 </div>
 
 
@@ -382,11 +364,9 @@
 <span class="k">class</span><span class="w"> </span><span class="nc">WeightedNand</span><span class="p">(</span><span class="n">nnx</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Weighted NAND gate (Negated AND).</span>
-<span class="sd">    </span>
-<span class="sd">    Implements negation of conjunction. In JLNN, </span>
-<span class="sd">    this operation is key for enforcing constraints, </span>
-<span class="sd">    where we want to prevent two contradictory statements </span>
-<span class="sd">    from being true at the same time.</span>
+
+<span class="sd">    Useful for enforcing constraints where two contradictory statements </span>
+<span class="sd">    should not be simultaneously true.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 <div class="viewcode-block" id="WeightedNand.__init__">
 <a class="viewcode-back" href="../../../modules/nn/gates.html#jlnn.nn.gates.WeightedNand.__init__">[docs]</a>
@@ -398,10 +378,7 @@
 <div class="viewcode-block" id="WeightedNand.__call__">
 <a class="viewcode-back" href="../../../modules/nn/gates.html#jlnn.nn.gates.WeightedNand.__call__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Computes a negated weighted conjunction using a functional interface.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">F</span><span class="o">.</span><span class="n">weighted_nand</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">beta</span><span class="o">.</span><span class="n">value</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">F</span><span class="o">.</span><span class="n">weighted_nand</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">[</span><span class="o">...</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">beta</span><span class="p">[</span><span class="o">...</span><span class="p">])</span></div>
 </div>
 
 
@@ -411,10 +388,8 @@
 <span class="k">class</span><span class="w"> </span><span class="nc">WeightedNor</span><span class="p">(</span><span class="n">nnx</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Weighted NOR gate (Negated OR).</span>
-<span class="sd">    </span>
-<span class="sd">    This operator returns a high truth value only if </span>
-<span class="sd">    all weighted inputs have a low truth value. </span>
-<span class="sd">    It is often used to detect the absence of specific features in the data.</span>
+
+<span class="sd">    Evaluates to high truth only if all weighted inputs are close to falsehood.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 <div class="viewcode-block" id="WeightedNor.__init__">
 <a class="viewcode-back" href="../../../modules/nn/gates.html#jlnn.nn.gates.WeightedNor.__init__">[docs]</a>
@@ -426,10 +401,7 @@
 <div class="viewcode-block" id="WeightedNor.__call__">
 <a class="viewcode-back" href="../../../modules/nn/gates.html#jlnn.nn.gates.WeightedNor.__call__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Calculates the negated weighted disjunction.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">F</span><span class="o">.</span><span class="n">weighted_nor</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">beta</span><span class="o">.</span><span class="n">value</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">F</span><span class="o">.</span><span class="n">weighted_nor</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">[</span><span class="o">...</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">beta</span><span class="p">[</span><span class="o">...</span><span class="p">])</span></div>
 </div>
 
 
@@ -438,29 +410,24 @@
 <a class="viewcode-back" href="../../../modules/nn/gates.html#jlnn.nn.gates.WeightedXor">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">WeightedXor</span><span class="p">(</span><span class="n">nnx</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Trainable n-ary XOR gate (Exclusive OR) using tree reduction.</span>
-<span class="sd">    </span>
-<span class="sd">    XOR is implemented in interval logic as a recursive binary tree. </span>
-<span class="sd">    For n=2 it uses the composition (A OR B) AND (A NAND B). </span>
-<span class="sd">    For n &gt; 2 the inputs are divided and the results are combined using binary XOR operations. </span>
-<span class="sd">    This structure allows learning complex parity functions with trainable weights at each node of the tree.</span>
+<span class="sd">    Trainable n-ary XOR gate implemented via recursive tree reduction.</span>
+
+<span class="sd">    XOR in interval logic is non-trivial. For n=2, it uses the logical </span>
+<span class="sd">    composition: (A OR B) AND (A NAND B). For n &gt; 2, it recursively builds </span>
+<span class="sd">    a binary tree of XOR operations.</span>
+
+<span class="sd">    This hierarchical structure allows the network to learn complex parity-like </span>
+<span class="sd">    functions with independent weights at each node.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 <div class="viewcode-block" id="WeightedXor.__init__">
 <a class="viewcode-back" href="../../../modules/nn/gates.html#jlnn.nn.gates.WeightedXor.__init__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_inputs</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">rngs</span><span class="p">:</span> <span class="n">nnx</span><span class="o">.</span><span class="n">Rngs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        It builds a hierarchical structure of an XOR gate.</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            num_inputs (int): Total number of inputs.</span>
-<span class="sd">            rngs (nnx.Rngs): Generator for initializing all internal gates.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">num_inputs</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;An XOR gate requires at least 2 inputs.&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">num_inputs</span> <span class="o">=</span> <span class="n">num_inputs</span>
 
         <span class="k">if</span> <span class="n">num_inputs</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
-            <span class="c1"># Base case: parameters for internal logical composition XOR</span>
+            <span class="c1"># Base case: Parameters for the internal composition</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">weights_or</span> <span class="o">=</span> <span class="n">nnx</span><span class="o">.</span><span class="n">Param</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">2</span><span class="p">,)))</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">weights_nand</span> <span class="o">=</span> <span class="n">nnx</span><span class="o">.</span><span class="n">Param</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">2</span><span class="p">,)))</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">weights_and</span> <span class="o">=</span> <span class="n">nnx</span><span class="o">.</span><span class="n">Param</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">2</span><span class="p">,)))</span>
@@ -468,7 +435,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">left_child</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">right_child</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="c1"># Recursive case: splitting inputs and creating subtrees</span>
+            <span class="c1"># Recursive case: Build a balanced tree</span>
             <span class="n">mid</span> <span class="o">=</span> <span class="n">num_inputs</span> <span class="o">//</span> <span class="mi">2</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">left_child</span> <span class="o">=</span> <span class="n">WeightedXor</span><span class="p">(</span><span class="n">num_inputs</span><span class="o">=</span><span class="n">mid</span><span class="p">,</span> <span class="n">rngs</span><span class="o">=</span><span class="n">rngs</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">right_child</span> <span class="o">=</span> <span class="n">WeightedXor</span><span class="p">(</span><span class="n">num_inputs</span><span class="o">=</span><span class="n">num_inputs</span> <span class="o">-</span> <span class="n">mid</span><span class="p">,</span> <span class="n">rngs</span><span class="o">=</span><span class="n">rngs</span><span class="p">)</span>
@@ -478,17 +445,16 @@
 <div class="viewcode-block" id="WeightedXor.__call__">
 <a class="viewcode-back" href="../../../modules/nn/gates.html#jlnn.nn.gates.WeightedXor.__call__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Performs a recursive parity calculation (XOR) over the tree structure.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_inputs</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
-            <span class="c1"># Atomic binary XOR operation using functional.py</span>
-            <span class="n">res_or</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">weighted_or</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights_or</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">beta</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
-            <span class="n">res_nand</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">weighted_nand</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights_nand</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">beta</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+            <span class="c1"># Atomic binary XOR logic</span>
+            <span class="n">res_or</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">weighted_or</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights_or</span><span class="p">[</span><span class="o">...</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">beta</span><span class="p">[</span><span class="o">...</span><span class="p">])</span>
+            <span class="n">res_nand</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">weighted_nand</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights_nand</span><span class="p">[</span><span class="o">...</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">beta</span><span class="p">[</span><span class="o">...</span><span class="p">])</span>
+            
+            <span class="c1"># Combine results into a new interval set for the final AND gate</span>
             <span class="n">combined</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">res_or</span><span class="p">,</span> <span class="n">res_nand</span><span class="p">],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">2</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">F</span><span class="o">.</span><span class="n">weighted_and</span><span class="p">(</span><span class="n">combined</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights_and</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">beta</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">F</span><span class="o">.</span><span class="n">weighted_and</span><span class="p">(</span><span class="n">combined</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights_and</span><span class="p">[</span><span class="o">...</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">beta</span><span class="p">[</span><span class="o">...</span><span class="p">])</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="c1"># Traversal of the reduction tree</span>
+            <span class="c1"># Tree traversal: pass data through sub-modules</span>
             <span class="n">mid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_inputs</span> <span class="o">//</span> <span class="mi">2</span>
             <span class="n">res_left</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">left_child</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="p">:</span><span class="n">mid</span><span class="p">,</span> <span class="p">:])</span>
             <span class="n">res_right</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">right_child</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">mid</span><span class="p">:,</span> <span class="p">:])</span>
@@ -502,20 +468,14 @@
 <a class="viewcode-back" href="../../../modules/nn/gates.html#jlnn.nn.gates.WeightedImplication">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">WeightedImplication</span><span class="p">(</span><span class="n">nnx</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Trainable gate for logical implication (A -&gt; B).</span>
-<span class="sd">    </span>
-<span class="sd">    Allows modeling of causal relationships between statements. </span>
-<span class="sd">    Supports multiple semantics (Łukasiewicz, Reichenbach, Kleene-Dienes) via the &#39;method&#39; parameter. </span>
-<span class="sd">    Weights allow setting different importance of antecedent and consequent.</span>
+<span class="sd">    Trainable implication gate (A -&gt; B).</span>
+
+<span class="sd">    Supports multiple semantics (Łukasiewicz, Reichenbach, Kleene-Dienes).</span>
+<span class="sd">    Ideal for modeling expert-driven rules within the neural architecture.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 <div class="viewcode-block" id="WeightedImplication.__init__">
 <a class="viewcode-back" href="../../../modules/nn/gates.html#jlnn.nn.gates.WeightedImplication.__init__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rngs</span><span class="p">:</span> <span class="n">nnx</span><span class="o">.</span><span class="n">Rngs</span><span class="p">,</span> <span class="n">method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;lukasiewicz&#39;</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Args:</span>
-<span class="sd">            rngs (nnx.Rngs): Generator for parameters.</span>
-<span class="sd">            method (str): Selected logical semantics for implication.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="o">=</span> <span class="n">method</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">weights</span> <span class="o">=</span> <span class="n">nnx</span><span class="o">.</span><span class="n">Param</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">2</span><span class="p">,)))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">beta</span> <span class="o">=</span> <span class="n">nnx</span><span class="o">.</span><span class="n">Param</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="mf">1.0</span><span class="p">))</span></div>
@@ -524,11 +484,8 @@
 <div class="viewcode-block" id="WeightedImplication.__call__">
 <a class="viewcode-back" href="../../../modules/nn/gates.html#jlnn.nn.gates.WeightedImplication.__call__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">int_a</span><span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">int_b</span><span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Calculates the truth interval of the implication.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">F</span><span class="o">.</span><span class="n">weighted_implication</span><span class="p">(</span>
-            <span class="n">int_a</span><span class="p">,</span> <span class="n">int_b</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">beta</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span>
+            <span class="n">int_a</span><span class="p">,</span> <span class="n">int_b</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">[</span><span class="o">...</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">beta</span><span class="p">[</span><span class="o">...</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span>
         <span class="p">)</span></div>
 </div>
 
@@ -539,10 +496,8 @@
 <span class="k">class</span><span class="w"> </span><span class="nc">WeightedNot</span><span class="p">(</span><span class="n">nnx</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Trainable weighted negation (NOT) gate.</span>
-<span class="sd">    </span>
-<span class="sd">    The weight parameter allows the network to learn how strongly to invert a given input. </span>
-<span class="sd">    This is useful in situations where negating a statement is only partially relevant </span>
-<span class="sd">    or under certain conditions.</span>
+
+<span class="sd">    Allows the model to learn the degree of inversion for a specific statement.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 <div class="viewcode-block" id="WeightedNot.__init__">
 <a class="viewcode-back" href="../../../modules/nn/gates.html#jlnn.nn.gates.WeightedNot.__init__">[docs]</a>
@@ -553,10 +508,7 @@
 <div class="viewcode-block" id="WeightedNot.__call__">
 <a class="viewcode-back" href="../../../modules/nn/gates.html#jlnn.nn.gates.WeightedNot.__call__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Applies a weighted negation to the input interval.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">F</span><span class="o">.</span><span class="n">weighted_not</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">weight</span><span class="o">.</span><span class="n">value</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">F</span><span class="o">.</span><span class="n">weighted_not</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">weight</span><span class="p">[</span><span class="o">...</span><span class="p">])</span></div>
 </div>
 
 </pre></div>

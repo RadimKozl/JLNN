@@ -297,123 +297,69 @@
 <a class="viewcode-back" href="../../../modules/nn/constraints.html#jlnn.nn.constraints.clip_weights">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">clip_weights</span><span class="p">(</span><span class="n">model</span><span class="p">:</span> <span class="n">nnx</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Ensures that all trainable weights in logic gates are &gt;= 1.0.</span>
+<span class="sd">    Ensures that all trainable weights in logic gates satisfy the condition w &gt;= 1.0.</span>
 
-<span class="sd">    In Logical Neural Networks (LNN) and Łukasiewicz logic, </span>
-<span class="sd">    strict adherence to the condition w &gt;= 1.0 is necessary </span>
-<span class="sd">    to preserve the semantic interpretability of t-norms and t-conorms. </span>
-<span class="sd">    If the weights were to fall below this limit, </span>
-<span class="sd">    the gates would lose their logical identity and start behaving like standard neurons, </span>
-<span class="sd">    making it impossible to translate the network back into a set of symbolic rules.</span>
+<span class="sd">    In Logical Neural Networks (LNN) using Łukasiewicz semantics, maintaining </span>
+<span class="sd">    weights &gt;= 1.0 is crucial for the interpretability of t-norms and t-conorms. </span>
+<span class="sd">    If weights fall below this threshold, gates lose their identity as logical </span>
+<span class="sd">    operators and behave like standard neural nodes.</span>
 
-<span class="sd">    This function implements the &#39;Projected Gradient Descent&#39; method. </span>
-<span class="sd">    After each parameter update (when the gradient may shift the weights into an invalid space) </span>
-<span class="sd">    it projects the weights back to the allowed region [1.0, inf).</span>
-
-<span class="sd">    The function automatically detects:</span>
-<span class="sd">    - &#39;weights&#39;: Collective weights for AND, OR, NAND, NOR, XOR gates.</span>
-<span class="sd">    - &#39;weight&#39;: Individual weight for unary operations like NOT.</span>
+<span class="sd">    This function implements a &#39;Projected Gradient Descent&#39; step by projecting </span>
+<span class="sd">    violating weights back to the valid domain [1.0, inf).</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        model (nnx.Module): An instance of the Flax NNX model. </span>
-<span class="sd">            The function iterates through the entire parameter graph </span>
-<span class="sd">            and modifies the nnx.Param values ​​in-place.</span>
+<span class="sd">        model (nnx.Module): The Flax NNX model/module to be constrained. </span>
+<span class="sd">            The function traverses the entire graph and updates parameters in-place.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># We traverse the model parameter graph using the NNX iterator</span>
-    <span class="k">for</span> <span class="n">path</span><span class="p">,</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">iter_graph</span><span class="p">():</span>
-        <span class="c1"># Check if this is a trainable parameter</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">param</span><span class="p">,</span> <span class="n">nnx</span><span class="o">.</span><span class="n">Param</span><span class="p">):</span>
-            <span class="c1"># We target weights across all gate types in gates.py</span>
-            <span class="c1"># path[-1] represents the attribute name in the class definition</span>
-            <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">name</span> <span class="ow">in</span> <span class="n">path</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;weights&#39;</span><span class="p">,</span> <span class="s1">&#39;weight&#39;</span><span class="p">)):</span>
-                <span class="c1"># Applying the maximum operation to trim the lower bound.</span>
-                <span class="c1"># In JAX, this operation is efficient and preserves the integrity of the calculation.</span>
-                <span class="n">param</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">param</span><span class="o">.</span><span class="n">value</span><span class="p">)</span></div>
-
+    <span class="c1"># We iterate through the model graph to find all Param nodes</span>
+    <span class="k">for</span> <span class="n">path</span><span class="p">,</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">nnx</span><span class="o">.</span><span class="n">iter_graph</span><span class="p">(</span><span class="n">model</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">nnx</span><span class="o">.</span><span class="n">Param</span><span class="p">):</span>
+            <span class="n">param_name</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="c1"># Target collective weights (AND, OR, XOR, etc.) and unary weights (NOT)</span>
+            <span class="k">if</span> <span class="s1">&#39;weight&#39;</span> <span class="ow">in</span> <span class="n">param_name</span><span class="p">:</span>
+                <span class="c1"># Use [...] for both reading the value and in-place assignment </span>
+                <span class="c1"># to avoid DeprecationWarnings and ensure JAX compatibility.</span>
+                <span class="n">node</span><span class="p">[</span><span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">node</span><span class="p">[</span><span class="o">...</span><span class="p">])</span></div>
 
 
 <div class="viewcode-block" id="clip_predicates">
 <a class="viewcode-back" href="../../../modules/nn/constraints.html#jlnn.nn.constraints.clip_predicates">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">clip_predicates</span><span class="p">(</span><span class="n">model</span><span class="p">:</span> <span class="n">nnx</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Ensures logical integrity and consistency of LearnedPredicate parameters.</span>
+<span class="sd">    Ensures logical consistency in grounding layers (predicates) by maintaining L &lt;= U.</span>
 
-<span class="sd">    This function enforces an axiomatic relationship between the lower (L) and upper (U) </span>
-<span class="sd">    bounds of the truth interval directly at the level of the ramp_sigmoid activation parameters. </span>
-<span class="sd">    In the JLNN framework, the lower bound represents the confirmed truth </span>
-<span class="sd">    and the upper bound represents the maximum possible truth; therefore, by definition, L &lt;= U must hold.</span>
-
-<span class="sd">    In the function used f(x) = clip(slope * (x - offset) + 0.5, 0, 1), </span>
-<span class="sd">    the &#39;offset&#39; parameter plays the role of a decision boundary on the X-axis. </span>
-<span class="sd">    A smaller offset value means that the function starts to rise earlier (at lower input values). </span>
-<span class="sd">    In order to maintain the integrity of the interval, </span>
-<span class="sd">    the upper bound (U) must always &quot;cover&quot; the lower bound (L), </span>
-<span class="sd">    which mathematically requires the condition: offset_u &lt;= offset_l.</span>
-
-<span class="sd">    Mechanism of operation:</span>
-<span class="sd">    1. The function searches for all &#39;offset_u&#39; parameters in the model graph.</span>
-<span class="sd">    2. Dynamically searches for the corresponding &#39;offset_l&#39; within the same module.</span>
-<span class="sd">    3. If the gradient moves &#39;offset_u&#39; above the &#39;offset_l&#39; value, </span>
-<span class="sd">    the function moves (projects) it back to the equality boundary.</span>
+<span class="sd">    For a LearnedPredicate, the lower bound (L) must never exceed the upper bound (U).</span>
+<span class="sd">    This is achieved by adjusting the offset parameters such that the transition </span>
+<span class="sd">    for the upper bound does not lag behind the lower bound.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        model (nnx.Module): An instance of the Flax NNX model for which input predicate consistency is required. </span>
-<span class="sd">            Modification is done in-place.</span>
+<span class="sd">        model (nnx.Module): The Flax NNX model containing LearnedPredicate modules.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># We traverse the model graph and look for parameters affecting the upper bounds of the predicates</span>
-    <span class="k">for</span> <span class="n">path</span><span class="p">,</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">iter_graph</span><span class="p">():</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">param</span><span class="p">,</span> <span class="n">nnx</span><span class="o">.</span><span class="n">Param</span><span class="p">):</span>
-            <span class="c1"># We are specifically targeting parameters defined in jlnn.nn.predicates</span>
-            <span class="k">if</span> <span class="n">path</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;offset_u&#39;</span><span class="p">:</span>
-                <span class="c1"># We access the parent module through the path in the graph</span>
-                <span class="n">parent_path</span> <span class="o">=</span> <span class="n">path</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-                <span class="k">try</span><span class="p">:</span>
-                    <span class="c1"># Finding the sibling parameter offset_l</span>
-                    <span class="n">offset_l_path</span> <span class="o">=</span> <span class="n">parent_path</span> <span class="o">+</span> <span class="p">(</span><span class="s1">&#39;offset_l&#39;</span><span class="p">,)</span>
-                    <span class="n">offset_l_value</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">get_at</span><span class="p">(</span><span class="n">offset_l_path</span><span class="p">)</span><span class="o">.</span><span class="n">value</span>
-                    
-                    <span class="c1"># Projection of the parameter offset_u into the allowed half-space.</span>
-                    <span class="c1"># We use jnp.minimum because for an earlier onset of U</span>
-                    <span class="c1"># we need an offset smaller than or equal to L.</span>
-                    <span class="n">param</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">offset_l_value</span><span class="p">,</span> <span class="n">param</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
-                    
-                <span class="k">except</span> <span class="p">(</span><span class="ne">AttributeError</span><span class="p">,</span> <span class="ne">KeyError</span><span class="p">):</span>
-                    <span class="c1"># Handling the case where a parameter exists outside the expected structure</span>
-                    <span class="k">pass</span></div>
-
+    <span class="k">for</span> <span class="n">path</span><span class="p">,</span> <span class="n">module</span> <span class="ow">in</span> <span class="n">nnx</span><span class="o">.</span><span class="n">iter_graph</span><span class="p">(</span><span class="n">model</span><span class="p">):</span>
+        <span class="c1"># Check for modules that have both lower and upper offsets (Predicates)</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="s1">&#39;offset_l&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="s1">&#39;offset_u&#39;</span><span class="p">):</span>
+            <span class="c1"># Enforce the constraint: offset_u must be &lt;= offset_l.</span>
+            <span class="c1"># This ensures that for any input x, the resulting interval [L, U] is valid.</span>
+            <span class="n">module</span><span class="o">.</span><span class="n">offset_u</span><span class="p">[</span><span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">module</span><span class="o">.</span><span class="n">offset_u</span><span class="p">[</span><span class="o">...</span><span class="p">],</span> <span class="n">module</span><span class="o">.</span><span class="n">offset_l</span><span class="p">[</span><span class="o">...</span><span class="p">])</span></div>
 
 
 <div class="viewcode-block" id="apply_constraints">
 <a class="viewcode-back" href="../../../modules/nn/constraints.html#jlnn.nn.constraints.apply_constraints">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">apply_constraints</span><span class="p">(</span><span class="n">model</span><span class="p">:</span> <span class="n">nnx</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Aggregates and applies all logical and structural constraints to the model parameters.</span>
+<span class="sd">    Top-level function to aggregate and apply all logical and structural constraints.</span>
 
-<span class="sd">    This function represents a critical point in the JLNN training loop, </span>
-<span class="sd">    implementing a method called &#39;Projected Gradient Descent&#39;. </span>
-<span class="sd">    It must be called immediately after each parameter update by an optimizer (e.g. Optax), </span>
-<span class="sd">    but before the next forward pass.</span>
-
-<span class="sd">    Main tasks of the function:</span>
-<span class="sd">    1. Guarantees interpretability: Returns gate weights to the range &gt;= 1.0,</span>
-<span class="sd">    ensuring that gates behave as t-norms/t-conorms.</span>
-<span class="sd">    </span>
-<span class="sd">    2. Prevents logical conflicts: Adjusts predicate parameters so that L &lt;= U always holds, </span>
-<span class="sd">    thus eliminating the emergence of internal contradictions at the input data level.</span>
-<span class="sd">    </span>
-<span class="sd">    3. Stabilizes learning: Keeps the model in the space of valid logical formulas, </span>
-<span class="sd">    which prevents numerical instability in deep logical graphs.</span>
+<span class="sd">    This should be called immediately after the optimizer&#39;s update step </span>
+<span class="sd">    but before the next forward pass. It keeps the model within the </span>
+<span class="sd">    feasible space of logical formulas.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        model (nnx.Module): An instance of </span>
-<span class="sd">            a Flax NNX model to which the constraints apply throughout the parameter tree.</span>
+<span class="sd">        model (nnx.Module): The Flax NNX model to be constrained.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># 1. Treatment of weights for all gates (AND, OR, NAND, NOR, XOR, NOT, Implication)</span>
-    <span class="c1"># Ensures that w &gt;= 1.0 to preserve operator interpretability.</span>
+    <span class="c1"># 1. Constrain gate weights to preserve logical operator semantics</span>
     <span class="n">clip_weights</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
     
-    <span class="c1"># 2. Treatment of predicates for interval stability (grounding consistency)</span>
-    <span class="c1"># Ensures that offset_u &lt;= offset_l so that the lower bound does not exceed the upper bound.</span>
+    <span class="c1"># 2. Constrain predicate offsets to ensure interval consistency (no contradictions)</span>
     <span class="n">clip_predicates</span><span class="p">(</span><span class="n">model</span><span class="p">)</span></div>
 
 </pre></div>
