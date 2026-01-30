@@ -290,13 +290,14 @@
 <span></span><span class="ch">#!/usr/bin/env python3</span>
 
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">JLNN Symbolic Compiler - WORKING VERSION</span>
+<span class="sd">JLNN Symbolic Compiler</span>
 
-<span class="sd">The issue: Lark is looking for methods named &quot;and&quot;, &quot;or&quot;, &quot;not&quot; (from grammar rules)</span>
-<span class="sd">but Python doesn&#39;t allow these as method names because they&#39;re keywords.</span>
-<span class="sd">Solution: Use setattr() to dynamically create the attributes after class definition.</span>
+<span class="sd">This module provides the infrastructure to compile symbolic logical formulas </span>
+<span class="sd">into neural computational graphs using Flax NNX and JAX. It leverages </span>
+<span class="sd">the Lark parser to transform strings into a tree of NNX Modules.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
+<span class="c1"># Imports</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Union</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">lark</span><span class="w"> </span><span class="kn">import</span> <span class="n">Transformer</span><span class="p">,</span> <span class="n">Tree</span><span class="p">,</span> <span class="n">Token</span>
@@ -310,9 +311,25 @@
 <span class="k">class</span><span class="w"> </span><span class="nc">Node</span><span class="p">(</span><span class="n">nnx</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Abstract base class for all nodes in the JLNN computational graph.</span>
+<span class="sd">    </span>
+<span class="sd">    Each node represents a logical operation or a predicate and must </span>
+<span class="sd">    implement a forward pass that operates on JAX arrays.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Node.forward">
+<a class="viewcode-back" href="../../../modules/symbolic/compiler.html#jlnn.symbolic.compiler.Node.forward">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Performs the forward evaluation of the node.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            values: A mapping of variable names to JAX arrays containing </span>
+<span class="sd">                   the raw input features.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A JAX array representing the truth value (typically a truth interval).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+</div>
 
 
 <div class="viewcode-block" id="PredicateNode">
@@ -320,85 +337,134 @@
 <span class="k">class</span><span class="w"> </span><span class="nc">PredicateNode</span><span class="p">(</span><span class="n">Node</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Represents a leaf node (variable) mapping to a LearnedPredicate.</span>
+<span class="sd">    </span>
+<span class="sd">    This node acts as the grounding layer where raw numeric data is </span>
+<span class="sd">    transformed into a fuzzy truth value.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">rngs</span><span class="p">:</span> <span class="n">nnx</span><span class="o">.</span><span class="n">Rngs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes the predicate node.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            name: The identifier of the variable in the formula.</span>
+<span class="sd">            rngs: Flax NNX random number generator stream for parameter initialization.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
-        <span class="c1"># Every variable gets its own trainable grounding</span>
+        <span class="c1"># Every variable gets its own trainable grounding (LearnedPredicate)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">predicate</span> <span class="o">=</span> <span class="n">predicates</span><span class="o">.</span><span class="n">LearnedPredicate</span><span class="p">(</span><span class="n">in_features</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">rngs</span><span class="o">=</span><span class="n">rngs</span><span class="p">)</span>
 
+<div class="viewcode-block" id="PredicateNode.forward">
+<a class="viewcode-back" href="../../../modules/symbolic/compiler.html#jlnn.symbolic.compiler.PredicateNode.forward">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-        <span class="c1"># Input &#39;values&#39; dictionary provides raw numeric data for this variable</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Retrieves input data by name and passes it through the predicate.&quot;&quot;&quot;</span>
         <span class="n">val</span> <span class="o">=</span> <span class="n">values</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">predicate</span><span class="p">(</span><span class="n">val</span><span class="p">)</span></div>
+</div>
 
 
 <div class="viewcode-block" id="NAryGateNode">
 <a class="viewcode-back" href="../../../modules/symbolic/compiler.html#jlnn.symbolic.compiler.NAryGateNode">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">NAryGateNode</span><span class="p">(</span><span class="n">Node</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Represents a gate with N inputs (AND, OR, XOR).</span>
+<span class="sd">    Represents a logic gate with N inputs, such as weighted AND, OR or XOR.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gate</span><span class="p">:</span> <span class="n">nnx</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span> <span class="n">children</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Node</span><span class="p">]):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Args:</span>
+<span class="sd">            gate: The neural logic gate module (e.g., WeightedAnd).</span>
+<span class="sd">            children: A list of child Nodes whose outputs are inputs to this gate.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">gate</span> <span class="o">=</span> <span class="n">gate</span>
-        <span class="c1"># Use nnx.List to store children that contain JAX arrays</span>
-        <span class="c1"># This is required in Flax NNX 0.12+ for proper pytree handling</span>
+        <span class="c1"># nnx.List is required for Flax NNX to correctly track child modules </span>
+        <span class="c1"># and their parameters during JAX transformations.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">children</span> <span class="o">=</span> <span class="n">nnx</span><span class="o">.</span><span class="n">List</span><span class="p">(</span><span class="n">children</span><span class="p">)</span>
 
+<div class="viewcode-block" id="NAryGateNode.forward">
+<a class="viewcode-back" href="../../../modules/symbolic/compiler.html#jlnn.symbolic.compiler.NAryGateNode.forward">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-        <span class="c1"># Recursively evaluate all children and stack their results</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Evaluates all children, stacks results, and applies the gate logic.&quot;&quot;&quot;</span>
         <span class="n">child_outputs</span> <span class="o">=</span> <span class="p">[</span><span class="n">child</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">values</span><span class="p">)</span> <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">]</span>
-        <span class="c1"># Stack on the second to last axis to match (batch, inputs, interval)</span>
+        <span class="c1"># Stack results on the second-to-last axis to form a tensor of </span>
+        <span class="c1"># shape (batch, num_inputs, truth_interval_dims).</span>
         <span class="n">x</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">child_outputs</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">2</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">gate</span><span class="p">(</span><span class="n">x</span><span class="p">)</span></div>
+</div>
 
 
 <div class="viewcode-block" id="BinaryGateNode">
 <a class="viewcode-back" href="../../../modules/symbolic/compiler.html#jlnn.symbolic.compiler.BinaryGateNode">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">BinaryGateNode</span><span class="p">(</span><span class="n">Node</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Represents a gate with exactly 2 inputs (Implication).</span>
+<span class="sd">    Represents a gate with exactly 2 inputs, specifically designed for </span>
+<span class="sd">    asymmetric operations like Implication (A -&gt; B).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gate</span><span class="p">:</span> <span class="n">nnx</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span> <span class="n">left</span><span class="p">:</span> <span class="n">Node</span><span class="p">,</span> <span class="n">right</span><span class="p">:</span> <span class="n">Node</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Args:</span>
+<span class="sd">            gate: The binary logic gate module.</span>
+<span class="sd">            left: The antecedent (left-hand side) node.</span>
+<span class="sd">            right: The consequent (right-hand side) node.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">gate</span> <span class="o">=</span> <span class="n">gate</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">left</span> <span class="o">=</span> <span class="n">left</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">right</span> <span class="o">=</span> <span class="n">right</span>
 
+<div class="viewcode-block" id="BinaryGateNode.forward">
+<a class="viewcode-back" href="../../../modules/symbolic/compiler.html#jlnn.symbolic.compiler.BinaryGateNode.forward">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Evaluates antecedent and consequent separately before applying the gate.&quot;&quot;&quot;</span>
         <span class="n">left_output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">left</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
         <span class="n">right_output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
+        
         <span class="c1"># The gate receives two separate arguments (antecedent, consequent)</span>
         <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gate</span><span class="p">(</span><span class="n">left_output</span><span class="p">,</span> <span class="n">right_output</span><span class="p">)</span>
-        <span class="c1"># Remove any singleton dimensions that shouldn&#39;t be there</span>
+        
+        <span class="c1"># Squeeze singleton dimensions to maintain consistent output shape (batch, 2)</span>
         <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">3</span> <span class="ow">and</span> <span class="n">result</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="n">result</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">result</span></div>
+</div>
 
 
 <div class="viewcode-block" id="UnaryGateNode">
 <a class="viewcode-back" href="../../../modules/symbolic/compiler.html#jlnn.symbolic.compiler.UnaryGateNode">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">UnaryGateNode</span><span class="p">(</span><span class="n">Node</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Represents a gate with 1 input (NOT).</span>
+<span class="sd">    Represents a gate with a single input, such as NOT.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gate</span><span class="p">:</span> <span class="n">nnx</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span> <span class="n">child</span><span class="p">:</span> <span class="n">Node</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Args:</span>
+<span class="sd">            gate: The unary logic gate module.</span>
+<span class="sd">            child: The child node to be negated.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">gate</span> <span class="o">=</span> <span class="n">gate</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">child</span> <span class="o">=</span> <span class="n">child</span>
 
+<div class="viewcode-block" id="UnaryGateNode.forward">
+<a class="viewcode-back" href="../../../modules/symbolic/compiler.html#jlnn.symbolic.compiler.UnaryGateNode.forward">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Passes the child&#39;s output through the unary gate.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">gate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">child</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">values</span><span class="p">))</span></div>
+</div>
 
 
 <div class="viewcode-block" id="JLNNCompiler">
 <a class="viewcode-back" href="../../../modules/symbolic/compiler.html#jlnn.symbolic.compiler.JLNNCompiler">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">JLNNCompiler</span><span class="p">(</span><span class="n">Transformer</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Lark Transformer that converts a CST (Concrete Syntax Tree) into an NNX model.</span>
+<span class="sd">    Lark Transformer that converts a CST (Concrete Syntax Tree) into an NNX model tree.</span>
 <span class="sd">    </span>
-<span class="sd">    CRITICAL FIX: The grammar uses &quot;and&quot;, &quot;or&quot;, &quot;not&quot; as rule names, but these</span>
-<span class="sd">    are Python keywords. We define methods with safe names (and_, or_, not_)</span>
-<span class="sd">    and then use setattr() to create aliases with the exact names Lark expects.</span>
+<span class="sd">    Note:</span>
+<span class="sd">        The grammar rules use &quot;and&quot;, &quot;or&quot;, and &quot;not&quot;. Since these are reserved </span>
+<span class="sd">        keywords in Python, we define them as and_, or_, not_ and alias them </span>
+<span class="sd">        dynamically after class definition.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rngs</span><span class="p">:</span> <span class="n">nnx</span><span class="o">.</span><span class="n">Rngs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Args:</span>
+<span class="sd">            rngs: Random streams for initializing gate and predicate parameters.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">rngs</span> <span class="o">=</span> <span class="n">rngs</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">predicates</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">predicates</span><span class="o">.</span><span class="n">LearnedPredicate</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
@@ -406,7 +472,7 @@
 <div class="viewcode-block" id="JLNNCompiler.variable">
 <a class="viewcode-back" href="../../../modules/symbolic/compiler.html#jlnn.symbolic.compiler.JLNNCompiler.variable">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tokens</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Transform a variable token into a PredicateNode.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Transforms a variable token into a PredicateNode, ensuring weight sharing if name repeats.&quot;&quot;&quot;</span>
         <span class="n">name</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">tokens</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
         <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">predicates</span><span class="p">:</span>
             <span class="n">node</span> <span class="o">=</span> <span class="n">PredicateNode</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rngs</span><span class="p">)</span>
@@ -417,7 +483,7 @@
 <div class="viewcode-block" id="JLNNCompiler.and_">
 <a class="viewcode-back" href="../../../modules/symbolic/compiler.html#jlnn.symbolic.compiler.JLNNCompiler.and_">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">and_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">children</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Transform an AND operation.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Constructs a WeightedAnd gate node.&quot;&quot;&quot;</span>
         <span class="n">gate</span> <span class="o">=</span> <span class="n">gates</span><span class="o">.</span><span class="n">WeightedAnd</span><span class="p">(</span><span class="n">num_inputs</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">children</span><span class="p">),</span> <span class="n">rngs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">rngs</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">NAryGateNode</span><span class="p">(</span><span class="n">gate</span><span class="p">,</span> <span class="n">children</span><span class="p">)</span></div>
 
@@ -425,7 +491,7 @@
 <div class="viewcode-block" id="JLNNCompiler.or_">
 <a class="viewcode-back" href="../../../modules/symbolic/compiler.html#jlnn.symbolic.compiler.JLNNCompiler.or_">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">or_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">children</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Transform an OR operation.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Constructs a WeightedOr gate node.&quot;&quot;&quot;</span>
         <span class="n">gate</span> <span class="o">=</span> <span class="n">gates</span><span class="o">.</span><span class="n">WeightedOr</span><span class="p">(</span><span class="n">num_inputs</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">children</span><span class="p">),</span> <span class="n">rngs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">rngs</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">NAryGateNode</span><span class="p">(</span><span class="n">gate</span><span class="p">,</span> <span class="n">children</span><span class="p">)</span></div>
 
@@ -433,7 +499,7 @@
 <div class="viewcode-block" id="JLNNCompiler.not_">
 <a class="viewcode-back" href="../../../modules/symbolic/compiler.html#jlnn.symbolic.compiler.JLNNCompiler.not_">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">not_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">children</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Transform a NOT operation.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Constructs a WeightedNot gate node.&quot;&quot;&quot;</span>
         <span class="n">gate</span> <span class="o">=</span> <span class="n">gates</span><span class="o">.</span><span class="n">WeightedNot</span><span class="p">(</span><span class="n">rngs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">rngs</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">UnaryGateNode</span><span class="p">(</span><span class="n">gate</span><span class="p">,</span> <span class="n">children</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span></div>
 
@@ -441,7 +507,7 @@
 <div class="viewcode-block" id="JLNNCompiler.implication">
 <a class="viewcode-back" href="../../../modules/symbolic/compiler.html#jlnn.symbolic.compiler.JLNNCompiler.implication">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">implication</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">children</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Transform an implication operation (A -&gt; B).&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Constructs a WeightedImplication gate node (A -&gt; B).&quot;&quot;&quot;</span>
         <span class="n">gate</span> <span class="o">=</span> <span class="n">gates</span><span class="o">.</span><span class="n">WeightedImplication</span><span class="p">(</span><span class="n">rngs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">rngs</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">BinaryGateNode</span><span class="p">(</span><span class="n">gate</span><span class="p">,</span> <span class="n">children</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">children</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span></div>
 
@@ -449,10 +515,7 @@
 <div class="viewcode-block" id="JLNNCompiler.weighted_expr">
 <a class="viewcode-back" href="../../../modules/symbolic/compiler.html#jlnn.symbolic.compiler.JLNNCompiler.weighted_expr">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">weighted_expr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">children</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Processes the root node of the grammar.</span>
-<span class="sd">        Returns the last child (the transformed expression).</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Root rule processor; returns the final compiled node structure.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">children</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span></div>
 </div>
 
@@ -469,43 +532,47 @@
 <a class="viewcode-back" href="../../../modules/symbolic/compiler.html#jlnn.symbolic.compiler.LNNFormula">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">LNNFormula</span><span class="p">(</span><span class="n">nnx</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    The main LNN Formula wrapper. Compiles a string into a neural structure.</span>
+<span class="sd">    The main LNN Formula wrapper. </span>
+<span class="sd">    Compiles a logical string formula into a differentiable NNX module.</span>
+<span class="sd">    </span>
+<span class="sd">    Attributes:</span>
+<span class="sd">        root: The root node of the neural computational graph.</span>
+<span class="sd">        predicates: An nnx.Dict containing all trainable predicate groundings.</span>
 <span class="sd">    </span>
 <span class="sd">    Example:</span>
-<span class="sd">        &gt;&gt;&gt; from flax import nnx</span>
 <span class="sd">        &gt;&gt;&gt; rngs = nnx.Rngs(0)</span>
 <span class="sd">        &gt;&gt;&gt; model = LNNFormula(&quot;A &amp; B -&gt; C&quot;, rngs)</span>
-<span class="sd">        &gt;&gt;&gt; inputs = {</span>
-<span class="sd">        ...     &quot;A&quot;: jnp.array([[0.9]]),</span>
-<span class="sd">        ...     &quot;B&quot;: jnp.array([[0.8]]),</span>
-<span class="sd">        ...     &quot;C&quot;: jnp.array([[0.1]])</span>
-<span class="sd">        ... }</span>
-<span class="sd">        &gt;&gt;&gt; output = model(inputs)  # Returns truth interval [L, U]</span>
+<span class="sd">        &gt;&gt;&gt; inputs = {&quot;A&quot;: jnp.array([[0.9]]), &quot;B&quot;: jnp.array([[0.8]]), &quot;C&quot;: jnp.array([[0.1]])}</span>
+<span class="sd">        &gt;&gt;&gt; output = model(inputs)  # Returns truth interval [Lower, Upper]</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">formula</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">rngs</span><span class="p">:</span> <span class="n">nnx</span><span class="o">.</span><span class="n">Rngs</span><span class="p">):</span>
-        <span class="c1"># Parse the formula string into an AST</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parses and compiles the formula.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            formula: The logical formula string (e.g., &#39;A &amp; B&#39;).</span>
+<span class="sd">            rngs: Flax NNX random number generator stream.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Parse the formula string into a Concrete Syntax Tree (CST)</span>
         <span class="n">parser</span> <span class="o">=</span> <span class="n">FormulaParser</span><span class="p">()</span>
         <span class="n">tree</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">formula</span><span class="p">)</span>
         
-        <span class="c1"># Transform the AST into a computational graph</span>
+        <span class="c1"># Transform the CST into a tree of NNX Modules (Nodes)</span>
         <span class="n">compiler</span> <span class="o">=</span> <span class="n">JLNNCompiler</span><span class="p">(</span><span class="n">rngs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="n">compiler</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">tree</span><span class="p">)</span>
         
-        <span class="c1"># Store predicates for access/inspection</span>
-        <span class="c1"># For Flax NNX 0.12+, dict with parameters must be wrapped in nnx.Dict</span>
+        <span class="c1"># Wrap the predicates dictionary in nnx.Dict for proper NNX parameter tracking</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">predicates</span> <span class="o">=</span> <span class="n">nnx</span><span class="o">.</span><span class="n">Dict</span><span class="p">(</span><span class="n">compiler</span><span class="o">.</span><span class="n">predicates</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Forward pass through the compiled logic tree.</span>
+<span class="sd">        Executes the forward pass of the compiled logic tree.</span>
 <span class="sd">        </span>
 <span class="sd">        Args:</span>
-<span class="sd">            inputs: Dictionary mapping variable names to their numeric values.</span>
-<span class="sd">                   Each value should be a JAX array of shape (batch_size, features).</span>
+<span class="sd">            inputs: Dictionary mapping variable names to JAX arrays of shape (batch_size, features).</span>
 <span class="sd">        </span>
 <span class="sd">        Returns:</span>
-<span class="sd">            JAX array of shape (batch_size, 2) representing truth intervals [L, U]</span>
-<span class="sd">            where L is the lower bound and U is the upper bound of truth.</span>
+<span class="sd">            A JAX array of shape (batch_size, 2) representing truth intervals [L, U].</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span></div>
 
