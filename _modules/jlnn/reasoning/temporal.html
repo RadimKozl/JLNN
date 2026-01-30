@@ -288,6 +288,8 @@
         <article role="main" id="furo-main-content">
           <h1>Source code for jlnn.reasoning.temporal</h1><div class="highlight"><pre>
 <span></span><span class="ch">#!/usr/bin/env python3</span>
+
+<span class="c1"># Imports</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">jax.numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">jnp</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">jlnn.symbolic.compiler</span><span class="w"> </span><span class="kn">import</span> <span class="n">Node</span>
@@ -295,15 +297,32 @@
 <div class="viewcode-block" id="AlwaysNode">
 <a class="viewcode-back" href="../../../modules/reasoning/temporal.html#jlnn.reasoning.temporal.AlwaysNode">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">AlwaysNode</span><span class="p">(</span><span class="n">Node</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Implements the &#39;Always&#39; (G) temporal operator.</span>
-<span class="sd">    </span>
-<span class="sd">    This node performs a generalized conjunction across the time axis. </span>
-<span class="sd">    It uses the Gödel t-norm (minimum) to find the lower bound of truth </span>
-<span class="sd">    across all moments in the sequence.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Implementation of the &#39;Always&#39; (Globally) temporal operator, denoted as $\mathcal{G}$.</span>
+
+<span class="sd">    In Linear Temporal Logic (LTL), the formula $\mathcal{G}\phi$ is true if the </span>
+<span class="sd">    sub-formula $\phi$ holds at every time step within a given sequence. </span>
+<span class="sd">    Within the JLNN framework, this is realized as a generalized conjunction (AND) </span>
+<span class="sd">    over the temporal axis. </span>
+
+<span class="sd">    It utilizes the Gödel t-norm (minimum) to aggregate truth intervals, ensuring </span>
+<span class="sd">    that the resulting lower bound represents the &quot;least true&quot; moment in the </span>
+<span class="sd">    time series.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        child (Node): The logical subtree or formula to be evaluated over time.</span>
+<span class="sd">        window_size (Optional[int]): The specific temporal look-ahead window. </span>
+<span class="sd">            If None, the operator applies to the entire input sequence.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">child</span><span class="p">:</span> <span class="n">Node</span><span class="p">,</span> <span class="n">window_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes the Always (G) node.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            child: The sub-formula to monitor.</span>
+<span class="sd">            window_size: The temporal range for the operator.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">child</span> <span class="o">=</span> <span class="n">child</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">window_size</span> <span class="o">=</span> <span class="n">window_size</span>
 
@@ -312,8 +331,21 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Calculates the minimum truth interval across the temporal dimension.</span>
+
+<span class="sd">        Computes the intersection of truth values over time, effectively </span>
+<span class="sd">        finding the invariant truth level of the sequence.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            values: A dictionary of input tensors where the temporal dimension </span>
+<span class="sd">                is expected at axis 1.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A JAX array of truth intervals $[L, U]$ with the temporal </span>
+<span class="sd">            dimension collapsed via the `min` operation.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Obtain child activations: shape (batch, time, 2)</span>
         <span class="n">a</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">child</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
+        <span class="c1"># Aggregate across the time axis (axis=1)</span>
         <span class="k">return</span> <span class="n">jnp</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span></div>
 </div>
 
@@ -321,15 +353,29 @@
 <div class="viewcode-block" id="EventuallyNode">
 <a class="viewcode-back" href="../../../modules/reasoning/temporal.html#jlnn.reasoning.temporal.EventuallyNode">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">EventuallyNode</span><span class="p">(</span><span class="n">Node</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Implements the &#39;Eventually&#39; (F) temporal operator.</span>
-<span class="sd">    </span>
-<span class="sd">    This node performs a generalized disjunction across the time axis. </span>
-<span class="sd">    It uses the maximum t-conorm to determine if the formula becomes </span>
-<span class="sd">    true at any point in the sequence.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Implementation of the &#39;Eventually&#39; (Finally) temporal operator, denoted as $\mathcal{F}$.</span>
+
+<span class="sd">    In LTL, the formula $\mathcal{F}\phi$ is true if the sub-formula $\phi$ holds at </span>
+<span class="sd">    least once at some point in the future or present. In JLNN, this is </span>
+<span class="sd">    implemented as a generalized disjunction (OR) over the temporal axis.</span>
+
+<span class="sd">    It utilizes a t-conorm (maximum) to aggregate truth intervals, meaning the </span>
+<span class="sd">    overall truth is determined by the &quot;most true&quot; moment in the sequence.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        child (Node): The logical subtree to be evaluated.</span>
+<span class="sd">        window_size (Optional[int]): The specific temporal look-ahead window.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">child</span><span class="p">:</span> <span class="n">Node</span><span class="p">,</span> <span class="n">window_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes the Eventually (F) node.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            child: The sub-formula expected to occur.</span>
+<span class="sd">            window_size: The temporal range for the operator.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">child</span> <span class="o">=</span> <span class="n">child</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">window_size</span> <span class="o">=</span> <span class="n">window_size</span>
 
@@ -338,8 +384,20 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Calculates the maximum truth interval across the temporal dimension.</span>
+
+<span class="sd">        Determines the peak truth value within the sequence, identifying if the </span>
+<span class="sd">        condition is met at any point.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            values: A dictionary of input tensors.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A JAX array of truth intervals $[L, U]$ with the temporal </span>
+<span class="sd">            dimension collapsed via the `max` operation.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Obtain child activations: shape (batch, time, 2)</span>
         <span class="n">a</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">child</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
+        <span class="c1"># Aggregate across the time axis (axis=1)</span>
         <span class="k">return</span> <span class="n">jnp</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span></div>
 </div>
 

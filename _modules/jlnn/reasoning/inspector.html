@@ -288,6 +288,8 @@
         <article role="main" id="furo-main-content">
           <h1>Source code for jlnn.reasoning.inspector</h1><div class="highlight"><pre>
 <span></span><span class="ch">#!/usr/bin/env python3</span>
+
+<span class="c1"># Imports</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Any</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">jax.numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">jnp</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">jlnn.symbolic.compiler</span><span class="w"> </span><span class="kn">import</span> <span class="n">Node</span>
@@ -297,6 +299,22 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">trace_reasoning</span><span class="p">(</span><span class="n">node</span><span class="p">:</span> <span class="n">Node</span><span class="p">,</span> <span class="n">inputs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Recursively audits the logical graph to capture activations for every node.</span>
+
+<span class="sd">    This function performs a deep introspection of the forward pass by traversing </span>
+<span class="sd">    the compiled logical tree. For each node, it captures the resulting </span>
+<span class="sd">    truth interval $[L, U]$, which is essential for Explainable AI (XAI) tasks, </span>
+<span class="sd">    rule auditing, and debugging model conclusions.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        node: The root node or subtree of a compiled JLNN model.</span>
+<span class="sd">        inputs: A dictionary mapping predicate names to input tensors </span>
+<span class="sd">            of shape (batch, [time], features).</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A list of dictionaries, where each entry represents a node&#39;s state:</span>
+<span class="sd">            - &#39;name&#39;: The descriptive identifier of the node.</span>
+<span class="sd">            - &#39;interval&#39;: The average truth interval (L, U) across the batch.</span>
+<span class="sd">            - &#39;output&#39;: The raw JAX array containing full activation data.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
     
@@ -335,10 +353,21 @@
 <a class="viewcode-back" href="../../../modules/reasoning/inspector.html#jlnn.reasoning.inspector.get_rule_report">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_rule_report</span><span class="p">(</span><span class="n">model</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">inputs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Generates a human-readable interpretation of the model&#39;s output.</span>
-<span class="sd">    </span>
-<span class="sd">    Refined to handle neural predicates that shift &#39;False&#39; inputs </span>
-<span class="sd">    toward the center (e.g., [0.52, 0.73]).</span>
+<span class="sd">    Generates a human-readable semantic interpretation of the model&#39;s output.</span>
+
+<span class="sd">    This utility classifies the resulting truth interval $[L, U]$ into qualitative </span>
+<span class="sd">    categories based on LNN semantics (TRUE, FALSE, UNKNOWN, CONFLICT). </span>
+<span class="sd">    It includes specific heuristics for neural predicates that may shift truth </span>
+<span class="sd">    values toward the center of the $[0, 1]$ spectrum during initialization </span>
+<span class="sd">    or training.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        model: The JLNN model or LNNFormula to evaluate.</span>
+<span class="sd">        inputs: Input data dictionary for the predicates.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A formatted string containing the numerical interval and its </span>
+<span class="sd">        semantic classification (e.g., &quot;Result: [0.52, 0.73] - FALSE (NEURAL)&quot;).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">output</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>
     
@@ -354,7 +383,7 @@
     <span class="k">elif</span> <span class="n">u</span> <span class="o">&lt;=</span> <span class="mf">0.2</span><span class="p">:</span>
         <span class="n">status</span> <span class="o">=</span> <span class="s2">&quot;FALSE&quot;</span>
     <span class="c1"># Adjusted Neural Heuristics:</span>
-    <span class="c1"># If the upper bound is still below the True threshold, </span>
+    <span class="c1"># If the upper bound is still below the True threshold,</span>
     <span class="c1"># and it originated from a False input, classify as Neural False.</span>
     <span class="k">elif</span> <span class="n">u</span> <span class="o">&lt;</span> <span class="mf">0.8</span><span class="p">:</span>
         <span class="n">status</span> <span class="o">=</span> <span class="s2">&quot;FALSE (NEURAL)&quot;</span>

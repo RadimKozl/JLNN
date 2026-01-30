@@ -288,6 +288,8 @@
         <article role="main" id="furo-main-content">
           <h1>Source code for jlnn.reasoning.engine</h1><div class="highlight"><pre>
 <span></span><span class="ch">#!/usr/bin/env python3</span>
+
+<span class="c1"># Imports</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">jax</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">flax</span><span class="w"> </span><span class="kn">import</span> <span class="n">nnx</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span>
@@ -297,19 +299,25 @@
 <a class="viewcode-back" href="../../../modules/reasoning/engine.html#jlnn.reasoning.engine.JLNNEngine">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">JLNNEngine</span><span class="p">(</span><span class="n">nnx</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    The orchestration engine for JLNN models, handling JIT compilation and training logic.</span>
+<span class="sd">    Orchestration engine for JLNN models, managing high-performance execution.</span>
 
-<span class="sd">    This class wraps a logical model to provide optimized inference and training </span>
-<span class="sd">    steps. By inheriting from nnx.Module, it ensures that JAX can correctly </span>
-<span class="sd">    trace the model state during compilation.</span>
+<span class="sd">    This class serves as a high-level wrapper for compiled logical formulas,</span>
+<span class="sd">    facilitating JIT-compiled inference and atomic training operations. </span>
+<span class="sd">    By extending `nnx.Module`, it leverages the Flax NNX state management </span>
+<span class="sd">    system, allowing JAX to efficiently trace and optimize the model&#39;s </span>
+<span class="sd">    computational graph across various hardware accelerators (CPU, GPU, TPU).</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        model (nnx.Module): The compiled logical network or formula to be executed.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="n">nnx</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Initializes the engine with a specific logical model.</span>
+<span class="sd">        Initializes the engine with a target logical model.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            model (nnx.Module): The compiled LNN formula or neural logic network.</span>
+<span class="sd">            model: A compiled LNN formula or neural logic network instance </span>
+<span class="sd">                conforming to the NNX module interface.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span>
 
@@ -318,14 +326,15 @@
     <span class="nd">@nnx</span><span class="o">.</span><span class="n">jit</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">infer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Executes a JIT-compiled forward pass.</span>
+<span class="sd">        Executes a JIT-compiled forward pass through the logical graph.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            inputs (Dict[str, jnp.ndarray]): Dictionary mapping predicate names </span>
-<span class="sd">                to input arrays of shape (batch, time/feature).</span>
+<span class="sd">            inputs: A dictionary mapping predicate names (strings) to input </span>
+<span class="sd">                tensors of shape (batch, [time], features). The engine handles </span>
+<span class="sd">                multi-dimensional data for both static and temporal reasoning.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            jnp.ndarray: Truth intervals of shape (batch, time/feature, 2).</span>
+<span class="sd">            A JAX array of truth intervals [L, U] with shape (batch, [time], 2).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span></div>
 
@@ -333,19 +342,30 @@
 <div class="viewcode-block" id="JLNNEngine.train_step">
 <a class="viewcode-back" href="../../../modules/reasoning/engine.html#jlnn.reasoning.engine.JLNNEngine.train_step">[docs]</a>
     <span class="nd">@nnx</span><span class="o">.</span><span class="n">jit</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">train_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span> <span class="n">targets</span><span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> 
-                   <span class="n">optimizer</span><span class="p">:</span> <span class="n">nnx</span><span class="o">.</span><span class="n">Optimizer</span><span class="p">,</span> <span class="n">loss_fn</span><span class="p">:</span> <span class="n">Callable</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">train_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> 
+                   <span class="n">inputs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span>
+                   <span class="n">targets</span><span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+                   <span class="n">optimizer</span><span class="p">:</span> <span class="n">nnx</span><span class="o">.</span><span class="n">Optimizer</span><span class="p">,</span>
+                   <span class="n">loss_fn</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Performs an atomic training step: Forward -&gt; Loss -&gt; Backward -&gt; Update.</span>
+<span class="sd">        Performs an atomic training step: Forward, Backward, and State Update.</span>
+
+<span class="sd">        This method encapsulates the complete optimization cycle within a single </span>
+<span class="sd">        JIT-compiled block. It computes the loss based on target intervals, </span>
+<span class="sd">        calculates gradients via automatic differentiation, and updates the </span>
+<span class="sd">        model parameters using the provided optimizer.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            inputs: Model input features.</span>
-<span class="sd">            targets: Target truth intervals.</span>
-<span class="sd">            optimizer: Flax NNX optimizer instance.</span>
-<span class="sd">            loss_fn: Scalar-valued loss function.</span>
+<span class="sd">            inputs: Input data dictionary for the forward pass.</span>
+<span class="sd">            targets: Ground truth intervals [L, U] representing the desired </span>
+<span class="sd">                logical state for the output nodes.</span>
+<span class="sd">            optimizer: A Flax NNX optimizer instance (e.g., Adam, SGD, </span>
+<span class="sd">                or a custom constrained optimizer).</span>
+<span class="sd">            loss_fn: A callable that computes a scalar loss value from </span>
+<span class="sd">                model predictions and target intervals.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            jnp.ndarray: The loss value for the current step.</span>
+<span class="sd">            The scalar loss value computed for the current step (pre-update).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">def</span><span class="w"> </span><span class="nf">compute_loss</span><span class="p">(</span><span class="n">model</span><span class="p">):</span>
             <span class="n">preds</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>

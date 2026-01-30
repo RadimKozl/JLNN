@@ -298,15 +298,54 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="jlnn.reasoning.inspector.get_rule_report">
 <span class="sig-prename descclassname"><span class="pre">jlnn.reasoning.inspector.</span></span><span class="sig-name descname"><span class="pre">get_rule_report</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inputs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Array</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="../../_modules/jlnn/reasoning/inspector.html#get_rule_report"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jlnn.reasoning.inspector.get_rule_report" title="Link to this definition">¶</a></dt>
-<dd><p>Generates a human-readable interpretation of the model’s output.</p>
-<p>Refined to handle neural predicates that shift ‘False’ inputs
-toward the center (e.g., [0.52, 0.73]).</p>
+<dd><p>Generates a human-readable semantic interpretation of the model’s output.</p>
+<p>This utility classifies the resulting truth interval $[L, U]$ into qualitative
+categories based on LNN semantics (TRUE, FALSE, UNKNOWN, CONFLICT).
+It includes specific heuristics for neural predicates that may shift truth
+values toward the center of the $[0, 1]$ spectrum during initialization
+or training.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> – The JLNN model or LNNFormula to evaluate.</p></li>
+<li><p><strong>inputs</strong> – Input data dictionary for the predicates.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A formatted string containing the numerical interval and its
+semantic classification (e.g., “Result: [0.52, 0.73] - FALSE (NEURAL)”).</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="jlnn.reasoning.inspector.trace_reasoning">
 <span class="sig-prename descclassname"><span class="pre">jlnn.reasoning.inspector.</span></span><span class="sig-name descname"><span class="pre">trace_reasoning</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../symbolic/compiler.html#jlnn.symbolic.compiler.Node" title="jlnn.symbolic.compiler.Node"><span class="pre">Node</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">inputs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Array</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../_modules/jlnn/reasoning/inspector.html#trace_reasoning"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jlnn.reasoning.inspector.trace_reasoning" title="Link to this definition">¶</a></dt>
 <dd><p>Recursively audits the logical graph to capture activations for every node.</p>
+<p>This function performs a deep introspection of the forward pass by traversing
+the compiled logical tree. For each node, it captures the resulting
+truth interval $[L, U]$, which is essential for Explainable AI (XAI) tasks,
+rule auditing, and debugging model conclusions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>node</strong> – The root node or subtree of a compiled JLNN model.</p></li>
+<li><p><strong>inputs</strong> – A dictionary mapping predicate names to input tensors
+of shape (batch, [time], features).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>‘name’: The descriptive identifier of the node.</p></li>
+<li><p>’interval’: The average truth interval (L, U) across the batch.</p></li>
+<li><p>’output’: The raw JAX array containing full activation data.</p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A list of dictionaries, where each entry represents a node’s state</p>
+</dd>
+</dl>
 </dd></dl>
 
 <p>Module for inspecting and auditing the model. Allows users to look “under the hood” and understand why the model reached a particular conclusion.</p>
