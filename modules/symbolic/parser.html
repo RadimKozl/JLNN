@@ -295,6 +295,39 @@
         <article role="main" id="furo-main-content">
           <section id="module-jlnn.symbolic.parser">
 <span id="formula-parser"></span><h1>Formula Parser<a class="headerlink" href="#module-jlnn.symbolic.parser" title="Link to this heading">¶</a></h1>
+<p>This module provides a parser for Logical Neural Networks (LNN) formulas.
+It utilizes the Lark library to transform logical expressions into a parse tree,
+supporting standard logic gates, temporal operators, and weighted expressions.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="jlnn.symbolic.parser.FormulaParser">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">jlnn.symbolic.parser.</span></span><span class="sig-name descname"><span class="pre">FormulaParser</span></span><a class="reference internal" href="../../_modules/jlnn/symbolic/parser.html#FormulaParser"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jlnn.symbolic.parser.FormulaParser" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A wrapper class for the Lark LALR parser configured with LNN grammar.</p>
+<p>This parser handles operator precedence and associativity for logical
+operators, including support for weighted implications and temporal
+logic operators like Always (G), Eventually (F), and Next (X).</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="jlnn.symbolic.parser.FormulaParser.parse">
+<span class="sig-name descname"><span class="pre">parse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">formula</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/jlnn/symbolic/parser.html#FormulaParser.parse"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jlnn.symbolic.parser.FormulaParser.parse" title="Link to this definition">¶</a></dt>
+<dd><p>Parses a string representation of a logical formula into a Lark Tree.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>formula</strong> (<em>str</em>) – The logical expression to be parsed (e.g., “A &amp; B -&gt; C”).</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A parse tree representing the hierarchical structure of the formula.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>lark.Tree</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If the input formula does not conform to the LNN grammar rules.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 <p>This module uses the <strong>Lark</strong> library to transform string definitions of rules into syntactic trees (CST).</p>
 <section id="lnn-grammar">
 <h2>LNN Grammar<a class="headerlink" href="#lnn-grammar" title="Link to this heading">¶</a></h2>
@@ -361,6 +394,10 @@
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">Formula Parser</a><ul>
+<li><a class="reference internal" href="#jlnn.symbolic.parser.FormulaParser"><code class="docutils literal notranslate"><span class="pre">FormulaParser</span></code></a><ul>
+<li><a class="reference internal" href="#jlnn.symbolic.parser.FormulaParser.parse"><code class="docutils literal notranslate"><span class="pre">FormulaParser.parse()</span></code></a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#lnn-grammar">LNN Grammar</a></li>
 </ul>
 </li>
