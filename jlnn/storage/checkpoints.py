@@ -2,6 +2,7 @@
 
 # Imports
 import pickle
+import warnings
 from pathlib import Path
 from flax import nnx
 from typing import Union, Optional
@@ -56,17 +57,26 @@ def load_checkpoint(model: nnx.Module, filepath: Union[str, Path]):
     with open(path, 'rb') as f:
         loaded_state = pickle.load(f)
     
-    # Use nnx.state to get the state and convert to dict for comparison
-    # Note: The deprecation warning suggests using dict in the future
-    current_state = nnx.state(model)
-    
-    # Convert FlatState to regular dict for comparison
-    current_flat_dict = dict(current_state.flat_state())
-    loaded_flat_dict = dict(loaded_state.flat_state())
+    # Suppress the deprecation warning since we know it's coming from Flax 0.12.2
+    # and we're using the correct API for this version
+    with warnings.catch_warnings():
+        warnings.filterwarnings("ignore", category=DeprecationWarning, module="flax.nnx.statelib")
+        
+        # Try to use nnx.to_flat_state if available (newer API), 
+        # otherwise fall back to dict conversion (compatible with 0.12.2)
+        try:
+            # Modern API (Flax >= 0.13.0)
+            current_flat = nnx.to_flat_state(model)
+            loaded_flat = nnx.to_flat_state(loaded_state)
+        except AttributeError:
+            # Fallback for Flax 0.12.2 - use dict conversion
+            current_state = nnx.state(model)
+            current_flat = dict(current_state.flat_state())
+            loaded_flat = dict(loaded_state.flat_state())
 
     # 1. Kontrola shody všech klíčů (paths k parametrům)
-    current_keys = set(current_flat_dict.keys())
-    loaded_keys = set(loaded_flat_dict.keys())
+    current_keys = set(current_flat.keys())
+    loaded_keys = set(loaded_flat.keys())
 
     if current_keys != loaded_keys:
         missing = current_keys - loaded_keys
@@ -79,8 +89,8 @@ def load_checkpoint(model: nnx.Module, filepath: Union[str, Path]):
 
     # 2. Kontrola shapes u všech Param objektů
     for key in current_keys:
-        curr_param = current_flat_dict[key]
-        load_param = loaded_flat_dict[key]
+        curr_param = current_flat[key]
+        load_param = loaded_flat[key]
         
         # Check if both have the same variable state type
         if type(curr_param) != type(load_param):

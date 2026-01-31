@@ -5,6 +5,7 @@ Focuses on structural integrity checks to prevent loading incompatible model sta
 """
 
 import pytest
+import warnings
 import jax.numpy as jnp
 from flax import nnx
 from pathlib import Path
@@ -30,6 +31,17 @@ def different_model(rngs):
     return LNNFormula("A | B | C", rngs)
 
 
+def _get_model_keys(model):
+    """Helper function to get model keys with deprecation warning suppression."""
+    with warnings.catch_warnings():
+        warnings.filterwarnings("ignore", category=DeprecationWarning, module="flax.nnx.statelib")
+        try:
+            return set(nnx.to_flat_state(model).keys())
+        except AttributeError:
+            # Fallback for Flax 0.12.2
+            return set(dict(nnx.state(model).flat_state()).keys())
+
+
 def test_save_and_load_same_structure(tmp_path, simple_model):
     """
     Ověřuje, že checkpoint lze uložit a načíst do modelu se stejnou strukturou.
@@ -46,8 +58,9 @@ def test_save_and_load_same_structure(tmp_path, simple_model):
     load_checkpoint(loaded_model, cp_path)
 
     # Ověřit shodu struktury (klíče parametrů)
-    orig_keys = set(nnx.variables(simple_model).keys())
-    loaded_keys = set(nnx.variables(loaded_model).keys())
+    orig_keys = _get_model_keys(simple_model)
+    loaded_keys = _get_model_keys(loaded_model)
+    
     assert orig_keys == loaded_keys, "Struktura checkpointu nesedí s modelem"
 
 
@@ -93,6 +106,7 @@ def test_checkpoint_roundtrip_different_seed(tmp_path, rngs):
     load_checkpoint(model2, cp_path)
 
     # Ověření shody struktury
-    keys1 = set(nnx.variables(model1).keys())
-    keys2 = set(nnx.variables(model2).keys())
+    keys1 = _get_model_keys(model1)
+    keys2 = _get_model_keys(model2)
+    
     assert keys1 == keys2, "Struktura po načtení nesedí"
