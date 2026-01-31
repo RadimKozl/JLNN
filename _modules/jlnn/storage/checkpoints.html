@@ -368,7 +368,7 @@
             <span class="n">current_flat</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">current_state</span><span class="o">.</span><span class="n">flat_state</span><span class="p">())</span>
             <span class="n">loaded_flat</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">loaded_state</span><span class="o">.</span><span class="n">flat_state</span><span class="p">())</span>
 
-    <span class="c1"># 1. Kontrola shody všech klíčů (paths k parametrům)</span>
+    <span class="c1"># 1. Checking the consistency of all keys (paths to parameters)</span>
     <span class="n">current_keys</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">current_flat</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
     <span class="n">loaded_keys</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">loaded_flat</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
 
@@ -381,7 +381,7 @@
             <span class="sa">f</span><span class="s2">&quot;Extra in checkpoint: </span><span class="si">{</span><span class="n">extra</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="p">)</span>
 
-    <span class="c1"># 2. Kontrola shapes u všech Param objektů</span>
+    <span class="c1"># 2. Check shapes for all Param objects</span>
     <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">current_keys</span><span class="p">:</span>
         <span class="n">curr_param</span> <span class="o">=</span> <span class="n">current_flat</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
         <span class="n">load_param</span> <span class="o">=</span> <span class="n">loaded_flat</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
@@ -412,7 +412,7 @@
             <span class="c1"># If the parameter doesn&#39;t have a value/shape, skip shape checking</span>
             <span class="k">pass</span>
 
-    <span class="c1"># Pokud vše sedí → aktualizujeme model</span>
+    <span class="c1"># If everything fits → we update the model</span>
     <span class="n">nnx</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">loaded_state</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Model parameters successfully restored from: </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
 
