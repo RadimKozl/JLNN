@@ -298,30 +298,22 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="jlnn.storage.checkpoints.load_checkpoint">
 <span class="sig-prename descclassname"><span class="pre">jlnn.storage.checkpoints.</span></span><span class="sig-name descname"><span class="pre">load_checkpoint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Module</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filepath</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/jlnn/storage/checkpoints.html#load_checkpoint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jlnn.storage.checkpoints.load_checkpoint" title="Link to this definition">¶</a></dt>
-<dd><p>Retrieves the saved parameter state and updates the existing model instance with it.</p>
-<p>The function performs an in-place update using <cite>nnx.update</cite>.
-It is essential that the model structure (number of gates, number of inputs) matches
-the structure stored in the checkpoint. After loading,
-it is recommended to run <cite>apply_constraints</cite> to guarantee the logical integrity of the intervals.</p>
+<dd><p>Retrieves the saved parameter state and updates the existing model instance.
+Includes structural integrity check via parameter keys and shapes.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>model</strong> (<em>nnx.Module</em>) – An existing model instance into which weights and biases will be loaded.</p></li>
-<li><p><strong>filepath</strong> (<em>Union</em><em>[</em><em>str</em><em>, </em><em>Path</em><em>]</em>) – Path to the source .pkl file.</p></li>
+<li><p><strong>model</strong> (<em>nnx.Module</em>) – The model instance to load parameters into.</p></li>
+<li><p><strong>filepath</strong> (<em>Union</em><em>[</em><em>str</em><em>, </em><em>Path</em><em>]</em>) – Path to the checkpoint file.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
-<li><p><strong>FileNotFoundError</strong> – If the file does not exist at the specified path.</p></li>
-<li><p><strong>ValueError</strong> – If the state in the file is not compatible with the model architecture.</p></li>
+<li><p><strong>FileNotFoundError</strong> – If the checkpoint file doesn’t exist.</p></li>
+<li><p><strong>ValueError</strong> – If the checkpoint structure doesn’t match the model structure.</p></li>
 </ul>
 </dd>
 </dl>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>When loading an n-ary XOR, the function recursively restores the weights
-at all levels of the reduction tree.</p>
-</div>
 </dd></dl>
 
 <dl class="py function">

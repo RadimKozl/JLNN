@@ -332,34 +332,78 @@
 <a class="viewcode-back" href="../../../modules/storage/checkpoints.html#jlnn.storage.checkpoints.load_checkpoint">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">load_checkpoint</span><span class="p">(</span><span class="n">model</span><span class="p">:</span> <span class="n">nnx</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span> <span class="n">filepath</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Retrieves the saved parameter state and updates the existing model instance with it.</span>
-
-<span class="sd">    The function performs an in-place update using `nnx.update`. </span>
-<span class="sd">    It is essential that the model structure (number of gates, number of inputs) matches </span>
-<span class="sd">    the structure stored in the checkpoint. After loading, </span>
-<span class="sd">    it is recommended to run `apply_constraints` to guarantee the logical integrity of the intervals.</span>
-
+<span class="sd">    Retrieves the saved parameter state and updates the existing model instance.</span>
+<span class="sd">    Includes structural integrity check via parameter keys and shapes.</span>
+<span class="sd">    </span>
 <span class="sd">    Args:</span>
-<span class="sd">        model (nnx.Module): An existing model instance into which weights and biases will be loaded.</span>
-<span class="sd">        filepath (Union[str, Path]): Path to the source .pkl file.</span>
-
+<span class="sd">        model (nnx.Module): The model instance to load parameters into.</span>
+<span class="sd">        filepath (Union[str, Path]): Path to the checkpoint file.</span>
+<span class="sd">        </span>
 <span class="sd">    Raises:</span>
-<span class="sd">        FileNotFoundError: If the file does not exist at the specified path.</span>
-<span class="sd">        ValueError: If the state in the file is not compatible with the model architecture.</span>
-
-<span class="sd">    Note:</span>
-<span class="sd">        When loading an n-ary XOR, the function recursively restores the weights </span>
-<span class="sd">        at all levels of the reduction tree.</span>
+<span class="sd">        FileNotFoundError: If the checkpoint file doesn&#39;t exist.</span>
+<span class="sd">        ValueError: If the checkpoint structure doesn&#39;t match the model structure.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
         <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unable to load checkpoint, file does not exist: </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-        <span class="n">state</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="n">loaded_state</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
     
-    <span class="c1"># nnx.update maps values ​​from State back to nnx.Param objects in the model</span>
-    <span class="n">nnx</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+    <span class="c1"># Use nnx.state to get the state and convert to dict for comparison</span>
+    <span class="c1"># Note: The deprecation warning suggests using dict in the future</span>
+    <span class="n">current_state</span> <span class="o">=</span> <span class="n">nnx</span><span class="o">.</span><span class="n">state</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+    
+    <span class="c1"># Convert FlatState to regular dict for comparison</span>
+    <span class="n">current_flat_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">current_state</span><span class="o">.</span><span class="n">flat_state</span><span class="p">())</span>
+    <span class="n">loaded_flat_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">loaded_state</span><span class="o">.</span><span class="n">flat_state</span><span class="p">())</span>
+
+    <span class="c1"># 1. Kontrola shody všech klíčů (paths k parametrům)</span>
+    <span class="n">current_keys</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">current_flat_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+    <span class="n">loaded_keys</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">loaded_flat_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+
+    <span class="k">if</span> <span class="n">current_keys</span> <span class="o">!=</span> <span class="n">loaded_keys</span><span class="p">:</span>
+        <span class="n">missing</span> <span class="o">=</span> <span class="n">current_keys</span> <span class="o">-</span> <span class="n">loaded_keys</span>
+        <span class="n">extra</span> <span class="o">=</span> <span class="n">loaded_keys</span> <span class="o">-</span> <span class="n">current_keys</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Checkpoint structure mismatch (parameter paths differ).</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;Missing in checkpoint: </span><span class="si">{</span><span class="n">missing</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;Extra in checkpoint: </span><span class="si">{</span><span class="n">extra</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+
+    <span class="c1"># 2. Kontrola shapes u všech Param objektů</span>
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">current_keys</span><span class="p">:</span>
+        <span class="n">curr_param</span> <span class="o">=</span> <span class="n">current_flat_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="n">load_param</span> <span class="o">=</span> <span class="n">loaded_flat_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        
+        <span class="c1"># Check if both have the same variable state type</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">curr_param</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">type</span><span class="p">(</span><span class="n">load_param</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Type mismatch for parameter &#39;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">&#39;: &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;current type </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">curr_param</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">, &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;checkpoint type </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">load_param</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+        
+        <span class="c1"># Check shapes for parameters with values</span>
+        <span class="c1"># Use get_value() instead of .value to avoid deprecation warning</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">curr_val</span> <span class="o">=</span> <span class="n">curr_param</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">curr_param</span><span class="p">,</span> <span class="s1">&#39;get_value&#39;</span><span class="p">)</span> <span class="k">else</span> <span class="n">curr_param</span><span class="p">[</span><span class="o">...</span><span class="p">]</span>
+            <span class="n">load_val</span> <span class="o">=</span> <span class="n">load_param</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">load_param</span><span class="p">,</span> <span class="s1">&#39;get_value&#39;</span><span class="p">)</span> <span class="k">else</span> <span class="n">load_param</span><span class="p">[</span><span class="o">...</span><span class="p">]</span>
+            
+            <span class="n">curr_shape</span> <span class="o">=</span> <span class="n">curr_val</span><span class="o">.</span><span class="n">shape</span>
+            <span class="n">load_shape</span> <span class="o">=</span> <span class="n">load_val</span><span class="o">.</span><span class="n">shape</span>
+            
+            <span class="k">if</span> <span class="n">curr_shape</span> <span class="o">!=</span> <span class="n">load_shape</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Checkpoint structure mismatch: shape mismatch for parameter &#39;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">&#39; &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;(current: </span><span class="si">{</span><span class="n">curr_shape</span><span class="si">}</span><span class="s2">, checkpoint: </span><span class="si">{</span><span class="n">load_shape</span><span class="si">}</span><span class="s2">)&quot;</span>
+                <span class="p">)</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">AttributeError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">):</span>
+            <span class="c1"># If the parameter doesn&#39;t have a value/shape, skip shape checking</span>
+            <span class="k">pass</span>
+
+    <span class="c1"># Pokud vše sedí → aktualizujeme model</span>
+    <span class="n">nnx</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">loaded_state</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Model parameters successfully restored from: </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
 
 </pre></div>
