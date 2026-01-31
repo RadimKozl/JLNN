@@ -74,7 +74,7 @@ def load_checkpoint(model: nnx.Module, filepath: Union[str, Path]):
             current_flat = dict(current_state.flat_state())
             loaded_flat = dict(loaded_state.flat_state())
 
-    # 1. Kontrola shody všech klíčů (paths k parametrům)
+    # 1. Checking the consistency of all keys (paths to parameters)
     current_keys = set(current_flat.keys())
     loaded_keys = set(loaded_flat.keys())
 
@@ -87,7 +87,7 @@ def load_checkpoint(model: nnx.Module, filepath: Union[str, Path]):
             f"Extra in checkpoint: {extra}"
         )
 
-    # 2. Kontrola shapes u všech Param objektů
+    # 2. Check shapes for all Param objects
     for key in current_keys:
         curr_param = current_flat[key]
         load_param = loaded_flat[key]
@@ -118,6 +118,6 @@ def load_checkpoint(model: nnx.Module, filepath: Union[str, Path]):
             # If the parameter doesn't have a value/shape, skip shape checking
             pass
 
-    # Pokud vše sedí → aktualizujeme model
+    # If everything fits → we update the model
     nnx.update(model, loaded_state)
     print(f"Model parameters successfully restored from: {path}")
