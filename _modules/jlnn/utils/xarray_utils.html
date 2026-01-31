@@ -288,6 +288,12 @@
         <article role="main" id="furo-main-content">
           <h1>Source code for jlnn.utils.xarray_utils</h1><div class="highlight"><pre>
 <span></span><span class="ch">#!/usr/bin/env python3</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Integration utilities for Xarray data structures.</span>
+
+<span class="sd">This module provides tools to bridge JAX tensors with xarray, allowing </span>
+<span class="sd">symbolic labeling of neural outputs and trained logical weights.</span>
+<span class="sd">&quot;&quot;&quot;</span>
 
 <span class="c1"># Imports</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
@@ -296,48 +302,59 @@
 
 <div class="viewcode-block" id="model_to_xarray">
 <a class="viewcode-back" href="../../../modules/utils/xarray_utils.html#jlnn.utils.xarray_utils.model_to_xarray">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">model_to_xarray</span><span class="p">(</span><span class="n">gate_outputs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span> <span class="n">predicate_names</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">model_to_xarray</span><span class="p">(</span><span class="n">gate_outputs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span> <span class="n">sample_labels</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Converts logical model outputs into a labeled xarray Dataset for advanced analysis.</span>
+<span class="sd">    Converts logical model outputs into a labeled xarray Dataset.</span>
 
-<span class="sd">    This utility bridges the gap between raw JAX tensors and structured scientific data. </span>
-<span class="sd">    By labeling dimensions such as &#39;predicate&#39;, &#39;bound&#39; (Lower/Upper), and &#39;sample&#39;, </span>
-<span class="sd">    researchers can use xarray&#39;s powerful indexing to inspect the model&#39;s reasoning.</span>
+<span class="sd">    By mapping raw (batch, 2) tensors to a Dataset with &#39;sample&#39; and &#39;bound&#39; </span>
+<span class="sd">    dimensions, we enable powerful scientific indexing and visualization </span>
+<span class="sd">    of truth intervals.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        gate_outputs (Dict[str, jnp.ndarray]): Mapping of gate names to their output tensors </span>
-<span class="sd">            of shape (batch, 2).</span>
-<span class="sd">        predicate_names (List[str]): List of labels for the dimension coordinates.</span>
+<span class="sd">        gate_outputs: Mapping of gate names to their [L, U] output tensors.</span>
+<span class="sd">        sample_labels: Names for the samples in the batch (e.g., individual IDs).</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        xr.Dataset: A multi-dimensional dataset containing truth intervals.</span>
+<span class="sd">        xr.Dataset: Multi-dimensional dataset containing truth intervals.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">ds_dict</span> <span class="o">=</span> <span class="p">{}</span>
-    
     <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">gate_outputs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-        <span class="c1"># data is expected to be (batch, 2)</span>
         <span class="n">ds_dict</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span>
             <span class="n">data</span><span class="p">,</span>
             <span class="n">dims</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;sample&quot;</span><span class="p">,</span> <span class="s2">&quot;bound&quot;</span><span class="p">],</span>
-            <span class="n">coords</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;bound&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;Lower&quot;</span><span class="p">,</span> <span class="s2">&quot;Upper&quot;</span><span class="p">]},</span>
+            <span class="n">coords</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;sample&quot;</span><span class="p">:</span> <span class="n">sample_labels</span><span class="p">,</span>
+                <span class="s2">&quot;bound&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;Lower&quot;</span><span class="p">,</span> <span class="s2">&quot;Upper&quot;</span><span class="p">]</span>
+            <span class="p">},</span>
             <span class="n">name</span><span class="o">=</span><span class="n">name</span>
         <span class="p">)</span>
-        
     <span class="k">return</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">(</span><span class="n">ds_dict</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="extract_weights_to_xarray">
 <a class="viewcode-back" href="../../../modules/utils/xarray_utils.html#jlnn.utils.xarray_utils.extract_weights_to_xarray">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">extract_weights_to_xarray</span><span class="p">(</span><span class="n">model_params</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">extract_weights_to_xarray</span><span class="p">(</span><span class="n">weights</span><span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">input_labels</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">gate_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Extracts flattened weights and maps them to a labeled DataArray.</span>
-<span class="sd">    </span>
-<span class="sd">    This is useful for cross-referencing learned weights across different </span>
-<span class="sd">    training runs or experimental configurations.</span>
+<span class="sd">    Extracts trained logic weights into a labeled xarray DataArray.</span>
+
+<span class="sd">    In LNN, weights w &gt;= 1.0 represent the importance of an antecedent. </span>
+<span class="sd">    This function creates a structured view of these weights, mapping </span>
+<span class="sd">    each value to its symbolic predicate name.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        weights: JAX array of weights from a logical gate.</span>
+<span class="sd">        input_labels: Symbolic names of the inputs (e.g., [&#39;A&#39;, &#39;B&#39;]).</span>
+<span class="sd">        gate_name: Name of the gate these weights belong to.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        xr.DataArray: Labeled weights with &#39;input&#39; dimension.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># Logic to filter and label weights from the structured dictionary</span>
-    <span class="c1"># Useful for analyzing WeightedXor reduction trees.</span>
-    <span class="k">pass</span></div>
+    <span class="k">return</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span>
+        <span class="n">weights</span><span class="p">,</span>
+        <span class="n">dims</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;input&quot;</span><span class="p">],</span>
+        <span class="n">coords</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;input&quot;</span><span class="p">:</span> <span class="n">input_labels</span><span class="p">},</span>
+        <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;weights_</span><span class="si">{</span><span class="n">gate_name</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="p">)</span></div>
 
 </pre></div>
         </article>

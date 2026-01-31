@@ -295,45 +295,81 @@
         <article role="main" id="furo-main-content">
           <section id="module-jlnn.utils.visualize">
 <span id="visualization-tools"></span><h1>Visualization Tools<a class="headerlink" href="#module-jlnn.utils.visualize" title="Link to this heading">¶</a></h1>
+<p>Visualization tools for inspecting LNN state and learned logic.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="jlnn.utils.visualize.plot_gate_weights">
-<span class="sig-prename descclassname"><span class="pre">jlnn.utils.visualize.</span></span><span class="sig-name descname"><span class="pre">plot_gate_weights</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_labels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gate_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'Gate'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/jlnn/utils/visualize.html#plot_gate_weights"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jlnn.utils.visualize.plot_gate_weights" title="Link to this definition">¶</a></dt>
-<dd><p>Generates a heatmap to visualize the importance of each input for a specific gate.</p>
-<p>In JLNN, weights (w &gt;= 1.0) signify the relative importance of an antecedent.
-A higher weight means the model relies more heavily on that specific truth
-value to reach a logical conclusion.</p>
+<span class="sig-prename descclassname"><span class="pre">jlnn.utils.visualize.</span></span><span class="sig-name descname"><span class="pre">plot_gate_weights</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_labels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gate_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'Gate'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Figure</span></span></span><a class="reference internal" href="../../_modules/jlnn/utils/visualize.html#plot_gate_weights"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jlnn.utils.visualize.plot_gate_weights" title="Link to this definition">¶</a></dt>
+<dd><p>Generates a heatmap to visualize the learned importance of inputs for a specific gate.</p>
+<p>In Logical Neural Networks, weights (constrained to w &gt;= 1.0) act as attention
+mechanisms over logical antecedents. A higher weight indicates that the
+corresponding input has a stronger influence on the gate’s activation
+and the overall truth value of the formula.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>weights</strong> (<em>jnp.ndarray</em>) – Array of trained weights from a gate module.</p></li>
-<li><p><strong>input_labels</strong> (<em>List</em><em>[</em><em>str</em><em>]</em>) – Symbolic names for the input predicates (from metadata).</p></li>
-<li><p><strong>gate_name</strong> (<em>str</em>) – Name of the gate being visualized.</p></li>
+<li><p><strong>weights</strong> – A JAX array of trained weights from the gate module.</p></li>
+<li><p><strong>input_labels</strong> – Symbolic names of the input predicates (e.g., from metadata).</p></li>
+<li><p><strong>gate_name</strong> – The label of the logical gate being inspected (e.g., ‘WeightedAND_1’).</p></li>
+<li><p><strong>show</strong> – If True, displays the plot immediately. Set to False for
+programmatic use or automated testing.</p></li>
 </ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The matplotlib Figure object containing the heatmap.</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="jlnn.utils.visualize.plot_training_log_loss">
-<span class="sig-prename descclassname"><span class="pre">jlnn.utils.visualize.</span></span><span class="sig-name descname"><span class="pre">plot_training_log_loss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">losses</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'Training</span> <span class="pre">Convergence'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/jlnn/utils/visualize.html#plot_training_log_loss"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jlnn.utils.visualize.plot_training_log_loss" title="Link to this definition">¶</a></dt>
-<dd><p>Plots the loss curve over training iterations.</p>
-<p>Useful for monitoring how the logical constraints and truth values
-stabilize over time.</p>
+<span class="sig-prename descclassname"><span class="pre">jlnn.utils.visualize.</span></span><span class="sig-name descname"><span class="pre">plot_training_log_loss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">losses</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'Training</span> <span class="pre">Convergence'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Figure</span></span></span><a class="reference internal" href="../../_modules/jlnn/utils/visualize.html#plot_training_log_loss"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jlnn.utils.visualize.plot_training_log_loss" title="Link to this definition">¶</a></dt>
+<dd><p>Plots the loss curve to visualize the optimization and logical grounding process.</p>
+<p>In Logical Neural Networks, the loss trajectory reflects how well the model
+is satisfying logical constraints while fitting the data. Monitoring this
+convergence is crucial for identifying ‘over-constrained’ models or
+oscillations caused by conflicting logical rules.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>losses</strong> – A list or array of loss values recorded during training epochs.</p></li>
+<li><p><strong>title</strong> – Descriptive title for the plot (e.g., ‘Convergence: XOR Problem’).</p></li>
+<li><p><strong>show</strong> – If True, invokes the backend’s display (GUI or Notebook inline).
+Set to False for automated reporting or background processing.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The matplotlib Figure object representing the convergence visualization.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="jlnn.utils.visualize.plot_truth_intervals">
-<span class="sig-prename descclassname"><span class="pre">jlnn.utils.visualize.</span></span><span class="sig-name descname"><span class="pre">plot_truth_intervals</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">intervals_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Array</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'JLNN</span> <span class="pre">Truth</span> <span class="pre">Intervals'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/jlnn/utils/visualize.html#plot_truth_intervals"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jlnn.utils.visualize.plot_truth_intervals" title="Link to this definition">¶</a></dt>
-<dd><p>Renders a horizontal bar chart of truth intervals for model inspection.</p>
-<p>Each bar represents the range [L, U]. If a contradiction is detected (L &gt; U),
-the bar is highlighted in red to signal a logical conflict in the network.</p>
+<span class="sig-prename descclassname"><span class="pre">jlnn.utils.visualize.</span></span><span class="sig-name descname"><span class="pre">plot_truth_intervals</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">intervals_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Array</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'JLNN</span> <span class="pre">Truth</span> <span class="pre">Intervals'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Figure</span></span></span><a class="reference internal" href="../../_modules/jlnn/utils/visualize.html#plot_truth_intervals"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jlnn.utils.visualize.plot_truth_intervals" title="Link to this definition">¶</a></dt>
+<dd><p>Renders a horizontal bar chart of truth intervals for model state inspection.</p>
+<p>In Logical Neural Networks, truth is represented by an interval [L, U].
+This visualization maps these intervals to horizontal bars:
+- The left edge represents the Lower bound (necessary truth).
+- The right edge represents the Upper bound (possible truth).
+- The width of the bar indicates uncertainty (ignorance).
+- A collapsed bar (L ≈ U) represents a precise classical truth value.</p>
+<p>The function automatically performs a consistency check: if L &gt; U, the bar
+is rendered in red to indicate a ‘Logical Contradiction’, signifying that
+the network has reached an unsatisfiable state where evidence for truth
+exceeds evidence for possibility.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>intervals_dict</strong> (<em>Dict</em><em>[</em><em>str</em><em>, </em><em>jnp.ndarray</em><em>]</em>) – Mapping of gate/predicate names
-to their [L, U] interval arrays.</p></li>
-<li><p><strong>title</strong> (<em>str</em>) – The chart title.</p></li>
+<li><p><strong>intervals_dict</strong> – Dictionary mapping symbolic names (predicates/gates)
+to JAX arrays of shape (2,) or (batch, 2). If batched,
+the first sample is typically visualized.</p></li>
+<li><p><strong>title</strong> – Title of the plot, identifying the model or inference step.</p></li>
+<li><p><strong>show</strong> – If True, calls plt.show(). Disable this for automated testing
+or when further figure manipulation is required.</p></li>
 </ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The matplotlib Figure object for further customization or logging.</p>
 </dd>
 </dl>
 </dd></dl>
