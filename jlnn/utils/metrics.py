@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 
+"""
+Logical health and performance metrics for LNN models.
+"""
 # Imports
 import jax.numpy as jnp
 from jlnn.core import intervals

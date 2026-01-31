@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
 
+"""
+General utility functions for Logical Neural Networks.
+"""
+
 # Imports
 import jax.numpy as jnp
 
@@ -19,6 +23,14 @@ def scalar_to_interval(x: jnp.ndarray) -> jnp.ndarray:
     return jnp.stack([x, x], axis=-1)
 
 def is_precise(interval: jnp.ndarray, epsilon: float = 1e-5) -> bool:
-    """Checks if an interval has collapsed into a single point (L ≈ U).
+    """
+    Checks if a truth interval has collapsed into a single point (L ≈ U).
+    
+    Args:
+        interval: Truth interval tensor [L, U].
+        epsilon: Maximum allowed difference between bounds.
+        
+    Returns:
+        True if the uncertainty is within epsilon, False otherwise.
     """
     return float(jnp.abs(interval[..., 0] - interval[..., 1])) < epsilon
