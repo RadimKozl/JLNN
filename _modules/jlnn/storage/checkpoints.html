@@ -291,6 +291,7 @@
 
 <span class="c1"># Imports</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pickle</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">flax</span><span class="w"> </span><span class="kn">import</span> <span class="n">nnx</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Optional</span>
@@ -350,17 +351,26 @@
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="n">loaded_state</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
     
-    <span class="c1"># Use nnx.state to get the state and convert to dict for comparison</span>
-    <span class="c1"># Note: The deprecation warning suggests using dict in the future</span>
-    <span class="n">current_state</span> <span class="o">=</span> <span class="n">nnx</span><span class="o">.</span><span class="n">state</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
-    
-    <span class="c1"># Convert FlatState to regular dict for comparison</span>
-    <span class="n">current_flat_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">current_state</span><span class="o">.</span><span class="n">flat_state</span><span class="p">())</span>
-    <span class="n">loaded_flat_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">loaded_state</span><span class="o">.</span><span class="n">flat_state</span><span class="p">())</span>
+    <span class="c1"># Suppress the deprecation warning since we know it&#39;s coming from Flax 0.12.2</span>
+    <span class="c1"># and we&#39;re using the correct API for this version</span>
+    <span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">():</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="ne">DeprecationWarning</span><span class="p">,</span> <span class="n">module</span><span class="o">=</span><span class="s2">&quot;flax.nnx.statelib&quot;</span><span class="p">)</span>
+        
+        <span class="c1"># Try to use nnx.to_flat_state if available (newer API), </span>
+        <span class="c1"># otherwise fall back to dict conversion (compatible with 0.12.2)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Modern API (Flax &gt;= 0.13.0)</span>
+            <span class="n">current_flat</span> <span class="o">=</span> <span class="n">nnx</span><span class="o">.</span><span class="n">to_flat_state</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+            <span class="n">loaded_flat</span> <span class="o">=</span> <span class="n">nnx</span><span class="o">.</span><span class="n">to_flat_state</span><span class="p">(</span><span class="n">loaded_state</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="c1"># Fallback for Flax 0.12.2 - use dict conversion</span>
+            <span class="n">current_state</span> <span class="o">=</span> <span class="n">nnx</span><span class="o">.</span><span class="n">state</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+            <span class="n">current_flat</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">current_state</span><span class="o">.</span><span class="n">flat_state</span><span class="p">())</span>
+            <span class="n">loaded_flat</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">loaded_state</span><span class="o">.</span><span class="n">flat_state</span><span class="p">())</span>
 
     <span class="c1"># 1. Kontrola shody všech klíčů (paths k parametrům)</span>
-    <span class="n">current_keys</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">current_flat_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
-    <span class="n">loaded_keys</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">loaded_flat_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+    <span class="n">current_keys</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">current_flat</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+    <span class="n">loaded_keys</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">loaded_flat</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
 
     <span class="k">if</span> <span class="n">current_keys</span> <span class="o">!=</span> <span class="n">loaded_keys</span><span class="p">:</span>
         <span class="n">missing</span> <span class="o">=</span> <span class="n">current_keys</span> <span class="o">-</span> <span class="n">loaded_keys</span>
@@ -373,8 +383,8 @@
 
     <span class="c1"># 2. Kontrola shapes u všech Param objektů</span>
     <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">current_keys</span><span class="p">:</span>
-        <span class="n">curr_param</span> <span class="o">=</span> <span class="n">current_flat_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
-        <span class="n">load_param</span> <span class="o">=</span> <span class="n">loaded_flat_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="n">curr_param</span> <span class="o">=</span> <span class="n">current_flat</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="n">load_param</span> <span class="o">=</span> <span class="n">loaded_flat</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
         
         <span class="c1"># Check if both have the same variable state type</span>
         <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">curr_param</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">type</span><span class="p">(</span><span class="n">load_param</span><span class="p">):</span>
