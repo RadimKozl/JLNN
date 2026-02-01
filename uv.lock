@@ -474,6 +474,7 @@ dependencies = [
     { name = "numpy" },
     { name = "numpyro" },
     { name = "onnx" },
+    { name = "onnx2pytorch" },
     { name = "onnx2torch" },
     { name = "onnxruntime" },
     { name = "optax" },
@@ -483,6 +484,7 @@ dependencies = [
     { name = "scipy" },
     { name = "seaborn" },
     { name = "sympy" },
+    { name = "torch" },
     { name = "xarray" },
 ]
 
@@ -499,6 +501,7 @@ requires-dist = [
     { name = "numpy", specifier = ">=2.4.1" },
     { name = "numpyro", specifier = ">=0.19.0" },
     { name = "onnx", specifier = ">=1.20.1" },
+    { name = "onnx2pytorch", specifier = ">=0.5.3" },
     { name = "onnx2torch" },
     { name = "onnxruntime" },
     { name = "optax", specifier = ">=0.2.6" },
@@ -508,6 +511,7 @@ requires-dist = [
     { name = "scipy", specifier = ">=1.17.0" },
     { name = "seaborn", specifier = ">=0.13.2" },
     { name = "sympy", specifier = ">=1.14.0" },
+    { name = "torch", specifier = ">=2.10.0" },
     { name = "xarray" },
 ]
 
@@ -1171,6 +1175,20 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/2c/3b/d5660a7d2ddf14f531ca66d409239f543bb290277c3f14f4b4b78e32efa3/onnx-1.20.1-cp313-cp313t-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:be1e5522200b203b34327b2cf132ddec20ab063469476e1f5b02bb7bd259a489", size = 17515602, upload-time = "2026-01-10T01:39:54.132Z" },
     { url = "https://files.pythonhosted.org/packages/9c/b4/47225ab2a92562eff87ba9a1a028e3535d659a7157d7cde659003998b8e3/onnx-1.20.1-cp313-cp313t-win_amd64.whl", hash = "sha256:15c815313bbc4b2fdc7e4daeb6e26b6012012adc4d850f4e3b09ed327a7ea92a", size = 16395729, upload-time = "2026-01-10T01:39:57.577Z" },
     { url = "https://files.pythonhosted.org/packages/aa/7d/1bbe626ff6b192c844d3ad34356840cc60fca02e2dea0db95e01645758b1/onnx-1.20.1-cp313-cp313t-win_arm64.whl", hash = "sha256:eb335d7bcf9abac82a0d6a0fda0363531ae0b22cfd0fc6304bff32ee29905def", size = 16348968, upload-time = "2026-01-10T01:40:00.491Z" },
+]
+
+[[package]]
+name = "onnx2pytorch"
+version = "0.5.3"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "onnx" },
+    { name = "torch" },
+    { name = "torchvision" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/1c/a6/70fa9bfab7a47f8516943dc99f263f521229adf1aea87bb22f88800efa85/onnx2pytorch-0.5.3.tar.gz", hash = "sha256:28cf3efff7a7f13144d83bfe24d110ca3329a3bd11e568e99fbaf3bc75f6f7c0", size = 41491, upload-time = "2025-11-04T20:43:32.011Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/f3/2a/242ce12ae9a5a107ce185df9bc5937a0fbddcb30541062df82dfb4b8983b/onnx2pytorch-0.5.3-py3-none-any.whl", hash = "sha256:f6aea58d1cbcdb8cb1700ad4ba2d19b7ee4f6fda59e6247588965be70fb69db7", size = 58291, upload-time = "2025-11-04T20:43:31.113Z" },
 ]
 
 [[package]]
