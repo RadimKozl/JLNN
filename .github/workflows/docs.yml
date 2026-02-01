@@ -23,6 +23,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install sphinx sphinx-autodoc-typehints furo jax jaxlib flax lark xarray onnx networkx matplotlib optax seaborn
           pip install sphinx furo sphinx-design sphinx-copybutton
+          pip install nbsphinx pandoc
           # Add here other libraries that JLNN imports so that autodoc doesn't fail
 
       - name: Build HTML
