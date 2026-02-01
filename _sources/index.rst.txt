@@ -33,6 +33,7 @@ Key Components
    installation
    quickstart
    theory
+   testing
 
 .. toctree::
    :maxdepth: 2

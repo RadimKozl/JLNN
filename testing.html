@@ -3,10 +3,10 @@
   <head><meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html"><link rel="next" title="Testing" href="testing.html"><link rel="prev" title="Quickstart" href="quickstart.html">
+<link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html"><link rel="next" title="Core Logic Engine (jlnn.core)" href="modules/core/index.html"><link rel="prev" title="Theoretical foundations of JLNN" href="theory.html">
 
     <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
-        <title>Theoretical foundations of JLNN - JLNN v0.0.2 documentation</title>
+        <title>Testing - JLNN v0.0.2 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
@@ -195,8 +195,8 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart</a></li>
-<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Theoretical foundations of JLNN</a></li>
-<li class="toctree-l1"><a class="reference internal" href="testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="theory.html">Theoretical foundations of JLNN</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Testing</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
 <ul>
@@ -276,7 +276,7 @@
         </a>
         <div class="content-icon-container">
           <div class="view-this-page">
-  <a class="muted-link" href="_sources/theory.rst.txt" title="View this page">
+  <a class="muted-link" href="_sources/testing.rst.txt" title="View this page">
     <svg><use href="#svg-eye"></use></svg>
     <span class="visually-hidden">View this page</span>
   </a>
@@ -294,39 +294,58 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="theoretical-foundations-of-jlnn">
-<h1>Theoretical foundations of JLNN<a class="headerlink" href="#theoretical-foundations-of-jlnn" title="Link to this heading">¶</a></h1>
-<p>JLNN combines classical propositional logic with deep learning using three pillars:</p>
-<section id="interval-truth">
-<h2>1. Interval truth<a class="headerlink" href="#interval-truth" title="Link to this heading">¶</a></h2>
-<p>Unlike standard fuzzy systems, where the truth value is <span class="math notranslate nohighlight">\(a \in [0, 1]\)</span>, JLNN works with the interval:</p>
-<div class="math-wrapper docutils container">
-<div class="math notranslate nohighlight">
-\[I_a = [L_a, U_a], \quad 0 \leq L_a \leq U_a \leq 1\]</div>
+          <section id="testing">
+<h1>Testing<a class="headerlink" href="#testing" title="Link to this heading">¶</a></h1>
+<p>JLNN uses a comprehensive test suite to ensure the mathematical correctness of Łukasiewicz logic operations, the stability of neural modules, and the reliability of export pipelines.</p>
+<section id="running-tests-locally">
+<h2>Running Tests Locally<a class="headerlink" href="#running-tests-locally" title="Link to this heading">¶</a></h2>
+<p>To run the tests, you need to install the development dependencies. It is recommended to use a virtual environment.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Install JLNN with test dependencies</span>
+pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;.[test]&quot;</span>
+
+<span class="c1"># Run the full suite using pytest</span>
+python<span class="w"> </span>-m<span class="w"> </span>pytest<span class="w"> </span>tests<span class="w"> </span>-vv
+</pre></div>
 </div>
+</section>
+<section id="test-suite-structure">
+<h2>Test Suite Structure<a class="headerlink" href="#test-suite-structure" title="Link to this heading">¶</a></h2>
+<p>The test suite is organized into several modules, mirroring the library structure:</p>
 <ul class="simple">
-<li><p><strong>Contradiction</strong>: If <span class="math notranslate nohighlight">\(L_a &gt; U_a\)</span> occurs during learning, the system detects a logical contradiction.</p></li>
-<li><p><strong>Uncertainty</strong>: The width of the interval <span class="math notranslate nohighlight">\(U_a - L_a\)</span> represents the degree of ignorance (epistemic uncertainty).</p></li>
+<li><p><strong>Core Logic</strong> (<code class="docutils literal notranslate"><span class="pre">tests/core/</span></code>): Verifies interval arithmetic and the fundamental Łukasiewicz t-norms/t-conorms.</p></li>
+<li><p><strong>Neural Components</strong> (<code class="docutils literal notranslate"><span class="pre">tests/nn/</span></code>): Ensures Flax NNX modules (gates, predicates) behave correctly during forward passes and handle constraints.</p></li>
+<li><dl class="simple">
+<dt><strong>Export Pipelines</strong> (<code class="docutils literal notranslate"><span class="pre">tests/export/</span></code>): Validates the consistency of models when exported to:</dt><dd><ul>
+<li><p><strong>StableHLO</strong>: Precision-matching between JAX and OpenXLA.</p></li>
+<li><p><strong>ONNX</strong>: Structural integrity of the generated computation graphs.</p></li>
+<li><p><strong>PyTorch</strong>: Numerical parity after JAX → ONNX → PyTorch conversion.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Symbolic Reasoning</strong> (<code class="docutils literal notranslate"><span class="pre">tests/symbolic/</span></code>): Tests the parser and compiler for translating logical strings into neural architectures.</p></li>
+<li><p><strong>Storage &amp; Utilities</strong> (<code class="docutils literal notranslate"><span class="pre">tests/storage/</span></code>, <code class="docutils literal notranslate"><span class="pre">tests/utils/</span></code>): Verifies checkpointing, metadata extraction, and Xarray integration.</p></li>
 </ul>
 </section>
-<section id="weighted-lukasiewicz-s-logic">
-<h2>2. Weighted Łukasiewicz’s logic<a class="headerlink" href="#weighted-lukasiewicz-s-logic" title="Link to this heading">¶</a></h2>
-<p>The operators (AND, OR, …, IMPLY) are implemented as differentiable functions. For an AND gate with weights <span class="math notranslate nohighlight">\(w_i\)</span> and threshold <span class="math notranslate nohighlight">\(\beta\)</span>:</p>
-<div class="math-wrapper docutils container">
-<div class="math notranslate nohighlight">
-\[L_{out} = \max\left(0, 1 - \sum w_i (1 - L_i) / \beta\right)\]</div>
-</div>
-<p>Weights <span class="math notranslate nohighlight">\(w \geq 1\)</span> allow the model to learn the relevance of individual antecedents.</p>
+<section id="continuous-integration">
+<h2>Continuous Integration<a class="headerlink" href="#continuous-integration" title="Link to this heading">¶</a></h2>
+<p>We use <strong>GitHub Actions</strong> to automatically run the entire test suite on every push and pull request to the <code class="docutils literal notranslate"><span class="pre">main</span></code> branch.</p>
+<p>The CI environment mirrors the production setup using:
+* Ubuntu Latest
+* Python 3.12
+* CPU-based JAX and PyTorch runtimes</p>
 </section>
-<section id="mapping-to-graphs">
-<h2>3. Mapping to graphs<a class="headerlink" href="#mapping-to-graphs" title="Link to this heading">¶</a></h2>
-<p>Thanks to the integration with <strong>NetworkX</strong>, each logical formula is represented as a directed acyclic graph (DAG).</p>
-<ul class="simple">
-<li><p><strong>Leaves</strong>: PredicateNodes (inputs).</p></li>
-<li><p><strong>Internal nodes</strong>: Logical Gates (operations).</p></li>
-<li><p><strong>Edges</strong>: Flow of truth intervals.</p></li>
-</ul>
-<p>This structure allows you to export the model to <code class="docutils literal notranslate"><span class="pre">.dot</span></code> format for visualization or to execute graph algorithms directly on top of the logical rule structure.</p>
+<section id="automated-verification">
+<h2>Automated Verification<a class="headerlink" href="#automated-verification" title="Link to this heading">¶</a></h2>
+<p>For critical operations like PyTorch conversion, JLNN includes built-in verification utilities:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">jlnn.export.torch_map</span><span class="w"> </span><span class="kn">import</span> <span class="n">verify_pytorch_conversion</span>
+
+<span class="c1"># This utility (tested in tests/export/test_torch_map.py)</span>
+<span class="c1"># automatically compares JAX and PyTorch outputs.</span>
+<span class="n">results</span> <span class="o">=</span> <span class="n">verify_pytorch_conversion</span><span class="p">(</span><span class="n">jax_model</span><span class="p">,</span> <span class="n">torch_model</span><span class="p">,</span> <span class="n">sample_input</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Max difference: </span><span class="si">{</span><span class="n">results</span><span class="p">[</span><span class="s1">&#39;max_diff&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
 </section>
 </section>
 
@@ -335,23 +354,23 @@
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="testing.html">
+          <a class="next-page" href="modules/core/index.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Testing</div>
+                <div class="title">Core Logic Engine (jlnn.core)</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="quickstart.html">
+          <a class="prev-page" href="theory.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Quickstart</div>
+                <div class="title">Theoretical foundations of JLNN</div>
                 
               </div>
             </a>
@@ -385,10 +404,11 @@
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">Theoretical foundations of JLNN</a><ul>
-<li><a class="reference internal" href="#interval-truth">1. Interval truth</a></li>
-<li><a class="reference internal" href="#weighted-lukasiewicz-s-logic">2. Weighted Łukasiewicz’s logic</a></li>
-<li><a class="reference internal" href="#mapping-to-graphs">3. Mapping to graphs</a></li>
+<li><a class="reference internal" href="#">Testing</a><ul>
+<li><a class="reference internal" href="#running-tests-locally">Running Tests Locally</a></li>
+<li><a class="reference internal" href="#test-suite-structure">Test Suite Structure</a></li>
+<li><a class="reference internal" href="#continuous-integration">Continuous Integration</a></li>
+<li><a class="reference internal" href="#automated-verification">Automated Verification</a></li>
 </ul>
 </li>
 </ul>
@@ -405,6 +425,5 @@
     <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/scripts/furo.js?v=46bd48cc"></script>
     <script src="_static/design-tabs.js?v=f930bc37"></script>
-    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
     </body>
 </html>
