@@ -288,6 +288,14 @@
         <article role="main" id="furo-main-content">
           <h1>Source code for jlnn.export.data</h1><div class="highlight"><pre>
 <span></span><span class="ch">#!/usr/bin/env python3</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Logic parameter extraction utilities for model portability and symbolic reasoning.</span>
+
+<span class="sd">This module provides functions to traverse the Flax NNX module hierarchy and </span>
+<span class="sd">extract learned logical parameters (weights, biases, thresholds) into standard </span>
+<span class="sd">Python dictionaries. This allows for saving model metadata as JSON or </span>
+<span class="sd">exporting the neural logic back into symbolic rules.</span>
+<span class="sd">&quot;&quot;&quot;</span>
 
 <span class="c1"># Imports</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">jax.numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">jnp</span>
@@ -305,20 +313,18 @@
 <span class="sd">    Recursively extracts logical parameters while preserving the module hierarchy.</span>
 
 <span class="sd">    This function traverses the Flax NNX module tree, identifying logical gates </span>
-<span class="sd">    and capturing their specific parameters (weights, beta, offsets). By maintaining </span>
-<span class="sd">    the tree structure, it allows for the reconstruction of nested logical </span>
-<span class="sd">    expressions, such as those found in binary-reduction trees of n-ary XOR gates.</span>
+<span class="sd">    and capturing their specific parameters. It maintains the tree structure, </span>
+<span class="sd">    allowing for the reconstruction of nested logical expressions (e.g., </span>
+<span class="sd">    reduction trees in n-ary gates).</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        module (Any): An instance of an NNX Module or a sub-gate.</span>
-<span class="sd">        name (str): The attribute name of the module within its parent. Defaults to &quot;root&quot;.</span>
+<span class="sd">        module (Any): An instance of an NNX Module or a sub-gate to be inspected.</span>
+<span class="sd">        name (str): The attribute name of the module within its parent. </span>
+<span class="sd">            Defaults to &quot;root&quot;.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        Dict[str, Any]: A dictionary containing:</span>
-<span class="sd">            - &quot;name&quot;: String identifier of the gate.</span>
-<span class="sd">            - &quot;type&quot;: Class name of the gate (e.g., &#39;WeightedAnd&#39;).</span>
-<span class="sd">            - &quot;params&quot;: Dictionary of numerical values (weights, beta, etc.).</span>
-<span class="sd">            - &quot;sub_gates&quot;: (Optional) Nested dictionaries of child modules.</span>
+<span class="sd">        Dict[str, Any]: A dictionary containing the gate&#39;s name, type, </span>
+<span class="sd">            extracted parameters (weights, beta, etc.), and optional nested sub-gates.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">data</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span>
@@ -326,30 +332,23 @@
         <span class="s2">&quot;params&quot;</span><span class="p">:</span> <span class="p">{}</span>
     <span class="p">}</span>
 
-    <span class="c1"># 1. Parameter Extraction Logic</span>
-    <span class="c1"># We extract known LNN parameters and convert them from JAX arrays </span>
-    <span class="c1"># to standard Python types for JSON serializability.</span>
+    <span class="c1"># Use [...] for NNX Variable access to avoid DeprecationWarnings</span>
+    <span class="c1"># weights (w &gt;= 1.0) represent the relative importance of antecedents</span>
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="s2">&quot;weights&quot;</span><span class="p">):</span>
+        <span class="n">data</span><span class="p">[</span><span class="s2">&quot;params&quot;</span><span class="p">][</span><span class="s2">&quot;weights&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">module</span><span class="o">.</span><span class="n">weights</span><span class="p">[</span><span class="o">...</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
     
-    <span class="c1"># Standard gate weights (AND, OR, NAND, NOR)</span>
-    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="s1">&#39;weights&#39;</span><span class="p">):</span>
-        <span class="n">data</span><span class="p">[</span><span class="s2">&quot;params&quot;</span><span class="p">][</span><span class="s2">&quot;weights&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">module</span><span class="o">.</span><span class="n">weights</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
-    
-    <span class="c1"># Sensitivity threshold (Bias equivalent)</span>
-    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="s1">&#39;beta&#39;</span><span class="p">):</span>
-        <span class="n">data</span><span class="p">[</span><span class="s2">&quot;params&quot;</span><span class="p">][</span><span class="s2">&quot;beta&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">module</span><span class="o">.</span><span class="n">beta</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
-    
-    <span class="c1"># Unary weight for negation gates</span>
-    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="s1">&#39;weight&#39;</span><span class="p">):</span>
-        <span class="n">data</span><span class="p">[</span><span class="s2">&quot;params&quot;</span><span class="p">][</span><span class="s2">&quot;weight&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">module</span><span class="o">.</span><span class="n">weight</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+    <span class="c1"># beta (b) is the threshold parameter for the Lukasiewicz t-norm</span>
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="s2">&quot;beta&quot;</span><span class="p">):</span>
+        <span class="c1"># Ensure beta is a standard float for JSON compatibility</span>
+        <span class="n">data</span><span class="p">[</span><span class="s2">&quot;params&quot;</span><span class="p">][</span><span class="s2">&quot;beta&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">module</span><span class="o">.</span><span class="n">beta</span><span class="p">[</span><span class="o">...</span><span class="p">])</span>
         
-    <span class="c1"># Specialized weights for complex gate compositions (e.g., WeightedXor sub-components)</span>
-    <span class="k">for</span> <span class="n">xor_param</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;weights_or&#39;</span><span class="p">,</span> <span class="s1">&#39;weights_nand&#39;</span><span class="p">,</span> <span class="s1">&#39;weights_and&#39;</span><span class="p">]:</span>
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">xor_param</span><span class="p">):</span>
-            <span class="n">data</span><span class="p">[</span><span class="s2">&quot;params&quot;</span><span class="p">][</span><span class="n">xor_param</span><span class="p">]</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">xor_param</span><span class="p">)</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+    <span class="c1"># Specific threshold for XOR gates (separating True from Contradictory/False)</span>
+    <span class="n">xor_param</span> <span class="o">=</span> <span class="s2">&quot;xor_threshold&quot;</span>
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">xor_param</span><span class="p">):</span>
+        <span class="n">data</span><span class="p">[</span><span class="s2">&quot;params&quot;</span><span class="p">][</span><span class="n">xor_param</span><span class="p">]</span> <span class="o">=</span> <span class="n">module</span><span class="o">.</span><span class="n">xor_threshold</span><span class="p">[</span><span class="o">...</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
 
-    <span class="c1"># 2. Recursive Tree Traversal</span>
+    <span class="c1"># Recursive Tree Traversal</span>
     <span class="c1"># We inspect the object&#39;s dictionary to find nested NNX modules.</span>
-    <span class="c1"># This captures left_child/right_child structures in recursive gates.</span>
     <span class="n">sub_modules</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">for</span> <span class="n">attr_name</span><span class="p">,</span> <span class="n">attr_value</span> <span class="ow">in</span> <span class="nb">vars</span><span class="p">(</span><span class="n">module</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">attr_value</span><span class="p">,</span> <span class="n">nnx</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
@@ -368,22 +367,21 @@
 <span class="sd">    Primary API to extract the full logical structure and weights of a JLNN model.</span>
 
 <span class="sd">    This function produces a portable, structured representation of the entire </span>
-<span class="sd">    logical network. The resulting dictionary can be saved as a JSON metadata </span>
-<span class="sd">    file or used by symbolic reasoners to translate the neural weights </span>
-<span class="sd">    back into formal logic rules.</span>
+<span class="sd">    logical network. The resulting dictionary is suitable for JSON serialization </span>
+<span class="sd">    and can be used by external symbolic reasoners to verify or visualize </span>
+<span class="sd">    learned rules.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        model (nnx.Module): The top-level Flax NNX logical model.</span>
+<span class="sd">        model (nnx.Module): The top-level Flax NNX logical model instance.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Dict[str, Any]: A nested dictionary containing framework metadata </span>
-<span class="sd">            and the recursive gate structure.</span>
+<span class="sd">            and the recursive gate structure of the model.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="p">{</span>
         <span class="s2">&quot;metadata&quot;</span><span class="p">:</span> <span class="p">{</span>
             <span class="s2">&quot;framework&quot;</span><span class="p">:</span> <span class="s2">&quot;JLNN&quot;</span><span class="p">,</span> 
-            <span class="s2">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;1.1&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Structured Logical Parameter Export&quot;</span>
+            <span class="s2">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;0.1.0&quot;</span>
         <span class="p">},</span>
         <span class="s2">&quot;structure&quot;</span><span class="p">:</span> <span class="n">export_module_recursive</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
     <span class="p">}</span></div>

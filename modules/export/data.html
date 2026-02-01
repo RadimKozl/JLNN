@@ -295,29 +295,30 @@
         <article role="main" id="furo-main-content">
           <section id="module-jlnn.export.data">
 <span id="metadata-state-export"></span><h1>Metadata &amp; State Export<a class="headerlink" href="#module-jlnn.export.data" title="Link to this heading">¶</a></h1>
+<p>Logic parameter extraction utilities for model portability and symbolic reasoning.</p>
+<p>This module provides functions to traverse the Flax NNX module hierarchy and
+extract learned logical parameters (weights, biases, thresholds) into standard
+Python dictionaries. This allows for saving model metadata as JSON or
+exporting the neural logic back into symbolic rules.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="jlnn.export.data.export_module_recursive">
 <span class="sig-prename descclassname"><span class="pre">jlnn.export.data.</span></span><span class="sig-name descname"><span class="pre">export_module_recursive</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">module</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'root'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../_modules/jlnn/export/data.html#export_module_recursive"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jlnn.export.data.export_module_recursive" title="Link to this definition">¶</a></dt>
 <dd><p>Recursively extracts logical parameters while preserving the module hierarchy.</p>
 <p>This function traverses the Flax NNX module tree, identifying logical gates
-and capturing their specific parameters (weights, beta, offsets). By maintaining
-the tree structure, it allows for the reconstruction of nested logical
-expressions, such as those found in binary-reduction trees of n-ary XOR gates.</p>
+and capturing their specific parameters. It maintains the tree structure,
+allowing for the reconstruction of nested logical expressions (e.g.,
+reduction trees in n-ary gates).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>module</strong> (<em>Any</em>) – An instance of an NNX Module or a sub-gate.</p></li>
-<li><p><strong>name</strong> (<em>str</em>) – The attribute name of the module within its parent. Defaults to “root”.</p></li>
+<li><p><strong>module</strong> (<em>Any</em>) – An instance of an NNX Module or a sub-gate to be inspected.</p></li>
+<li><p><strong>name</strong> (<em>str</em>) – The attribute name of the module within its parent.
+Defaults to “root”.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><dl class="simple">
-<dt>A dictionary containing:</dt><dd><ul class="simple">
-<li><p>”name”: String identifier of the gate.</p></li>
-<li><p>”type”: Class name of the gate (e.g., ‘WeightedAnd’).</p></li>
-<li><p>”params”: Dictionary of numerical values (weights, beta, etc.).</p></li>
-<li><p>”sub_gates”: (Optional) Nested dictionaries of child modules.</p></li>
-</ul>
+<dt>A dictionary containing the gate’s name, type,</dt><dd><p>extracted parameters (weights, beta, etc.), and optional nested sub-gates.</p>
 </dd>
 </dl>
 </p>
@@ -333,16 +334,16 @@ expressions, such as those found in binary-reduction trees of n-ary XOR gates.</
 <span class="sig-prename descclassname"><span class="pre">jlnn.export.data.</span></span><span class="sig-name descname"><span class="pre">extract_logic_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Module</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../_modules/jlnn/export/data.html#extract_logic_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jlnn.export.data.extract_logic_parameters" title="Link to this definition">¶</a></dt>
 <dd><p>Primary API to extract the full logical structure and weights of a JLNN model.</p>
 <p>This function produces a portable, structured representation of the entire
-logical network. The resulting dictionary can be saved as a JSON metadata
-file or used by symbolic reasoners to translate the neural weights
-back into formal logic rules.</p>
+logical network. The resulting dictionary is suitable for JSON serialization
+and can be used by external symbolic reasoners to verify or visualize
+learned rules.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>model</strong> (<em>nnx.Module</em>) – The top-level Flax NNX logical model.</p>
+<dd class="field-odd"><p><strong>model</strong> (<em>nnx.Module</em>) – The top-level Flax NNX logical model instance.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><dl class="simple">
-<dt>A nested dictionary containing framework metadata</dt><dd><p>and the recursive gate structure.</p>
+<dt>A nested dictionary containing framework metadata</dt><dd><p>and the recursive gate structure of the model.</p>
 </dd>
 </dl>
 </p>

@@ -295,197 +295,68 @@
         <article role="main" id="furo-main-content">
           <section id="module-jlnn.export.torch_map">
 <span id="pytorch-mapping"></span><h1>PyTorch Mapping<a class="headerlink" href="#module-jlnn.export.torch_map" title="Link to this heading">¶</a></h1>
-<p>PyTorch Export Module for JLNN Models</p>
-<p>This module provides utilities to convert JAX/Flax NNX models to PyTorch format
-using ONNX as an intermediate representation. The conversion pipeline:
-JAX/NNX → ONNX → PyTorch</p>
-<dl class="simple">
-<dt>Dependencies:</dt><dd><ul class="simple">
-<li><p>torch: PyTorch framework</p></li>
-<li><p>onnx: ONNX model format</p></li>
-<li><p>onnx2pytorch: ONNX to PyTorch converter (<a class="reference external" href="https://github.com/Talmaj/onnx2pytorch">https://github.com/Talmaj/onnx2pytorch</a>)</p></li>
-</ul>
-</dd>
-<dt>Installation:</dt><dd><p>pip install torch onnx onnx2pytorch</p>
-</dd>
-</dl>
-<dl class="py function">
-<dt class="sig sig-object py" id="jlnn.export.torch_map.export_pytorch_with_verification">
-<span class="sig-prename descclassname"><span class="pre">jlnn.export.torch_map.</span></span><span class="sig-name descname"><span class="pre">export_pytorch_with_verification</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Module</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_input</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1e-05</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">torch.nn.Module</span></span></span><a class="reference internal" href="../../_modules/jlnn/export/torch_map.html#export_pytorch_with_verification"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jlnn.export.torch_map.export_pytorch_with_verification" title="Link to this definition">¶</a></dt>
-<dd><p>Complete workflow: export to PyTorch and verify the conversion.</p>
-<p>This convenience function combines export and verification in a single call.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>model</strong> (<em>nnx.Module</em>) – JAX model to export.</p></li>
-<li><p><strong>sample_input</strong> (<em>jnp.ndarray</em>) – Sample input for tracing.</p></li>
-<li><p><strong>output_path</strong> (<em>str</em>) – Path to save the PyTorch model (.pth or .pt).</p></li>
-<li><p><strong>tolerance</strong> (<em>float</em>) – Verification tolerance for output comparison.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Verified PyTorch model.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>torch.nn.Module</p>
-</dd>
-<dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>RuntimeError</strong> – If verification fails.</p>
-</dd>
-</dl>
-<p class="rubric">Example</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pytorch_model</span> <span class="o">=</span> <span class="n">export_pytorch_with_verification</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="n">jax_model</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="s2">&quot;model.pth&quot;</span><span class="p">,</span> <span class="n">tolerance</span><span class="o">=</span><span class="mf">1e-5</span>
-<span class="gp">... </span><span class="p">)</span>
-</pre></div>
-</div>
-</dd></dl>
-
+<p>PyTorch Export Module for JLNN Models.</p>
+<p>This module provides utilities to bridge the JAX/Flax NNX ecosystem with PyTorch.
+It uses ONNX as an intermediate representation to translate logical neural
+network structures into PyTorch-compatible modules.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="jlnn.export.torch_map.export_to_pytorch">
 <span class="sig-prename descclassname"><span class="pre">jlnn.export.torch_map.</span></span><span class="sig-name descname"><span class="pre">export_to_pytorch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Module</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_input</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmp_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'tmp_model.onnx'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cleanup</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">torch.nn.Module</span></span></span><a class="reference internal" href="../../_modules/jlnn/export/torch_map.html#export_to_pytorch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jlnn.export.torch_map.export_to_pytorch" title="Link to this definition">¶</a></dt>
-<dd><p>Converts a JLNN (JAX/NNX) model to a PyTorch module using ONNX as an intermediary.</p>
-<p>This function implements a three-stage conversion pipeline:
-1. Export the JAX/Flax model to ONNX format (using export_to_onnx)
-2. Load the ONNX model and convert it to PyTorch computational graph
-3. Optionally clean up the temporary ONNX file</p>
-<p>The resulting PyTorch module preserves:
-- Model architecture and computational graph
-- Trained weights and parameters
-- Łukasiewicz logic operations (as equivalent PyTorch ops)
-- Input/output shapes and dtypes</p>
+<dd><p>Converts a JLNN model to a PyTorch Module via ONNX.</p>
+<p>The conversion process involves tracing the JAX model to an ONNX graph
+and then re-mapping those operations to PyTorch layers using onnx2pytorch.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>model</strong> (<em>nnx.Module</em>) – The trained JLNN model to convert.</p></li>
-<li><p><strong>sample_input</strong> (<em>jnp.ndarray</em>) – Sample input tensor for tracing.
-Shape should match expected input format,
-typically […, 2] for truth intervals.</p></li>
-<li><p><strong>tmp_path</strong> (<em>str</em>) – Temporary file path for intermediate ONNX file.
-Default: “tmp_model.onnx”</p></li>
-<li><p><strong>cleanup</strong> (<em>bool</em>) – If True, removes the temporary ONNX file after conversion.
-Set to False if you want to inspect the ONNX model.
-Default: True</p></li>
+<li><p><strong>model</strong> (<em>nnx.Module</em>) – The logical neural network (NNX) to export.</p></li>
+<li><p><strong>sample_input</strong> (<em>jnp.ndarray</em>) – Representative input for shape tracing (batch, 2).</p></li>
+<li><p><strong>tmp_path</strong> (<em>str</em>) – Temporary path for the intermediate ONNX file.</p></li>
+<li><p><strong>cleanup</strong> (<em>bool</em>) – If True, deletes the temporary ONNX file after conversion.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><dl class="simple">
-<dt>A PyTorch module with identical logic and weights.</dt><dd><p>Can be used for inference, fine-tuning, or integration
-into PyTorch pipelines.</p>
-</dd>
-</dl>
-</p>
+<dd class="field-even"><p>An equivalent PyTorch module for inference.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>torch.nn.Module</p>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><strong>ImportError</strong> – If required dependencies (torch, onnx, onnx2pytorch)
-    are not installed.</p></li>
-<li><p><strong>RuntimeError</strong> – If ONNX export or PyTorch conversion fails.</p></li>
-</ul>
+<dd class="field-even"><p><strong>ImportError</strong> – If torch, onnx, or onnx2pytorch are not installed.</p>
 </dd>
 </dl>
-<p class="rubric">References</p>
-<ul class="simple">
-<li><p>onnx2pytorch: <a class="reference external" href="https://github.com/Talmaj/onnx2pytorch">https://github.com/Talmaj/onnx2pytorch</a></p></li>
-<li><p>ONNX: <a class="reference external" href="https://onnx.ai/">https://onnx.ai/</a></p></li>
-<li><p>PyTorch: <a class="reference external" href="https://pytorch.org/">https://pytorch.org/</a></p></li>
-</ul>
-<p class="rubric">Example</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Export JAX model to PyTorch</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">jax_model</span> <span class="o">=</span> <span class="n">MyJLNNModel</span><span class="p">(</span><span class="n">feature_dim</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">sample</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.7</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">]])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">pytorch_model</span> <span class="o">=</span> <span class="n">export_to_pytorch</span><span class="p">(</span><span class="n">jax_model</span><span class="p">,</span> <span class="n">sample</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Use the PyTorch model</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">torch_input</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([[</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.7</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">]])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">output</span> <span class="o">=</span> <span class="n">pytorch_model</span><span class="p">(</span><span class="n">torch_input</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Save the PyTorch model</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">pytorch_model</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span> <span class="s1">&#39;model.pth&#39;</span><span class="p">)</span>
-</pre></div>
-</div>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>The conversion quality depends on:
-- Completeness of the ONNX export (some JAX ops may not map perfectly)
-- onnx2pytorch’s support for ONNX operators
-- Complexity of logical operations in the model</p>
-<p>For production use, validate the converted model’s outputs against
-the original JAX model on representative test data.</p>
-</div>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="jlnn.export.torch_map.generate_pytorch_state_dict_code">
-<span class="sig-prename descclassname"><span class="pre">jlnn.export.torch_map.</span></span><span class="sig-name descname"><span class="pre">generate_pytorch_state_dict_code</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Module</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_input</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="../../_modules/jlnn/export/torch_map.html#generate_pytorch_state_dict_code"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jlnn.export.torch_map.generate_pytorch_state_dict_code" title="Link to this definition">¶</a></dt>
-<dd><p>Generates Python code for manually loading weights into a PyTorch model.</p>
-<p>This function is useful when you want to:
-- Port the model architecture manually to PyTorch
-- Inspect the exact weight values
-- Create custom PyTorch modules with pretrained JLNN weights</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>model</strong> (<em>nnx.Module</em>) – The JLNN model to extract weights from.</p></li>
-<li><p><strong>sample_input</strong> (<em>jnp.ndarray</em>) – Sample input for model tracing.</p></li>
-<li><p><strong>output_file</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em>) – If provided, saves the generated code to this file.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Python code snippet that creates a PyTorch state_dict.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>str</p>
-</dd>
-</dl>
-<p class="rubric">Example</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">code</span> <span class="o">=</span> <span class="n">generate_pytorch_state_dict_code</span><span class="p">(</span><span class="n">jax_model</span><span class="p">,</span> <span class="n">sample</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">code</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Or save to file</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">generate_pytorch_state_dict_code</span><span class="p">(</span><span class="n">jax_model</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="s2">&quot;weights.py&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="jlnn.export.torch_map.verify_pytorch_conversion">
-<span class="sig-prename descclassname"><span class="pre">jlnn.export.torch_map.</span></span><span class="sig-name descname"><span class="pre">verify_pytorch_conversion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">jax_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Module</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pytorch_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">torch.nn.Module</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_input</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1e-05</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../_modules/jlnn/export/torch_map.html#verify_pytorch_conversion"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jlnn.export.torch_map.verify_pytorch_conversion" title="Link to this definition">¶</a></dt>
-<dd><p>Verifies that the PyTorch conversion produces equivalent outputs to the JAX model.</p>
-<p>This function runs both models on the same input and compares their outputs
-to ensure the conversion preserved the model’s behavior.</p>
+<span class="sig-prename descclassname"><span class="pre">jlnn.export.torch_map.</span></span><span class="sig-name descname"><span class="pre">verify_pytorch_conversion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">jax_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Module</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pytorch_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">torch.nn.Module</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_input</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1e-05</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../_modules/jlnn/export/torch_map.html#verify_pytorch_conversion"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jlnn.export.torch_map.verify_pytorch_conversion" title="Link to this definition">¶</a></dt>
+<dd><p>Verifies numerical consistency between the original JAX model and the exported PyTorch model.</p>
+<p>This utility performs a forward pass on both models using the same input and
+compares the resulting truth intervals using the specified absolute tolerance.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>jax_model</strong> (<em>nnx.Module</em>) – Original JAX/Flax model.</p></li>
-<li><p><strong>pytorch_model</strong> (<em>torch.nn.Module</em>) – Converted PyTorch model.</p></li>
-<li><p><strong>sample_input</strong> (<em>jnp.ndarray</em>) – Test input tensor.</p></li>
-<li><p><strong>tolerance</strong> (<em>float</em>) – Maximum allowed difference between outputs.</p></li>
+<li><p><strong>jax_model</strong> (<em>nnx.Module</em>) – The original source model.</p></li>
+<li><p><strong>pytorch_model</strong> (<em>torch.nn.Module</em>) – The converted destination model.</p></li>
+<li><p><strong>sample_input</strong> (<em>jnp.ndarray</em>) – Input data for comparison.</p></li>
+<li><p><strong>tolerance</strong> (<em>float</em>) – Maximum allowed absolute difference between outputs.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><ul class="simple">
-<li><p>‘passed’: bool indicating if verification passed</p></li>
-<li><p>’max_diff’: maximum absolute difference</p></li>
-<li><p>’mean_diff’: mean absolute difference</p></li>
-<li><p>’jax_output’: JAX model output</p></li>
-<li><p>’pytorch_output’: PyTorch model output (as numpy)</p></li>
+<dd class="field-even"><p><dl class="simple">
+<dt>A report containing:</dt><dd><ul class="simple">
+<li><p>’passed’ (bool): Whether the difference is within tolerance.</p></li>
+<li><p>’max_diff’ (float): The maximum observed absolute error.</p></li>
+<li><p>’jax_output’ (np.ndarray): Output from the original model.</p></li>
+<li><p>’pytorch_output’ (np.ndarray): Output from the converted model.</p></li>
 </ul>
+</dd>
+</dl>
 </p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Dict containing</p>
+<dd class="field-odd"><p>Dict[str, Any]</p>
 </dd>
 </dl>
-<p class="rubric">Example</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pytorch_model</span> <span class="o">=</span> <span class="n">export_to_pytorch</span><span class="p">(</span><span class="n">jax_model</span><span class="p">,</span> <span class="n">sample</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">results</span> <span class="o">=</span> <span class="n">verify_pytorch_conversion</span><span class="p">(</span><span class="n">jax_model</span><span class="p">,</span> <span class="n">pytorch_model</span><span class="p">,</span> <span class="n">sample</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">if</span> <span class="n">results</span><span class="p">[</span><span class="s1">&#39;passed&#39;</span><span class="p">]:</span>
-<span class="gp">&gt;&gt;&gt; </span>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;✓ Conversion verified successfully!&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
 </dd></dl>
 
 <p>Enables mapping JLNN operations to equivalent structures in <strong>PyTorch</strong>. This is useful if JLNN is part of a larger system that primarily runs in the Torch ecosystem.</p>
@@ -554,9 +425,7 @@ to ensure the conversion preserved the model’s behavior.</p>
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">PyTorch Mapping</a><ul>
-<li><a class="reference internal" href="#jlnn.export.torch_map.export_pytorch_with_verification"><code class="docutils literal notranslate"><span class="pre">export_pytorch_with_verification()</span></code></a></li>
 <li><a class="reference internal" href="#jlnn.export.torch_map.export_to_pytorch"><code class="docutils literal notranslate"><span class="pre">export_to_pytorch()</span></code></a></li>
-<li><a class="reference internal" href="#jlnn.export.torch_map.generate_pytorch_state_dict_code"><code class="docutils literal notranslate"><span class="pre">generate_pytorch_state_dict_code()</span></code></a></li>
 <li><a class="reference internal" href="#jlnn.export.torch_map.verify_pytorch_conversion"><code class="docutils literal notranslate"><span class="pre">verify_pytorch_conversion()</span></code></a></li>
 <li><a class="reference internal" href="#key-features">Key Features:</a></li>
 </ul>
