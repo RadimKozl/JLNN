@@ -1,5 +1,5 @@
 [project]
-name = "jlnn"
+name = "jax-lnn"
 version = "0.1.0"
 description = "High-performance Neuro-Symbolic framework on JAX and Flax NNX"
 authors = [{name = "Ing. Radim Közl"}]
