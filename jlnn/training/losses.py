@@ -149,3 +149,43 @@ def rule_violation_loss(antecedent: jnp.ndarray, consequent: jnp.ndarray) -> jnp
     return jnp.mean(jnp.maximum(0.0, l_a - u_b))
 
 
+def jlnn_learning_loss(
+    prediction: jnp.ndarray, 
+    target: jnp.ndarray, 
+    contradiction_weight: float = 1.0,
+    uncertainty_weight: float = 0.05
+) -> jnp.ndarray:
+    """
+    Calculates a combined loss function designed for stable learning of neuro-symbolic weights.
+
+    This loss function unifies three optimization objectives:
+        1. Accuracy: Standard Mean Squared Error (MSE) to align prediction bounds with targets.
+        2. Consistency: Quadratic penalty for logical contradictions where the lower bound exceeds the upper bound (L > U).
+        3. Decisiveness: A penalty on the interval width (U - L) to prevent the model from remaining in a 
+           neutral "unknown" state [0, 1] and forcing it to converge towards more certain truth values.
+
+    Args:
+        prediction (jnp.ndarray): Predicted truth interval tensor of the form (..., 2).
+        target (jnp.ndarray): Target (ground truth) interval tensor of the form (..., 2).
+        contradiction_weight (float): Scalar multiplier for the consistency penalty. Defaults to 1.0.
+        uncertainty_weight (float): Scalar multiplier for the uncertainty (width) penalty. 
+            Small values (e.g., 0.05) are recommended to maintain focus on accuracy.
+
+    Returns:
+        jnp.ndarray: A scalar value representing the total learning loss.
+    """
+    # 1. Accuracy (MSE) - forces interval bounds towards the labels
+    mse = jnp.mean(jnp.square(prediction - target))
+    
+    # 2. Contradiction (L > U) - penalizes logically invalid states
+    l = intervals.get_lower(prediction)
+    u = intervals.get_upper(prediction)
+    contra = jnp.mean(jnp.square(jnp.maximum(0.0, l - u)))
+    
+    # 3. Pressure on 'Decisiveness' - penalizes the interval width (U - L)
+    # Without this, models often settle for [0, 1] as a low-loss "safe" bet,
+    # effectively learning nothing about the underlying logic.
+    uncertainty = jnp.mean(u - l)
+    
+    return mse + (contradiction_weight * contra) + (uncertainty_weight * uncertainty)
+
