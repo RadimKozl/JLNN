@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../../genindex.html"><link rel="search" title="Search" href="../../../search.html">
 
     <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
-        <title>jlnn.training.losses - JLNN v0.0.2 documentation</title>
+        <title>jlnn.training.losses - JLNN v0.1.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
@@ -161,7 +161,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../../../index.html"><div class="brand">JLNN v0.0.2 documentation</div></a>
+      <a href="../../../index.html"><div class="brand">JLNN v0.1.0 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -182,7 +182,7 @@
       
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../../../index.html">
   
-  <span class="sidebar-brand-text">JLNN v0.0.2 documentation</span>
+  <span class="sidebar-brand-text">JLNN v0.1.0 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -454,6 +454,49 @@
 
 
 
+<div class="viewcode-block" id="jlnn_learning_loss">
+<a class="viewcode-back" href="../../../modules/training/losses.html#jlnn.training.losses.jlnn_learning_loss">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">jlnn_learning_loss</span><span class="p">(</span>
+    <span class="n">prediction</span><span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> 
+    <span class="n">target</span><span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> 
+    <span class="n">contradiction_weight</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
+    <span class="n">uncertainty_weight</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.05</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculates a combined loss function designed for stable learning of neuro-symbolic weights.</span>
+
+<span class="sd">    This loss function unifies three optimization objectives:</span>
+<span class="sd">        1. Accuracy: Standard Mean Squared Error (MSE) to align prediction bounds with targets.</span>
+<span class="sd">        2. Consistency: Quadratic penalty for logical contradictions where the lower bound exceeds the upper bound (L &gt; U).</span>
+<span class="sd">        3. Decisiveness: A penalty on the interval width (U - L) to prevent the model from remaining in a </span>
+<span class="sd">           neutral &quot;unknown&quot; state [0, 1] and forcing it to converge towards more certain truth values.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        prediction (jnp.ndarray): Predicted truth interval tensor of the form (..., 2).</span>
+<span class="sd">        target (jnp.ndarray): Target (ground truth) interval tensor of the form (..., 2).</span>
+<span class="sd">        contradiction_weight (float): Scalar multiplier for the consistency penalty. Defaults to 1.0.</span>
+<span class="sd">        uncertainty_weight (float): Scalar multiplier for the uncertainty (width) penalty. </span>
+<span class="sd">            Small values (e.g., 0.05) are recommended to maintain focus on accuracy.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        jnp.ndarray: A scalar value representing the total learning loss.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># 1. Accuracy (MSE) - forces interval bounds towards the labels</span>
+    <span class="n">mse</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">prediction</span> <span class="o">-</span> <span class="n">target</span><span class="p">))</span>
+    
+    <span class="c1"># 2. Contradiction (L &gt; U) - penalizes logically invalid states</span>
+    <span class="n">l</span> <span class="o">=</span> <span class="n">intervals</span><span class="o">.</span><span class="n">get_lower</span><span class="p">(</span><span class="n">prediction</span><span class="p">)</span>
+    <span class="n">u</span> <span class="o">=</span> <span class="n">intervals</span><span class="o">.</span><span class="n">get_upper</span><span class="p">(</span><span class="n">prediction</span><span class="p">)</span>
+    <span class="n">contra</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">l</span> <span class="o">-</span> <span class="n">u</span><span class="p">)))</span>
+    
+    <span class="c1"># 3. Pressure on &#39;Decisiveness&#39; - penalizes the interval width (U - L)</span>
+    <span class="c1"># Without this, models often settle for [0, 1] as a low-loss &quot;safe&quot; bet,</span>
+    <span class="c1"># effectively learning nothing about the underlying logic.</span>
+    <span class="n">uncertainty</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">u</span> <span class="o">-</span> <span class="n">l</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">mse</span> <span class="o">+</span> <span class="p">(</span><span class="n">contradiction_weight</span> <span class="o">*</span> <span class="n">contra</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">uncertainty_weight</span> <span class="o">*</span> <span class="n">uncertainty</span><span class="p">)</span></div>
+
+
 </pre></div>
         </article>
       </div>
@@ -486,7 +529,7 @@
       
     </aside>
   </div>
-</div><script src="../../../_static/documentation_options.js?v=1812e922"></script>
+</div><script src="../../../_static/documentation_options.js?v=fa47ad08"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/scripts/furo.js?v=46bd48cc"></script>

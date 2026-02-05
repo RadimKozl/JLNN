@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html"><link rel="next" title="Projected Optimizers" href="optimizers.html"><link rel="prev" title="Training &amp; Optimization (jlnn.training)" href="index.html">
 
     <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
-        <title>Logical Loss Functions - JLNN v0.0.2 documentation</title>
+        <title>Logical Loss Functions - JLNN v0.1.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
@@ -162,7 +162,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../../index.html"><div class="brand">JLNN v0.0.2 documentation</div></a>
+      <a href="../../index.html"><div class="brand">JLNN v0.1.0 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -183,7 +183,7 @@
       
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
   
-  <span class="sidebar-brand-text">JLNN v0.0.2 documentation</span>
+  <span class="sidebar-brand-text">JLNN v0.1.0 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -314,6 +314,38 @@ The last dimension contains the pair [Lower Bound, Upper Bound].</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A scalar value representing the average contradiction loss.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>jnp.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="jlnn.training.losses.jlnn_learning_loss">
+<span class="sig-prename descclassname"><span class="pre">jlnn.training.losses.</span></span><span class="sig-name descname"><span class="pre">jlnn_learning_loss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prediction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">contradiction_weight</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uncertainty_weight</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.05</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Array</span></span></span><a class="reference internal" href="../../_modules/jlnn/training/losses.html#jlnn_learning_loss"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jlnn.training.losses.jlnn_learning_loss" title="Link to this definition">¶</a></dt>
+<dd><p>Calculates a combined loss function designed for stable learning of neuro-symbolic weights.</p>
+<dl class="simple">
+<dt>This loss function unifies three optimization objectives:</dt><dd><ol class="arabic simple">
+<li><p>Accuracy: Standard Mean Squared Error (MSE) to align prediction bounds with targets.</p></li>
+<li><p>Consistency: Quadratic penalty for logical contradictions where the lower bound exceeds the upper bound (L &gt; U).</p></li>
+<li><p>Decisiveness: A penalty on the interval width (U - L) to prevent the model from remaining in a
+neutral “unknown” state [0, 1] and forcing it to converge towards more certain truth values.</p></li>
+</ol>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>prediction</strong> (<em>jnp.ndarray</em>) – Predicted truth interval tensor of the form (…, 2).</p></li>
+<li><p><strong>target</strong> (<em>jnp.ndarray</em>) – Target (ground truth) interval tensor of the form (…, 2).</p></li>
+<li><p><strong>contradiction_weight</strong> (<em>float</em>) – Scalar multiplier for the consistency penalty. Defaults to 1.0.</p></li>
+<li><p><strong>uncertainty_weight</strong> (<em>float</em>) – Scalar multiplier for the uncertainty (width) penalty.
+Small values (e.g., 0.05) are recommended to maintain focus on accuracy.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A scalar value representing the total learning loss.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>jnp.ndarray</p>
@@ -499,6 +531,7 @@ at the cost of slower MSE error reduction. The default value is 1.0.</p></li>
             <ul>
 <li><a class="reference internal" href="#">Logical Loss Functions</a><ul>
 <li><a class="reference internal" href="#jlnn.training.losses.contradiction_loss"><code class="docutils literal notranslate"><span class="pre">contradiction_loss()</span></code></a></li>
+<li><a class="reference internal" href="#jlnn.training.losses.jlnn_learning_loss"><code class="docutils literal notranslate"><span class="pre">jlnn_learning_loss()</span></code></a></li>
 <li><a class="reference internal" href="#jlnn.training.losses.logical_consistency_loss"><code class="docutils literal notranslate"><span class="pre">logical_consistency_loss()</span></code></a></li>
 <li><a class="reference internal" href="#jlnn.training.losses.logical_mse_loss"><code class="docutils literal notranslate"><span class="pre">logical_mse_loss()</span></code></a></li>
 <li><a class="reference internal" href="#jlnn.training.losses.rule_violation_loss"><code class="docutils literal notranslate"><span class="pre">rule_violation_loss()</span></code></a></li>
@@ -515,7 +548,7 @@ at the cost of slower MSE error reduction. The default value is 1.0.</p></li>
       
     </aside>
   </div>
-</div><script src="../../_static/documentation_options.js?v=1812e922"></script>
+</div><script src="../../_static/documentation_options.js?v=fa47ad08"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/scripts/furo.js?v=46bd48cc"></script>
