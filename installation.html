@@ -194,7 +194,6 @@
   <p class="caption" role="heading"><span class="caption-text">User Guide:</span></p>
 <ul class="current">
 <li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="#id1">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="tutorials/index.html">Examples &amp; Tutorials</a><input aria-label="Toggle navigation of Examples &amp; Tutorials" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="tutorials/introduction_tutorial.html">Introductory Example: JLNN Base</a></li>
@@ -301,26 +300,6 @@
         <article role="main" id="furo-main-content">
           <section id="installation">
 <h1>Installation<a class="headerlink" href="#installation" title="Link to this heading">¶</a></h1>
-<p>LNN requires Python 3.9 or later. Since the framework is built on the <strong>JAX</strong> library, we recommend paying attention to choosing the correct version based on your hardware.</p>
-<section id="quick-installation">
-<h2>Quick installation<a class="headerlink" href="#quick-installation" title="Link to this heading">¶</a></h2>
-<p>Quick installation can be done directly from the repository using <code class="docutils literal notranslate"><span class="pre">pip</span></code>:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>git+https://github.com/RadimKozl/JLNN.git
-</pre></div>
-</div>
-</section>
-<section id="dependencies">
-<h2>Dependencies<a class="headerlink" href="#dependencies" title="Link to this heading">¶</a></h2>
-<p>The framework automatically installs these key libraries:
-* <strong>jax &amp; jaxlib</strong>: Computing core.
-* <strong>flax</strong>: For managing the state of neural networks (we use the modern NNX API).
-* <strong>lark</strong>: For parsing logical formulas.
-* <strong>networkx</strong>: For working with the graph structure of the model.
-* <strong>optax</strong>: For optimization and learning.</p>
-</section>
-</section>
-<section id="id1">
-<h1>Installation<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h1>
 <p>JLNN requires Python 3.11 or later. Since the framework is built on the <strong>JAX</strong> stack, we recommend paying attention to choosing the correct version based on your hardware.</p>
 <section id="standard-installation">
 <h2>Standard Installation<a class="headerlink" href="#standard-installation" title="Link to this heading">¶</a></h2>
@@ -362,8 +341,8 @@ pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </s
 <code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">os;</span> <span class="pre">os.kill(os.getpid(),</span> <span class="pre">9)</span></code></p>
 </div>
 </section>
-<section id="id2">
-<h2>Dependencies<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h2>
+<section id="dependencies">
+<h2>Dependencies<a class="headerlink" href="#dependencies" title="Link to this heading">¶</a></h2>
 <p>The framework automatically installs these key libraries:
 * <strong>jax &amp; jaxlib</strong>: Computing core.
 * <strong>flax</strong>: For managing the state of neural networks (we use the modern NNX API).
@@ -447,15 +426,10 @@ pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </s
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">Installation</a><ul>
-<li><a class="reference internal" href="#quick-installation">Quick installation</a></li>
-<li><a class="reference internal" href="#dependencies">Dependencies</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#id1">Installation</a><ul>
 <li><a class="reference internal" href="#standard-installation">Standard Installation</a></li>
 <li><a class="reference internal" href="#development-installation">Development Installation</a></li>
 <li><a class="reference internal" href="#jax-cuda-specifics">JAX &amp; CUDA Specifics</a></li>
-<li><a class="reference internal" href="#id2">Dependencies</a></li>
+<li><a class="reference internal" href="#dependencies">Dependencies</a></li>
 <li><a class="reference internal" href="#verification">Verification</a></li>
 <li><a class="reference internal" href="#support-for-os">Support for OS</a></li>
 </ul>
