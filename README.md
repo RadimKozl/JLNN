@@ -134,7 +134,7 @@ JLNN is inspired by and builds upon the foundations laid by several pioneering n
 ## **Documentation**
 
 - [***Online Documentation***](https://radimkozl.github.io/JLNN/)
-- [***Introductory Tutorial (Colab)***](https://radimkozl.github.io/JLNN/)
+- [***Introductory Tutorial***](https://radimkozl.github.io/JLNN/tutorials/introduction_tutorial.html)
 - [***API Reference***](https://radimkozl.github.io/JLNN/)
 
 ## **License**
