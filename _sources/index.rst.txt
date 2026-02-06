@@ -32,6 +32,7 @@ Key Components
 
    installation
    quickstart
+   tutorials/index
    theory
    testing
 
