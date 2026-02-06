@@ -6,8 +6,21 @@ All significant changes to the JLNN project will be documented in this file. The
 .. note::
    JLNN is currently in the **Alpha** phase. API may change based on feedback from research deployments.
 
-[0.0.2] - 2024-01-27
---------------------
+[0.1.0] - 2026-02-06
+---------------------
+First public release (Alpha Release). Implementation of the core framework built on JAX and Flax NNX.
+
+Added
+^^^^^^^
+* **Example Notebooks**: Added Jupyter notebooks demonstrating basic usage, training, and reasoning with JLNN.
+* **README**: Created a comprehensive README with installation instructions and quickstart guide.
+
+Changed
+^^^^^^^
+* Updated documentation structure to include user guide and tutorials.
+
+[0.0.2] - 2026-01-27
+---------------------
 
 First public release (Alpha Release). Implementation of the core framework built on JAX and Flax NNX.
 
@@ -32,6 +45,6 @@ Fixed
 * Add base documentation.
 
 [0.0.1] - 2026-01-17
---------------------
+---------------------
 * Create a project
 * Basic framework concept

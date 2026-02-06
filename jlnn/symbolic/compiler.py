@@ -135,8 +135,8 @@ class JLNNCompiler(Transformer):
     Lark Transformer that converts a CST (Concrete Syntax Tree) into an NNX model tree.
     
     Note:
-        The grammar rules use "and", "or", and "not". Since these are reserved 
-        keywords in Python, we define them as and_, or_, not_ and alias them 
+        The grammar rules use ``and``, ``or``, and ``not``. Since these are reserved 
+        keywords in Python, we define them as ``and_``, ``or_``, ``not_`` and alias them 
         dynamically after class definition.
     """
     def __init__(self, rngs: nnx.Rngs):
