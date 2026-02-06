@@ -26,7 +26,7 @@ JLNN enables turning symbolic logical rules into differentiable neural networks 
 ## **Installation**
 
 ```bash
-# From PyPI (coming soon)
+# From PyPI
 pip install jax-lnn
 
 # From GitHub
