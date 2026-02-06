@@ -1,8 +1,18 @@
 [project]
 name = "jax-lnn"
 version = "0.1.0"
-description = "High-performance Neuro-Symbolic framework on JAX and Flax NNX"
+description = "JAX Logical Neural Networks – neuro-symbolic framework with interval Łukasiewicz logic"
+license = {text = "MIT"}
 authors = [{name = "Ing. Radim Közl"}]
+keywords = ["jax", "neuro-symbolic", "logical-neural-networks", "lukasiewicz", "interval-logic"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "License :: OSI Approved :: MIT License",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Development Status :: 3 - Alpha",
+]
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
