@@ -1,33 +1,6 @@
 Installation
 ============
 
-LNN requires Python 3.9 or later. Since the framework is built on the **JAX** library, we recommend paying attention to choosing the correct version based on your hardware.
-
-Quick installation
-------------------
-
-Quick installation can be done directly from the repository using ``pip``:
-
-.. code-block:: bash
-
-    pip install git+https://github.com/RadimKozl/JLNN.git
-
-Dependencies
-------------
-
-The framework automatically installs these key libraries:
-* **jax & jaxlib**: Computing core.
-* **flax**: For managing the state of neural networks (we use the modern NNX API).
-* **lark**: For parsing logical formulas.
-* **networkx**: For working with the graph structure of the model.
-* **optax**: For optimization and learning.
-
-
-
-
-Installation
-============
-
 JLNN requires Python 3.11 or later. Since the framework is built on the **JAX** stack, we recommend paying attention to choosing the correct version based on your hardware.
 
 Standard Installation
