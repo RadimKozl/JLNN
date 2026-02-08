@@ -41,7 +41,7 @@ In this example, we consider an implication with a weight of 0.8:
 
 .. code-block:: python
 
-    ```
+    '''
     try:
         import jlnn
         from flax import nnx
@@ -58,7 +58,7 @@ In this example, we consider an implication with a weight of 0.8:
         print("\n🔄 RESTARTING ENVIRONMENT... Please wait a second and then run the cell again.")
         os.kill(os.getpid(), 9)
         os.kill(os.getpid(), 9) # After this line, the cell stops and the environment restarts
-    ```
+    '''
     
     import os
     os.environ["JAX_PLATFORMS"] = "cpu"
