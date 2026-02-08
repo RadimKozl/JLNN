@@ -345,24 +345,24 @@ a differentiable graph (NNX). Instead of a single truth value, we work with an <
 <h2>Rule definition<a class="headerlink" href="#rule-definition" title="Link to this heading">¶</a></h2>
 <p>We create the model by compiling a symbolic rule using the <code class="docutils literal notranslate"><span class="pre">LNNFormula</span></code> class.
 In this example, we consider an implication with a weight of 0.8:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="err">```</span>
-<span class="k">try</span><span class="p">:</span>
-    <span class="kn">import</span><span class="w"> </span><span class="nn">jlnn</span>
-    <span class="kn">from</span><span class="w"> </span><span class="nn">flax</span><span class="w"> </span><span class="kn">import</span> <span class="n">nnx</span>
-    <span class="kn">import</span><span class="w"> </span><span class="nn">jax.numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">jnp</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;✅ JLNN and JAX are ready.&quot;</span><span class="p">)</span>
-<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;🚀 Installing JLNN from GitHub and fixing JAX for Colab...&quot;</span><span class="p">)</span>
-    <span class="c1"># Instalace frameworku</span>
-    <span class="err">!</span><span class="n">pip</span> <span class="n">install</span> <span class="n">jax</span><span class="o">-</span><span class="n">lnn</span> <span class="o">--</span><span class="n">quiet</span>
-    <span class="c1"># Fix JAX/CUDA compatibility for 2026 in Colab</span>
-    <span class="err">!</span><span class="n">pip</span> <span class="n">install</span> <span class="o">--</span><span class="n">upgrade</span> <span class="s2">&quot;jax[cuda12_pip]&quot;</span> <span class="o">-</span><span class="n">f</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">storage</span><span class="o">.</span><span class="n">googleapis</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">jax</span><span class="o">-</span><span class="n">releases</span><span class="o">/</span><span class="n">jax_cuda_releases</span><span class="o">.</span><span class="n">html</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">try:</span>
+<span class="sd">    import jlnn</span>
+<span class="sd">    from flax import nnx</span>
+<span class="sd">    import jax.numpy as jnp</span>
+<span class="sd">    print(&quot;✅ JLNN and JAX are ready.&quot;)</span>
+<span class="sd">except ImportError:</span>
+<span class="sd">    print(&quot;🚀 Installing JLNN from GitHub and fixing JAX for Colab...&quot;)</span>
+<span class="sd">    # Instalace frameworku</span>
+<span class="sd">    !pip install jax-lnn --quiet</span>
+<span class="sd">    # Fix JAX/CUDA compatibility for 2026 in Colab</span>
+<span class="sd">    !pip install --upgrade &quot;jax[cuda12_pip]&quot; -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html</span>
 
-    <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">🔄 RESTARTING ENVIRONMENT... Please wait a second and then run the cell again.&quot;</span><span class="p">)</span>
-    <span class="n">os</span><span class="o">.</span><span class="n">kill</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getpid</span><span class="p">(),</span> <span class="mi">9</span><span class="p">)</span>
-    <span class="n">os</span><span class="o">.</span><span class="n">kill</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getpid</span><span class="p">(),</span> <span class="mi">9</span><span class="p">)</span> <span class="c1"># After this line, the cell stops and the environment restarts</span>
-<span class="err">```</span>
+<span class="sd">    import os</span>
+<span class="sd">    print(&quot;\n🔄 RESTARTING ENVIRONMENT... Please wait a second and then run the cell again.&quot;)</span>
+<span class="sd">    os.kill(os.getpid(), 9)</span>
+<span class="sd">    os.kill(os.getpid(), 9) # After this line, the cell stops and the environment restarts</span>
+<span class="sd">&#39;&#39;&#39;</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;JAX_PLATFORMS&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;cpu&quot;</span>
