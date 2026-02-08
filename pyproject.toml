@@ -15,6 +15,7 @@ classifiers = [
 ]
 readme = "README.md"
 requires-python = ">=3.11"
+
 dependencies = [
     "flax>=0.12.2",
     "jax>=0.8.2",
@@ -65,3 +66,8 @@ extra = [
 [build-system]
 requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
+
+[project.urls]
+homepage = "https://github.com/RadimKozl/JLNN"
+documentation = "https://radimkozl.github.io/JLNN/"
+source = "https://github.com/RadimKozl/JLNN"
