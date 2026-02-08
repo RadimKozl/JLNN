@@ -152,8 +152,9 @@ In this tutorial, you will learn:
    print("\nOriginal prediction (for comparison):")
    print(model(inputs))
 
+
 Download
---------
+---------
 
 You can also download the raw notebook file for local use:
 :download:`Jax_lnn_base.ipynb <https://github.com/RadimKozl/JLNN/blob/main/examples/Jax_lnn_base.ipynb>`
