@@ -40,6 +40,7 @@ We create the model by compiling a symbolic rule using the ``LNNFormula`` class.
 In this example, we consider an implication with a weight of 0.8:
 
 .. code-block:: python
+
     ```
     try:
         import jlnn
@@ -127,6 +128,8 @@ In this example, we consider an implication with a weight of 0.8:
     }
     print("\nExp 3 – high uncertainty in A:")
     print(model(inputs_exp3))
+
+
 
 Tutorial summary
 ------------------
