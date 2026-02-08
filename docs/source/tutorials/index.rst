@@ -6,3 +6,4 @@ Examples & Tutorials
    :caption: Getting Started
 
    introduction_tutorial
+   basic_inference_tutorial
