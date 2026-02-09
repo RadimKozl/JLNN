@@ -150,3 +150,62 @@ def negate(interval: jnp.ndarray) -> jnp.ndarray:
     
     # Calculation of negation: lower limit of result is 1 - upper limit of input and vice versa
     return create_interval(1.0 - upper, 1.0 - lower)
+
+
+def ensure_consistent(lower: jnp.ndarray, upper: jnp.ndarray) -> Tuple[jnp.ndarray, jnp.ndarray]:
+    """
+    Enforces interval consistency by ensuring that the lower bound is less than or equal to the upper bound.
+
+    In neuro-symbolic and fuzzy logic operations, continuous transformations (like weighted 
+    negations) can sometimes invert interval boundaries. This function corrects such 
+    inversions using vectorized minimum and maximum operations, maintaining compatibility 
+    with JAX's JIT compilation and auto-differentiation.
+
+    Args:
+        lower: A JAX array representing the lower bounds (L) of the intervals.
+        upper: A JAX array representing the upper bounds (U) of the intervals.
+
+    Returns:
+        A tuple of (new_lower, new_upper) where new_lower <= new_upper for all elements.
+        The shapes of the returned arrays match the input shapes.
+
+    Example:
+        >>> L, U = jnp.array(0.7), jnp.array(0.5)
+        >>> ensure_consistent(L, U)
+        (DeviceArray(0.5, dtype=float32), DeviceArray(0.7, dtype=float32))
+    """
+    # Vectorized swap logic – works for scalars, batches, and high-dimensional tensors
+    new_lower = jnp.minimum(lower, upper)
+    new_upper = jnp.maximum(lower, upper)
+    return new_lower, new_upper
+
+
+def ensure_interval(array: jnp.ndarray) -> jnp.ndarray:
+    """
+    Validates and corrects an entire interval tensor to ensure mathematical consistency.
+
+    This function processes a tensor where the last dimension represents an interval 
+    [lower_bound, upper_bound]. It decomposes the tensor, ensures that each lower 
+    bound is less than or equal to its corresponding upper bound using 
+    `ensure_consistent`, and reconstructs the tensor.
+
+    This is a critical safety utility for neuro-symbolic layers where batch 
+    operations or weighted logic transformations might invert interval limits.
+
+    Args:
+        array: A JAX array of shape [..., 2], where the last axis contains 
+               the interval pairs.
+
+    Returns:
+        A JAX array of the same shape [..., 2] with corrected (sorted) intervals 
+        along the last axis.
+
+    Example:
+        >>> data = jnp.array([[0.8, 0.2], [0.1, 0.9]])
+        >>> ensure_interval(data)
+        DeviceArray([[0.2, 0.8], [0.1, 0.9]], dtype=float32)
+    """
+    lower = array[..., 0]
+    upper = array[..., 1]
+    new_lower, new_upper = ensure_consistent(lower, upper)
+    return jnp.stack([new_lower, new_upper], axis=-1)

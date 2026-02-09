@@ -18,7 +18,8 @@ def weighted_and(x: jnp.ndarray, weights: jnp.ndarray, beta: jnp.ndarray) -> jnp
         jnp.ndarray: The resulting truth interval [L, U].
     """
     # Calls low-level implementation from kernel
-    return logic.weighted_and_lukasiewicz(x, weights, beta)
+    results = logic.weighted_and_lukasiewicz(x, weights, beta)
+    return intervals.ensure_interval(results)
 
 def weighted_or(x: jnp.ndarray, weights: jnp.ndarray, beta: jnp.ndarray) -> jnp.ndarray:
     """
@@ -33,7 +34,8 @@ def weighted_or(x: jnp.ndarray, weights: jnp.ndarray, beta: jnp.ndarray) -> jnp.
         jnp.ndarray: The resulting truth interval [L, U].
     """
     # Calls low-level implementation from kernel
-    return logic.weighted_or_lukasiewicz(x, weights, beta)
+    results = logic.weighted_or_lukasiewicz(x, weights, beta)
+    return intervals.ensure_interval(results)
 
 def weighted_not(x: jnp.ndarray, weight: jnp.ndarray) -> jnp.ndarray:
     """
@@ -53,21 +55,24 @@ def weighted_not(x: jnp.ndarray, weight: jnp.ndarray) -> jnp.ndarray:
         jnp.minimum(1.0, intervals.get_lower(x) * weight),
         jnp.minimum(1.0, intervals.get_upper(x) * weight)
     )
-    return intervals.negate(weighted_x)
+    results = intervals.negate(weighted_x)
+    return intervals.ensure_interval(results)
 
 def weighted_nand(x: jnp.ndarray, weights: jnp.ndarray, beta: jnp.ndarray) -> jnp.ndarray:
     """
     Weighted NAND calculated as the negation of weighted AND.
     """
     res_and = weighted_and(x, weights, beta)
-    return intervals.negate(res_and)
+    results = intervals.negate(res_and)
+    return intervals.ensure_interval(results)
 
 def weighted_nor(x: jnp.ndarray, weights: jnp.ndarray, beta: jnp.ndarray) -> jnp.ndarray:
     """
     Weighted NOR calculated as the negation of the weighted OR.
     """
     res_or = weighted_or(x, weights, beta)
-    return intervals.negate(res_or)
+    results = intervals.negate(res_or)
+    return intervals.ensure_interval(results)
 
 def weighted_implication(int_a: jnp.ndarray, int_b: jnp.ndarray, 
                          weights: jnp.ndarray, beta: jnp.ndarray, 
@@ -101,8 +106,10 @@ def weighted_implication(int_a: jnp.ndarray, int_b: jnp.ndarray,
     )
 
     if method == 'kleene_dienes':
-        return logic.implies_kleene_dienes(weighted_a, weighted_b)
+        results = logic.implies_kleene_dienes(weighted_a, weighted_b)
     elif method == 'reichenbach':
-        return logic.implies_reichenbach(weighted_a, weighted_b)
+        results = logic.implies_reichenbach(weighted_a, weighted_b)
     else:
         raise ValueError(f"Method {method} is not supported.")
+    
+    return intervals.ensure_interval(results)

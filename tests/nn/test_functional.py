@@ -25,7 +25,10 @@ def test_weighted_and_functional():
     
     res = F.weighted_and(x, weights, beta)
     
-    # Check if the upper bound of the result is close to 0 (False)
+    # Check consistency: Lower bound must be <= Upper bound
+    assert jnp.all(intervals.get_lower(res) <= intervals.get_upper(res))
+    
+    # In Łukasiewicz logic: 1 AND 0 = 0
     assert jnp.isclose(intervals.get_upper(res), 0.0)
 
 def test_weighted_or_functional():
@@ -46,5 +49,107 @@ def test_weighted_or_functional():
     
     res = F.weighted_or(x, weights, beta)
     
-    # Check if the lower bound of the result is close to 1 (True)
+    assert jnp.all(intervals.get_lower(res) <= intervals.get_upper(res))
+    
+    # Check if the lower bound of the result is close to 1 (True, 1 OR 0 = 1)
     assert jnp.isclose(intervals.get_lower(res), 1.0)
+    
+def test_weighted_not_consistency():
+    """
+    Validates that the weighted NOT operation maintains interval invariant L <= U.
+
+    This test checks the robustness of the negation logic when scaling weights 
+    are applied. In neuro-symbolic models, weights greater than 1.0 or 
+    continuous transformations can shift interval boundaries in ways that 
+    threaten mathematical consistency. 
+
+    The test verifies that:
+    1. The `weighted_not` function correctly handles scaled input intervals.
+    2. The internal `ensure_consistent` (or `ensure_interval`) call 
+       successfully prevents negative uncertainty widths, even under 
+       non-unit weighting.
+    3. The output remains a valid truth interval within the [0, 1] domain.
+    """
+    # Input [0.2, 0.8] - a standard uncertain interval
+    x = intervals.create_interval(jnp.array(0.2), jnp.array(0.8))
+    weight = jnp.array(1.5) # Weight > 1.0 can push bounds
+    
+    res = F.weighted_not(x, weight)
+    
+    # Axiom: Interval integrity must be preserved regardless of the weight magnitude
+    assert jnp.all(intervals.get_lower(res) <= intervals.get_upper(res)), \
+        f"Weighted NOT produced an inconsistent interval: {res}"
+        
+    # Domain check: Results must still be within logical bounds [0, 1]
+    assert jnp.all(res >= 0.0) and jnp.all(res <= 1.0)
+    
+def test_weighted_nand_consistency():
+    """
+    Validates that the weighted NAND operation prevents negative uncertainty widths.
+
+    The NAND operation is a compound transformation (NOT AND). In interval logic, 
+    this sequence is highly susceptible to boundary inversion. This test verifies 
+    that even when intermediate logical steps produce potentially invalid states, 
+    the final `weighted_nand` output is strictly validated and corrected.
+
+    Specifically, it ensures that:
+    1. The composite logic correctly aggregates input intervals.
+    2. The boundary swap inherent in the negation step (NOT) is properly managed.
+    3. The final result preserves the interval invariant L <= U, ensuring 
+       numerical stability for subsequent neuro-symbolic layers.
+    """
+    # Input with overlapping boundaries to challenge the consistency logic
+    x = intervals.create_interval(jnp.array([0.7, 0.5]), jnp.array([0.9, 0.6]))
+    x = x[jnp.newaxis, ...]
+    
+    weights = jnp.array([1.0, 1.0])
+    beta = jnp.array(1.0)
+    
+    res = F.weighted_nand(x, weights, beta)
+    
+    # Check if the internal consistency mechanism handled the nested negation
+    assert jnp.all(intervals.get_lower(res) <= intervals.get_upper(res)), \
+        f"NAND produced inconsistent interval boundaries: {res}"
+        
+    # Ensure width is non-negative
+    width = intervals.get_upper(res) - intervals.get_lower(res)
+    assert jnp.all(width >= 0.0), f"Negative uncertainty width detected: {width}"
+    
+def test_weighted_implication_methods():
+    """
+    Validates cross-method consistency for weighted logical implications.
+
+    This test ensures that all supported implication semantics (Łukasiewicz, 
+    Kleene-Dienes, and Reichenbach) maintain the interval invariant (L <= U) 
+    when processing weighted antecedents and consequents. 
+
+    Implications are often sensitive to boundary inversions during the 
+    weighting of the antecedent (int_a). This test confirms that:
+    1. The `weighted_implication` interface correctly routes data to specific 
+       logical kernels.
+    2. Every method, regardless of its mathematical implementation, returns 
+       a consistent and valid truth interval.
+    3. The boundary correction mechanism (ensure_consistent) is active and 
+       functional across all implication types.
+
+    Methods tested:
+        - Łukasiewicz: Standard T-norm based implication.
+        - Kleene-Dienes: Max-min based implication.
+        - Reichenbach: Product-based continuous implication.
+    """
+    # Test case: High truth antecedent [0.8, 1.0] implies low truth consequent [0.2, 0.4]
+    int_a = intervals.create_interval(jnp.array(0.8), jnp.array(1.0))
+    int_b = intervals.create_interval(jnp.array(0.2), jnp.array(0.4))
+    weights = jnp.array([1.0, 1.0])
+    beta = jnp.array(1.0)
+    
+    for method in ['lukasiewicz', 'kleene_dienes', 'reichenbach']:
+        res = F.weighted_implication(int_a, int_b, weights, beta, method=method)
+        
+        # Verify interval integrity for the specific method
+        assert jnp.all(intervals.get_lower(res) <= intervals.get_upper(res)), \
+            f"Implication method '{method}' produced an inconsistent interval: {res}"
+            
+        # Domain check: Results must stay within [0, 1]
+        assert jnp.all(res >= 0.0) and jnp.all(res <= 1.0), \
+            f"Implication method '{method}' out of logical bounds: {res}"
