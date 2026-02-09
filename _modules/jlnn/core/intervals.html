@@ -463,6 +463,71 @@
     <span class="c1"># Calculation of negation: lower limit of result is 1 - upper limit of input and vice versa</span>
     <span class="k">return</span> <span class="n">create_interval</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">upper</span><span class="p">,</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="n">lower</span><span class="p">)</span></div>
 
+
+
+<div class="viewcode-block" id="ensure_consistent">
+<a class="viewcode-back" href="../../../modules/core/intervals.html#jlnn.core.intervals.ensure_consistent">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">ensure_consistent</span><span class="p">(</span><span class="n">lower</span><span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">upper</span><span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Enforces interval consistency by ensuring that the lower bound is less than or equal to the upper bound.</span>
+
+<span class="sd">    In neuro-symbolic and fuzzy logic operations, continuous transformations (like weighted </span>
+<span class="sd">    negations) can sometimes invert interval boundaries. This function corrects such </span>
+<span class="sd">    inversions using vectorized minimum and maximum operations, maintaining compatibility </span>
+<span class="sd">    with JAX&#39;s JIT compilation and auto-differentiation.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        lower: A JAX array representing the lower bounds (L) of the intervals.</span>
+<span class="sd">        upper: A JAX array representing the upper bounds (U) of the intervals.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A tuple of (new_lower, new_upper) where new_lower &lt;= new_upper for all elements.</span>
+<span class="sd">        The shapes of the returned arrays match the input shapes.</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; L, U = jnp.array(0.7), jnp.array(0.5)</span>
+<span class="sd">        &gt;&gt;&gt; ensure_consistent(L, U)</span>
+<span class="sd">        (DeviceArray(0.5, dtype=float32), DeviceArray(0.7, dtype=float32))</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Vectorized swap logic – works for scalars, batches, and high-dimensional tensors</span>
+    <span class="n">new_lower</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">lower</span><span class="p">,</span> <span class="n">upper</span><span class="p">)</span>
+    <span class="n">new_upper</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">lower</span><span class="p">,</span> <span class="n">upper</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">new_lower</span><span class="p">,</span> <span class="n">new_upper</span></div>
+
+
+
+<div class="viewcode-block" id="ensure_interval">
+<a class="viewcode-back" href="../../../modules/core/intervals.html#jlnn.core.intervals.ensure_interval">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">ensure_interval</span><span class="p">(</span><span class="n">array</span><span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Validates and corrects an entire interval tensor to ensure mathematical consistency.</span>
+
+<span class="sd">    This function processes a tensor where the last dimension represents an interval </span>
+<span class="sd">    [lower_bound, upper_bound]. It decomposes the tensor, ensures that each lower </span>
+<span class="sd">    bound is less than or equal to its corresponding upper bound using </span>
+<span class="sd">    `ensure_consistent`, and reconstructs the tensor.</span>
+
+<span class="sd">    This is a critical safety utility for neuro-symbolic layers where batch </span>
+<span class="sd">    operations or weighted logic transformations might invert interval limits.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        array: A JAX array of shape [..., 2], where the last axis contains </span>
+<span class="sd">               the interval pairs.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A JAX array of the same shape [..., 2] with corrected (sorted) intervals </span>
+<span class="sd">        along the last axis.</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; data = jnp.array([[0.8, 0.2], [0.1, 0.9]])</span>
+<span class="sd">        &gt;&gt;&gt; ensure_interval(data)</span>
+<span class="sd">        DeviceArray([[0.2, 0.8], [0.1, 0.9]], dtype=float32)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">lower</span> <span class="o">=</span> <span class="n">array</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">upper</span> <span class="o">=</span> <span class="n">array</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="n">new_lower</span><span class="p">,</span> <span class="n">new_upper</span> <span class="o">=</span> <span class="n">ensure_consistent</span><span class="p">(</span><span class="n">lower</span><span class="p">,</span> <span class="n">upper</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">jnp</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">new_lower</span><span class="p">,</span> <span class="n">new_upper</span><span class="p">],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span></div>
+
 </pre></div>
         </article>
       </div>
