@@ -344,32 +344,55 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Computes a weighted logical negation (NOT) with confidence scaling.</span>
 
-<span class="sd">    This operation follows a two-stage process:</span>
-<span class="sd">    1. **Pure Negation:** The input interval [L, U] is inverted to [1-U, 1-L] </span>
-<span class="sd">       preserving the uncertainty width.</span>
-<span class="sd">    2. **Confidence Scaling:** The resulting negated interval is scaled by the </span>
-<span class="sd">       `weight` parameter. If weight &gt; 1.0, the truth values are amplified </span>
-<span class="sd">       and then clipped to the [0, 1] domain.</span>
+<span class="sd">    FIXED VERSION - Corrects the weighting semantics to preserve NOT logic.</span>
+
+<span class="sd">    The weight parameter controls how much the negation &quot;pulls toward uncertainty&quot;:</span>
+<span class="sd">    - weight = 1.0: Pure logical NOT, [L, U] -&gt; [1-U, 1-L]</span>
+<span class="sd">    - weight &lt; 1.0: Negation is &quot;softened&quot; by blending with the unknown state [0, 1]</span>
+<span class="sd">    - weight &gt; 1.0: Not recommended (would push values outside [0, 1])</span>
+
+<span class="sd">    The weighting is applied by linear interpolation:</span>
+<span class="sd">        result = weight * NOT(x) + (1 - weight) * [0, 1]</span>
+
+<span class="sd">    This ensures that when weight = 1.0, we get pure logical negation.</span>
+<span class="sd">    When weight = 0.0, we get complete uncertainty [0, 1].</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        x (jnp.ndarray): Input truth interval tensor of shape (..., 2).</span>
-<span class="sd">        weight (jnp.ndarray): Scaling factor (0.0 to 1.0+) representing </span>
-<span class="sd">            the importance or confidence of the negation.</span>
+<span class="sd">        weight (jnp.ndarray): Scaling factor (0.0 to 1.0) representing </span>
+<span class="sd">            the confidence or strength of the negation.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        jnp.ndarray: The scaled negated interval, clipped to [0, 1].</span>
+<span class="sd">        jnp.ndarray: The weighted negated interval, clipped to [0, 1].</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; # Pure negation (weight = 1.0)</span>
+<span class="sd">        &gt;&gt;&gt; x = jnp.array([[0.0, 0.0]])  # False</span>
+<span class="sd">        &gt;&gt;&gt; weighted_not(x, jnp.array(1.0))</span>
+<span class="sd">        # Returns: [[1.0, 1.0]] (True) ✓</span>
+<span class="sd">        </span>
+<span class="sd">        &gt;&gt;&gt; x = jnp.array([[1.0, 1.0]])  # True</span>
+<span class="sd">        &gt;&gt;&gt; weighted_not(x, jnp.array(1.0))</span>
+<span class="sd">        # Returns: [[0.0, 0.0]] (False) ✓</span>
+<span class="sd">        </span>
+<span class="sd">        &gt;&gt;&gt; # Softened negation (weight = 0.5)</span>
+<span class="sd">        &gt;&gt;&gt; x = jnp.array([[0.0, 0.0]])  # False</span>
+<span class="sd">        &gt;&gt;&gt; weighted_not(x, jnp.array(0.5))</span>
+<span class="sd">        # Returns: [[0.5, 1.0]] (blend of True and Unknown)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># 1. Pure negation: [L, U] -&gt; [1-U, 1-L]</span>
     <span class="n">negated</span> <span class="o">=</span> <span class="n">intervals</span><span class="o">.</span><span class="n">negate</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
     
-    <span class="c1"># 2. Applying weight to the result of negation</span>
-    <span class="n">l_neg</span> <span class="o">=</span> <span class="n">intervals</span><span class="o">.</span><span class="n">get_lower</span><span class="p">(</span><span class="n">negated</span><span class="p">)</span> <span class="o">*</span> <span class="n">weight</span>
-    <span class="n">u_neg</span> <span class="o">=</span> <span class="n">intervals</span><span class="o">.</span><span class="n">get_upper</span><span class="p">(</span><span class="n">negated</span><span class="p">)</span> <span class="o">*</span> <span class="n">weight</span>
+    <span class="c1"># 2. Linear interpolation between negated result and maximum uncertainty [0, 1]</span>
+    <span class="c1"># When weight = 1.0: result = negated (pure NOT)</span>
+    <span class="c1"># When weight = 0.0: result = [0, 1] (complete ignorance)</span>
+    <span class="n">l_neg</span> <span class="o">=</span> <span class="n">intervals</span><span class="o">.</span><span class="n">get_lower</span><span class="p">(</span><span class="n">negated</span><span class="p">)</span> <span class="o">*</span> <span class="n">weight</span> <span class="o">+</span> <span class="mf">0.0</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">weight</span><span class="p">)</span>
+    <span class="n">u_neg</span> <span class="o">=</span> <span class="n">intervals</span><span class="o">.</span><span class="n">get_upper</span><span class="p">(</span><span class="n">negated</span><span class="p">)</span> <span class="o">*</span> <span class="n">weight</span> <span class="o">+</span> <span class="mf">1.0</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">weight</span><span class="p">)</span>
     
     <span class="c1"># 3. Merge and enforce domain [0, 1] and consistency L &lt;= U</span>
     <span class="n">combined</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">l_neg</span><span class="p">,</span> <span class="n">u_neg</span><span class="p">],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
-    <span class="c1"># Explicit clip ensures that tests on domain bounds [0, 1] pass</span>
     <span class="k">return</span> <span class="n">intervals</span><span class="o">.</span><span class="n">ensure_interval</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">combined</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">))</span></div>
+
 
 
 <div class="viewcode-block" id="weighted_nand">
