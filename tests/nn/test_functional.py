@@ -54,6 +54,49 @@ def test_weighted_or_functional():
     # Check if the lower bound of the result is close to 1 (True, 1 OR 0 = 1)
     assert jnp.isclose(intervals.get_lower(res), 1.0)
     
+
+def test_weighted_not_fuzzy_integrity():
+    """
+    Validates uncertainty preservation during fuzzy negation transformations.
+
+    A common failure mode in interval logic is 'information collapse,' where 
+    near-boundary values (e.g., [0.95, 1.0]) are prematurely clipped to crisp 
+    values (e.g., [0, 0]) during negation, destroying the epistemic uncertainty.
+
+    This test ensures that:
+    1. **Mathematical Inversion:** The NOT operator correctly maps [L, U] to 
+       [1-U, 1-L] without rounding errors.
+    2. **Uncertainty Width Conservation:** The 'ignorance' (U - L) of the 
+       input interval is exactly preserved in the output.
+    3. **Fuzzy Boundary Mapping:** 'Almost True' inputs correctly transition 
+       to 'Almost False' outputs, maintaining the delicate balance required 
+       for neuro-symbolic backpropagation.
+
+    Example:
+        Input:  [0.95, 1.00] (Width: 0.05)
+        Output: [0.00, 0.05] (Width: 0.05)
+    """
+    # "Almost True" interval [0.95, 1.0], width = 0.05
+    x = intervals.create_interval(jnp.array(0.95), jnp.array(1.0))
+    weight = jnp.array(1.0)
+    
+    res = F.weighted_not(x, weight)
+    
+    lower = intervals.get_lower(res)
+    upper = intervals.get_upper(res)
+    width = intervals.uncertainty(res)
+    
+    # 1. Check mathematical correctness
+    assert jnp.isclose(lower, 0.0), f"Expected lower 0.0, got {lower}"
+    assert jnp.isclose(upper, 0.05), f"Expected upper 0.05, got {upper}"
+    
+    # 2. Check uncertainty preservation
+    assert jnp.isclose(width, 0.05), f"Uncertainty width lost! Expected 0.05, got {width}"
+    
+    # 3. Invariant check
+    assert lower <= upper
+
+
 def test_weighted_not_consistency():
     """
     Validates that the weighted NOT operation maintains interval invariant L <= U.

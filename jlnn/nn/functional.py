@@ -39,24 +39,40 @@ def weighted_or(x: jnp.ndarray, weights: jnp.ndarray, beta: jnp.ndarray) -> jnp.
 
 def weighted_not(x: jnp.ndarray, weight: jnp.ndarray) -> jnp.ndarray:
     """
-    Weighted negation of an interval.
+    Computes the weighted logical negation (NOT) of a truth interval.
 
-    It first applies a weight to the interval boundaries (clipped to 1.0) 
-    and then performs an inversion of the boundaries.
+    In JLNN interval logic, negation is defined by the transformation:
+    [L, U] -> [1 - U, 1 - L]. This function extends this principle by applying 
+    a scaling weight to the input boundaries before the inversion.
+
+    The operation ensures that:
+    1. **Evidence Reversal:** Strong evidence for truth (high L) is converted into 
+       strong evidence for falsehood (low U).
+    2. **Weight Scaling:** Input importance is adjusted via the `weight` parameter, 
+       with results strictly clipped to the [0, 1] logical domain.
+    3. **Invariant Preservation:** The function explicitly prevents boundary inversion 
+       (negative width) ensuring the output interval always satisfies L <= U.
 
     Args:
-        x (jnp.ndarray): Input interval [L, U].
-        weight (jnp.ndarray): Scalar weight or tensor weight.
+        x (jnp.ndarray): Input interval tensor of shape (..., 2).
+        weight (jnp.ndarray): Scaling weight applied to the input signal.
 
     Returns:
-        jnp.ndarray: Negated interval [1-U_w, 1-L_w].
+        jnp.ndarray: The negated and consistent truth interval tensor.
     """
-    weighted_x = intervals.create_interval(
-        jnp.minimum(1.0, intervals.get_lower(x) * weight),
-        jnp.minimum(1.0, intervals.get_upper(x) * weight)
-    )
-    results = intervals.negate(weighted_x)
-    return intervals.ensure_interval(results)
+    # 1. Apply weight to both edges and crop to [0,1]
+    l_w = jnp.minimum(1.0, intervals.get_lower(x) * weight)
+    u_w = jnp.minimum(1.0, intervals.get_upper(x) * weight)
+
+    # 2. Perform negation – boundaries are swapped (1-U becomes new L)
+    new_lower = 1.0 - u_w
+    new_upper = 1.0 - l_w
+
+    # 3. Final safety check for numerical stability and consistency
+    final_lower = jnp.minimum(new_lower, new_upper)
+    final_upper = jnp.maximum(new_lower, new_upper)
+
+    return intervals.create_interval(final_lower, final_upper)
 
 def weighted_nand(x: jnp.ndarray, weights: jnp.ndarray, beta: jnp.ndarray) -> jnp.ndarray:
     """

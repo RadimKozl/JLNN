@@ -1,6 +1,6 @@
 [project]
 name = "jax-lnn"
-version = "0.1.0"
+version = "0.1.rc1"
 description = "JAX Logical Neural Networks – neuro-symbolic framework with interval Łukasiewicz logic"
 license = {text = "MIT"}
 authors = [{name = "Ing. Radim Közl"}]
