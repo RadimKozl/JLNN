@@ -99,43 +99,45 @@ def test_weighted_not_fuzzy_integrity():
 
 def test_weighted_not_consistency():
     """
-    Validates boundary consistency and domain enforcement for weighted negation.
+    Validates boundary consistency and domain enforcement for weighted negation 
+    using confidence-scaling semantics.
 
-    This test ensures that the NOT operator remains mathematically sound even when 
-    subjected to super-unit weights (weight > 1.0), which are common during 
-    neural network training. It specifically targets the prevention of 
-    'out-of-bounds' truth values and 'boundary inversion.'
+    This test ensures that weighted NOT remains mathematically sound even with 
+    super-unit weights. In this implementation, the weight acts as a confidence 
+    interpolator between pure negation and the unknown state [0, 1].
 
-    The test confirms the following pipeline:
-    1. **Negation:** Input [0.2, 0.8] is logically inverted to [0.2, 0.8].
-    2. **Amplification:** A weight of 1.5 scales the interval to [0.3, 1.2].
-    3. **Domain Clipping:** The upper bound is strictly capped at 1.0.
-    4. **Invariant Protection:** The relationship L <= U is maintained 
-       throughout the transformation.
+    Calculation for input [0.2, 0.8] and weight 1.5:
+    1. Pure Negation: [0.2, 0.8]
+    2. Interpolated Lower: 0.2 * 1.5 + 0.0 * (1 - 1.5) = 0.3
+    3. Interpolated Upper: 0.8 * 1.5 + 1.0 * (1 - 1.5) = 1.2 - 0.5 = 0.7
+    4. Result: [0.3, 0.7]
 
     Asserts:
-        - Invariant: Lower bound <= Upper bound.
-        - Domain: All values reside within the [0.0, 1.0] interval.
-        - Precision: The clipped results match expected mathematical values.
+        - Invariant: Resulting Lower bound <= Upper bound.
+        - Domain: All truth values reside within [0.0, 1.0].
+        - Precision: Matches confidence-scaling interpolation results.
     """
-    # Input [0.2, 0.8] -> Negation is [0.2, 0.8]
+    # Input [0.2, 0.8], Weight 1.5
     x = intervals.create_interval(jnp.array(0.2), jnp.array(0.8))
-    weight = jnp.array(1.5) # 0.8 * 1.5 = 1.2 -> should be trimmed to 1.0
-    
+    weight = jnp.array(1.5)
+
     res = F.weighted_not(x, weight)
-    
+
     lower = intervals.get_lower(res)
     upper = intervals.get_upper(res)
 
     # 1. Invariant check: L <= U
     assert jnp.all(lower <= upper), f"Inconsistent boundaries: {res}"
-    
-    # 2. Domain check: Must be in [0, 1]
+
+    # 2. Domain check: Must be strictly in [0, 1]
     assert jnp.all(res >= 0.0) and jnp.all(res <= 1.0), f"Out of bounds: {res}"
+
+    # 3. Value check: Based on confidence interpolation
+    # Lower: 0.2 * 1.5 + 0.0 * (-0.5) = 0.3
+    assert jnp.isclose(lower, 0.3), f"Expected interpolated lower 0.3, got {lower}"
     
-    # 3. Value check: Clipping check (0.8 * 1.5 = 1.2 -> 1.0)
-    assert jnp.isclose(upper, 1.0), f"Expected clipped upper 1.0, got {upper}"
-    assert jnp.isclose(lower, 0.3), f"Expected lower 0.3, got {lower}"
+    # Upper: 0.8 * 1.5 + 1.0 * (-0.5) = 1.2 - 0.5 = 0.7
+    assert jnp.isclose(upper, 0.7), f"Expected interpolated upper 0.7, got {upper}"
 
  
 def test_weighted_nand_consistency():

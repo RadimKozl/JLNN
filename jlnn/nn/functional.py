@@ -41,32 +41,55 @@ def weighted_not(x: jnp.ndarray, weight: jnp.ndarray) -> jnp.ndarray:
     """
     Computes a weighted logical negation (NOT) with confidence scaling.
 
-    This operation follows a two-stage process:
-    1. **Pure Negation:** The input interval [L, U] is inverted to [1-U, 1-L] 
-       preserving the uncertainty width.
-    2. **Confidence Scaling:** The resulting negated interval is scaled by the 
-       `weight` parameter. If weight > 1.0, the truth values are amplified 
-       and then clipped to the [0, 1] domain.
+    FIXED VERSION - Corrects the weighting semantics to preserve NOT logic.
+
+    The weight parameter controls how much the negation "pulls toward uncertainty":
+    - weight = 1.0: Pure logical NOT, [L, U] -> [1-U, 1-L]
+    - weight < 1.0: Negation is "softened" by blending with the unknown state [0, 1]
+    - weight > 1.0: Not recommended (would push values outside [0, 1])
+
+    The weighting is applied by linear interpolation:
+        result = weight * NOT(x) + (1 - weight) * [0, 1]
+
+    This ensures that when weight = 1.0, we get pure logical negation.
+    When weight = 0.0, we get complete uncertainty [0, 1].
 
     Args:
         x (jnp.ndarray): Input truth interval tensor of shape (..., 2).
-        weight (jnp.ndarray): Scaling factor (0.0 to 1.0+) representing 
-            the importance or confidence of the negation.
+        weight (jnp.ndarray): Scaling factor (0.0 to 1.0) representing 
+            the confidence or strength of the negation.
 
     Returns:
-        jnp.ndarray: The scaled negated interval, clipped to [0, 1].
+        jnp.ndarray: The weighted negated interval, clipped to [0, 1].
+
+    Examples:
+        >>> # Pure negation (weight = 1.0)
+        >>> x = jnp.array([[0.0, 0.0]])  # False
+        >>> weighted_not(x, jnp.array(1.0))
+        # Returns: [[1.0, 1.0]] (True) ✓
+        
+        >>> x = jnp.array([[1.0, 1.0]])  # True
+        >>> weighted_not(x, jnp.array(1.0))
+        # Returns: [[0.0, 0.0]] (False) ✓
+        
+        >>> # Softened negation (weight = 0.5)
+        >>> x = jnp.array([[0.0, 0.0]])  # False
+        >>> weighted_not(x, jnp.array(0.5))
+        # Returns: [[0.5, 1.0]] (blend of True and Unknown)
     """
     # 1. Pure negation: [L, U] -> [1-U, 1-L]
     negated = intervals.negate(x)
     
-    # 2. Applying weight to the result of negation
-    l_neg = intervals.get_lower(negated) * weight
-    u_neg = intervals.get_upper(negated) * weight
+    # 2. Linear interpolation between negated result and maximum uncertainty [0, 1]
+    # When weight = 1.0: result = negated (pure NOT)
+    # When weight = 0.0: result = [0, 1] (complete ignorance)
+    l_neg = intervals.get_lower(negated) * weight + 0.0 * (1.0 - weight)
+    u_neg = intervals.get_upper(negated) * weight + 1.0 * (1.0 - weight)
     
     # 3. Merge and enforce domain [0, 1] and consistency L <= U
     combined = jnp.stack([l_neg, u_neg], axis=-1)
-    # Explicit clip ensures that tests on domain bounds [0, 1] pass
     return intervals.ensure_interval(jnp.clip(combined, 0.0, 1.0))
+
 
 def weighted_nand(x: jnp.ndarray, weights: jnp.ndarray, beta: jnp.ndarray) -> jnp.ndarray:
     """
