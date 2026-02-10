@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html"><link rel="prev" title="Contributing to JLNN" href="contributing.html">
 
     <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
-        <title>Changelog - JLNN v0.1.0 documentation</title>
+        <title>Changelog - JLNN 0.1.rc1 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
@@ -162,7 +162,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="index.html"><div class="brand">JLNN v0.1.0 documentation</div></a>
+      <a href="index.html"><div class="brand">JLNN 0.1.rc1 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -183,7 +183,7 @@
       
       <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
   
-  <span class="sidebar-brand-text">JLNN v0.1.0 documentation</span>
+  <span class="sidebar-brand-text">JLNN 0.1.rc1 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -198,6 +198,7 @@
 <li class="toctree-l1 has-children"><a class="reference internal" href="tutorials/index.html">Examples &amp; Tutorials</a><input aria-label="Toggle navigation of Examples &amp; Tutorials" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="tutorials/introduction_tutorial.html">Introductory Example: JLNN Base</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tutorials/basic_inference_tutorial.html">Base Example: Basic inference and manual grounding</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/JLNN_basic_boolean_gates.html">Basic Boolean Gates</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="theory.html">Theoretical foundations of JLNN</a></li>
@@ -306,28 +307,59 @@
 <p class="admonition-title">Note</p>
 <p>JLNN is currently in the <strong>Alpha</strong> phase. API may change based on feedback from research deployments.</p>
 </div>
+<section id="rc1-2026-02-10">
+<h2>[0.1.rc1] - 2026-02-10<a class="headerlink" href="#rc1-2026-02-10" title="Link to this heading">¶</a></h2>
+<p>Release Candidate 1 – significant improvements in negation logic, crisp mode support, and documentation.</p>
+<section id="added">
+<h3><strong>Added</strong><a class="headerlink" href="#added" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><strong>FixedPredicate</strong> – non-trainable identity predicate for crisp (exact 0/1) logic examples</p></li>
+<li><p><strong>Two new tutorials</strong>:
+- Introductory Example (training + checkpoint demo)
+- Basic Boolean Gates (AND/OR/NOT/NAND/NOR/XOR with crisp vs fuzzy comparison)</p></li>
+<li><p>Visualization of uncertainty propagation (width U-L) in boolean operations</p></li>
+<li><p>Support for crisp logic mode (bypassing LearnedPredicate ramps)</p></li>
+</ul>
+</section>
+<section id="changed">
+<h3><strong>Changed</strong><a class="headerlink" href="#changed" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><strong>weighted_not</strong> – corrected negation axiom: pure negation first ([1-U, 1-L]), then weight scaling</p></li>
+<li><p>Ensured consistent L ≤ U after every logical operation (via ensure_interval)</p></li>
+<li><p>Improved documentation structure with dedicated Tutorials section</p></li>
+</ul>
+</section>
+<section id="fixed">
+<h3><strong>Fixed</strong><a class="headerlink" href="#fixed" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Negation width preservation – fuzzy inputs now correctly transfer uncertainty (e.g. [0.95,1.0] → ~ = [0.0,0.05])</p></li>
+<li><p>AttributeError in visualization loop (fixed key handling for fuzzy inputs)</p></li>
+<li><p>Incorrect output for crisp negation (~0 → [1,1], ~1 → [0,0])</p></li>
+</ul>
+</section>
+</section>
 <section id="id1">
 <h2>[0.1.0] - 2026-02-06<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h2>
 <p>First public release (Alpha Release). Implementation of the core framework built on JAX and Flax NNX.</p>
-<section id="added">
-<h3>Added<a class="headerlink" href="#added" title="Link to this heading">¶</a></h3>
+<section id="id2">
+<h3>Added<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h3>
 <ul class="simple">
 <li><p><strong>Example Notebooks</strong>: Added Jupyter notebooks demonstrating basic usage, training, and reasoning with JLNN.</p></li>
 <li><p><strong>README</strong>: Created a comprehensive README with installation instructions and quickstart guide.</p></li>
 </ul>
 </section>
-<section id="changed">
-<h3>Changed<a class="headerlink" href="#changed" title="Link to this heading">¶</a></h3>
+<section id="id3">
+<h3>Changed<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>Updated documentation structure to include user guide and tutorials.</p></li>
 </ul>
 </section>
 </section>
-<section id="id2">
-<h2>[0.0.2] - 2026-01-27<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h2>
+<section id="id4">
+<h2>[0.0.2] - 2026-01-27<a class="headerlink" href="#id4" title="Link to this heading">¶</a></h2>
 <p>First public release (Alpha Release). Implementation of the core framework built on JAX and Flax NNX.</p>
-<section id="id3">
-<h3>Added<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h3>
+<section id="id5">
+<h3>Added<a class="headerlink" href="#id5" title="Link to this heading">¶</a></h3>
 <ul class="simple">
 <li><p><strong>Core Engine</strong>: Implementation of Łukasiewicz logic for interval arithmetic <span class="math notranslate nohighlight">\([L, U]\)</span>.</p></li>
 <li><p><strong>Symbolic Compiler</strong>: Parser for logical formulas (Lark) and automatic compiler to hierarchical NNX modules.</p></li>
@@ -338,23 +370,23 @@
 <li><p><strong>Xarray Integration</strong>: Support for scientific data formats and labeled outputs.</p></li>
 </ul>
 </section>
-<section id="id4">
-<h3>Changed<a class="headerlink" href="#id4" title="Link to this heading">¶</a></h3>
+<section id="id6">
+<h3>Changed<a class="headerlink" href="#id6" title="Link to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>Created on the basis of modern <strong>Flax NNX</strong>.</p></li>
 <li><p>Optimization of recursive graph traversal for full compatibility with <code class="docutils literal notranslate"><span class="pre">jax.jit</span></code>.</p></li>
 </ul>
 </section>
-<section id="fixed">
-<h3>Fixed<a class="headerlink" href="#fixed" title="Link to this heading">¶</a></h3>
+<section id="id7">
+<h3>Fixed<a class="headerlink" href="#id7" title="Link to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>Fix numeric instability in XOR gate when intervals are very narrow.</p></li>
 <li><p>Add base documentation.</p></li>
 </ul>
 </section>
 </section>
-<section id="id5">
-<h2>[0.0.1] - 2026-01-17<a class="headerlink" href="#id5" title="Link to this heading">¶</a></h2>
+<section id="id8">
+<h2>[0.0.1] - 2026-01-17<a class="headerlink" href="#id8" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Create a project</p></li>
 <li><p>Basic framework concept</p></li>
@@ -410,18 +442,24 @@
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">Changelog</a><ul>
+<li><a class="reference internal" href="#rc1-2026-02-10">[0.1.rc1] - 2026-02-10</a><ul>
+<li><a class="reference internal" href="#added"><strong>Added</strong></a></li>
+<li><a class="reference internal" href="#changed"><strong>Changed</strong></a></li>
+<li><a class="reference internal" href="#fixed"><strong>Fixed</strong></a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#id1">[0.1.0] - 2026-02-06</a><ul>
-<li><a class="reference internal" href="#added">Added</a></li>
-<li><a class="reference internal" href="#changed">Changed</a></li>
+<li><a class="reference internal" href="#id2">Added</a></li>
+<li><a class="reference internal" href="#id3">Changed</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#id2">[0.0.2] - 2026-01-27</a><ul>
-<li><a class="reference internal" href="#id3">Added</a></li>
-<li><a class="reference internal" href="#id4">Changed</a></li>
-<li><a class="reference internal" href="#fixed">Fixed</a></li>
+<li><a class="reference internal" href="#id4">[0.0.2] - 2026-01-27</a><ul>
+<li><a class="reference internal" href="#id5">Added</a></li>
+<li><a class="reference internal" href="#id6">Changed</a></li>
+<li><a class="reference internal" href="#id7">Fixed</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#id5">[0.0.1] - 2026-01-17</a></li>
+<li><a class="reference internal" href="#id8">[0.0.1] - 2026-01-17</a></li>
 </ul>
 </li>
 </ul>
@@ -433,7 +471,7 @@
       
     </aside>
   </div>
-</div><script src="_static/documentation_options.js?v=fa47ad08"></script>
+</div><script src="_static/documentation_options.js?v=7ab32793"></script>
     <script src="_static/doctools.js?v=fd6eb6e6"></script>
     <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/scripts/furo.js?v=46bd48cc"></script>

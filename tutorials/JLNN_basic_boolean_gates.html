@@ -3,10 +3,10 @@
   <head><meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="next" title="Basic Boolean Gates" href="JLNN_basic_boolean_gates.html"><link rel="prev" title="Introductory Example: JLNN Base" href="introduction_tutorial.html">
+<link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="next" title="Theoretical foundations of JLNN" href="../theory.html"><link rel="prev" title="Base Example: Basic inference and manual grounding" href="basic_inference_tutorial.html">
 
     <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
-        <title>Base Example: Basic inference and manual grounding - JLNN 0.1.rc1 documentation</title>
+        <title>Basic Boolean Gates - JLNN 0.1.rc1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
@@ -197,8 +197,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quickstart</a></li>
 <li class="toctree-l1 current has-children"><a class="reference internal" href="index.html">Examples &amp; Tutorials</a><input aria-label="Toggle navigation of Examples &amp; Tutorials" checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="introduction_tutorial.html">Introductory Example: JLNN Base</a></li>
-<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Base Example: Basic inference and manual grounding</a></li>
-<li class="toctree-l2"><a class="reference internal" href="JLNN_basic_boolean_gates.html">Basic Boolean Gates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="basic_inference_tutorial.html">Base Example: Basic inference and manual grounding</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Basic Boolean Gates</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../theory.html">Theoretical foundations of JLNN</a></li>
@@ -282,7 +282,7 @@
         </a>
         <div class="content-icon-container">
           <div class="view-this-page">
-  <a class="muted-link" href="../_sources/tutorials/basic_inference_tutorial.rst.txt" title="View this page">
+  <a class="muted-link" href="../_sources/tutorials/JLNN_basic_boolean_gates.rst.txt" title="View this page">
     <svg><use href="#svg-eye"></use></svg>
     <span class="visually-hidden">View this page</span>
   </a>
@@ -300,11 +300,12 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="base-example-basic-inference-and-manual-grounding">
-<h1>Base Example: Basic inference and manual grounding<a class="headerlink" href="#base-example-basic-inference-and-manual-grounding" title="Link to this heading">¶</a></h1>
-<p>This tutorial presents the simplest way to use the <strong>JLNN</strong> framework for logical reasoning with uncertainty.
-It focuses on defining rules, manually setting truth intervals,
-and calculating the resulting inference without the need to train a model.</p>
+          <section id="basic-boolean-gates">
+<h1>Basic Boolean Gates<a class="headerlink" href="#basic-boolean-gates" title="Link to this heading">¶</a></h1>
+<p>This tutorial demonstrates how JLNN handles classical Boolean operations
+(AND, OR, NOT, NAND, NOR, XOR) using interval logic. You will see how
+crisp inputs (0/1) translate to certain intervals and how the system
+manages uncertainty.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>The interactive notebook is hosted externally to ensure the best viewing experience
@@ -319,33 +320,28 @@ and to allow immediate execution in the cloud.</p>
 Run in Google Colab</div>
 <p class="sd-card-text">Execute the code directly in your browser without any local setup.</p>
 </div>
-<a class="sd-stretched-link sd-hide-link-text reference external" href="https://colab.research.google.com/github/RadimKozl/JLNN/blob/main/examples/JLNN_basic_inference.ipynb"><span>https://colab.research.google.com/github/RadimKozl/JLNN/blob/main/examples/JLNN_basic_inference.ipynb</span></a></div>
+<a class="sd-stretched-link sd-hide-link-text reference external" href="https://colab.research.google.com/github/RadimKozl/JLNN/blob/main/examples/JLNN_basic_boolean_gates.ipynb"><span>https://colab.research.google.com/github/RadimKozl/JLNN/blob/main/examples/JLNN_basic_boolean_gates.ipynb</span></a></div>
 </div>
 <div class="sd-col sd-d-flex-row docutils">
 <div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-sm sd-card-hover docutils">
 <div class="sd-card-body docutils">
 <div class="sd-card-title sd-font-weight-bold docutils">
 View on GitHub</div>
-<p class="sd-card-text">View source code and outputs in the GitHub notebook browser.</p>
+<p class="sd-card-text">Browse the source code and outputs in the GitHub notebook viewer.</p>
 </div>
-<a class="sd-stretched-link sd-hide-link-text reference external" href="https://github.com/RadimKozl/JLNN/blob/main/examples/JLNN_basic_inference.ipynb"><span>https://github.com/RadimKozl/JLNN/blob/main/examples/JLNN_basic_inference.ipynb</span></a></div>
+<a class="sd-stretched-link sd-hide-link-text reference external" href="https://github.com/RadimKozl/JLNN/blob/main/examples/JLNN_basic_boolean_gates.ipynb"><span>https://github.com/RadimKozl/JLNN/blob/main/examples/JLNN_basic_boolean_gates.ipynb</span></a></div>
 </div>
 </div>
 </div>
-<section id="key-concepts">
-<h2>Key concepts<a class="headerlink" href="#key-concepts" title="Link to this heading">¶</a></h2>
-<p>In JLNN, we work with logical rules that are represented as
-a differentiable graph (NNX). Instead of a single truth value, we work with an <strong>interval [L, U]</strong>:</p>
+<section id="content-overview">
+<h2>Content Overview<a class="headerlink" href="#content-overview" title="Link to this heading">¶</a></h2>
+<p>This tutorial explores the intersection of classical logic and neuro-symbolic reasoning. You will learn how to:</p>
 <ul class="simple">
-<li><p><strong>L (Lower bound):</strong> Minimum confirmed truth.</p></li>
-<li><p><strong>U (Upper bound):</strong> Maximum possible truth.</p></li>
-<li><p><strong>Interval width (U - L):</strong> Expresses the degree of uncertainty or ignorance about the given predicate.</p></li>
+<li><p><strong>Define Boolean Gates as Logical Formulas</strong>: Using JLNN’s symbolic syntax to represent AND, OR, NOT, NAND, NOR, and XOR operations.</p></li>
+<li><p><strong>Bridge Crisp and Fuzzy Inputs</strong>: Observe how the system handles perfect certainty (0/1) versus real-world uncertainty (e.g., “almost true” intervals like [0.95, 1.0]).</p></li>
+<li><p><strong>Monitor Interval Integrity</strong>: Verify that the system maintains consistent boundaries ($L le U$) even through complex nested operations like XOR.</p></li>
+<li><p><strong>Analyze Uncertainty Widths</strong>: Visualize how “ignorance” propagates through different logical gates using JAX-backed computations.</p></li>
 </ul>
-</section>
-<section id="rule-definition">
-<h2>Rule definition<a class="headerlink" href="#rule-definition" title="Link to this heading">¶</a></h2>
-<p>We create the model by compiling a symbolic rule using the <code class="docutils literal notranslate"><span class="pre">LNNFormula</span></code> class.
-In this example, we consider an implication with a weight of 0.8:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">try:</span>
 <span class="sd">    import jlnn</span>
@@ -365,90 +361,147 @@ In this example, we consider an implication with a weight of 0.8:</p>
 <span class="sd">    os.kill(os.getpid(), 9)</span>
 <span class="sd">    os.kill(os.getpid(), 9) # After this line, the cell stops and the environment restarts</span>
 <span class="sd">&#39;&#39;&#39;</span>
-
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;JAX_PLATFORMS&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;cpu&quot;</span>
 
+<span class="kn">import</span><span class="w"> </span><span class="nn">jlnn</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">jax.numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">jnp</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">flax</span><span class="w"> </span><span class="kn">import</span> <span class="n">nnx</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">jlnn.symbolic.compiler</span><span class="w"> </span><span class="kn">import</span> <span class="n">LNNFormula</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">jax</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+
+<span class="c1"># JLNN core imports</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">jlnn.nn.gates</span><span class="w"> </span><span class="kn">import</span> <span class="n">WeightedAnd</span><span class="p">,</span> <span class="n">WeightedOr</span><span class="p">,</span> <span class="n">WeightedNot</span><span class="p">,</span> <span class="n">WeightedNand</span><span class="p">,</span> <span class="n">WeightedNor</span><span class="p">,</span> <span class="n">WeightedXor</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">jlnn.nn.predicates</span><span class="w"> </span><span class="kn">import</span> <span class="n">FixedPredicate</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">jlnn.symbolic.compiler</span><span class="w"> </span><span class="kn">import</span> <span class="n">LNNFormula</span><span class="p">,</span> <span class="n">PredicateNode</span><span class="p">,</span> <span class="n">UnaryGateNode</span><span class="p">,</span> <span class="n">BinaryGateNode</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;JLNN loaded.&quot;</span><span class="p">)</span>
 
-<span class="c1"># Model creation – compiling rules into an NNX graph</span>
-<span class="n">model</span> <span class="o">=</span> <span class="n">LNNFormula</span><span class="p">(</span><span class="s2">&quot;0.8::A &amp; B -&gt; C&quot;</span><span class="p">,</span> <span class="n">nnx</span><span class="o">.</span><span class="n">Rngs</span><span class="p">(</span><span class="mi">42</span><span class="p">))</span>
-
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Model created. Predicates:&quot;</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">predicates</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
-
-<span class="c1"># Manual grounding – setting intervals</span>
-
-<span class="n">inputs</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;A&quot;</span><span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.7</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">]]),</span>   <span class="c1"># And it is quite likely</span>
-    <span class="s2">&quot;B&quot;</span><span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.4</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">]]),</span>   <span class="c1"># B has more uncertainty</span>
-    <span class="s2">&quot;C&quot;</span><span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]])</span>    <span class="c1"># C is completely unknown (ignorance)</span>
+<span class="n">crisp_inputs</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;A&quot;</span><span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]]),</span>   <span class="c1"># A = True</span>
+    <span class="s2">&quot;B&quot;</span><span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]])</span>    <span class="c1"># B = False</span>
 <span class="p">}</span>
 
-<span class="n">output</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>
+<span class="n">fuzzy_inputs</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;A&quot;</span><span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.95</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]]),</span>  <span class="c1"># A almost True</span>
+    <span class="s2">&quot;B&quot;</span><span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.05</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">]])</span>   <span class="c1"># B almost False</span>
+<span class="p">}</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Output shape:&quot;</span><span class="p">,</span> <span class="n">output</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">run_gate</span><span class="p">(</span><span class="n">rule</span><span class="p">,</span> <span class="n">inputs</span><span class="p">):</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">LNNFormula</span><span class="p">(</span><span class="n">rule</span><span class="p">,</span> <span class="n">nnx</span><span class="o">.</span><span class="n">Rngs</span><span class="p">(</span><span class="mi">42</span><span class="p">))</span>
 
-<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">output</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>          <span class="c1"># (batch, 1, 2) or similar</span>
-    <span class="n">L</span> <span class="o">=</span> <span class="n">output</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
-    <span class="n">U</span> <span class="o">=</span> <span class="n">output</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
-<span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">output</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>        <span class="c1"># (batch, 2)</span>
+    <span class="c1"># Key override: replace LearnedPredicate with Fixed (identity)</span>
+    <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">inputs</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">predicates</span><span class="p">:</span>
+            <span class="n">model</span><span class="o">.</span><span class="n">predicates</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">predicate</span> <span class="o">=</span> <span class="n">FixedPredicate</span><span class="p">()</span>
+
+    <span class="n">output</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>
+
+    <span class="c1"># Fuse L &lt;= U (although it should already be OK)</span>
+    <span class="n">output</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
     <span class="n">L</span> <span class="o">=</span> <span class="n">output</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
     <span class="n">U</span> <span class="o">=</span> <span class="n">output</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
-<span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">output</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>        <span class="c1"># only (2,)</span>
-    <span class="n">L</span> <span class="o">=</span> <span class="n">output</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
-    <span class="n">U</span> <span class="o">=</span> <span class="n">output</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
-<span class="k">else</span><span class="p">:</span>
-    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown output shape: </span><span class="si">{</span><span class="n">output</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">width</span> <span class="o">=</span> <span class="n">U</span> <span class="o">-</span> <span class="n">L</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Output interval for C:&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  L = </span><span class="si">{</span><span class="n">L</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  U = </span><span class="si">{</span><span class="n">U</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Uncertainty (width): </span><span class="si">{</span><span class="n">U</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">L</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Rule: </span><span class="si">{</span><span class="n">rule</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Output: [</span><span class="si">{</span><span class="n">L</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">U</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">] (width </span><span class="si">{</span><span class="n">width</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
 
-<span class="c1"># Experiments – different input intervals</span>
+    <span class="k">return</span> <span class="n">L</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="n">width</span>
 
-<span class="n">inputs_exp1</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;A&quot;</span><span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.95</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]]),</span>
-    <span class="s2">&quot;B&quot;</span><span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.90</span><span class="p">,</span> <span class="mf">0.98</span><span class="p">]]),</span>
-    <span class="s2">&quot;C&quot;</span><span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]])</span>
-<span class="p">}</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Exp 1 – strong A and B:&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">model</span><span class="p">(</span><span class="n">inputs_exp1</span><span class="p">))</span>
 
-<span class="n">inputs_exp2</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;A&quot;</span><span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.95</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]]),</span>
-    <span class="s2">&quot;B&quot;</span><span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">]]),</span>
-    <span class="s2">&quot;C&quot;</span><span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]])</span>
-<span class="p">}</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Exp 2 – weak B:&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">model</span><span class="p">(</span><span class="n">inputs_exp2</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=== AND ===&quot;</span><span class="p">)</span>
+<span class="n">run_gate</span><span class="p">(</span><span class="s2">&quot;A &amp; B&quot;</span><span class="p">,</span> <span class="n">crisp_inputs</span><span class="p">)</span>   <span class="c1"># we expect [0,0]</span>
+<span class="n">run_gate</span><span class="p">(</span><span class="s2">&quot;A &amp; B&quot;</span><span class="p">,</span> <span class="n">fuzzy_inputs</span><span class="p">)</span>   <span class="c1"># we expect low values ​​+ small width</span>
 
-<span class="n">inputs_exp3</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;A&quot;</span><span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.4</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">]]),</span>
-    <span class="s2">&quot;B&quot;</span><span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.95</span><span class="p">]]),</span>
-    <span class="s2">&quot;C&quot;</span><span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]])</span>
-<span class="p">}</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Exp 3 – high uncertainty in A:&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">model</span><span class="p">(</span><span class="n">inputs_exp3</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=== OR ===&quot;</span><span class="p">)</span>
+<span class="n">run_gate</span><span class="p">(</span><span class="s2">&quot;A | B&quot;</span><span class="p">,</span> <span class="n">crisp_inputs</span><span class="p">)</span>   <span class="c1"># we expect [1,1]</span>
+<span class="n">run_gate</span><span class="p">(</span><span class="s2">&quot;A | B&quot;</span><span class="p">,</span> <span class="n">fuzzy_inputs</span><span class="p">)</span>   <span class="c1"># we expect high values</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=== NOT ===&quot;</span><span class="p">)</span>
+<span class="n">run_gate</span><span class="p">(</span><span class="s2">&quot;~A&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;A&quot;</span><span class="p">:</span> <span class="n">crisp_inputs</span><span class="p">[</span><span class="s2">&quot;A&quot;</span><span class="p">]})</span>     <span class="c1"># we expect [0,0]</span>
+<span class="n">run_gate</span><span class="p">(</span><span class="s2">&quot;~A&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;A&quot;</span><span class="p">:</span> <span class="n">fuzzy_inputs</span><span class="p">[</span><span class="s2">&quot;A&quot;</span><span class="p">]})</span>     <span class="c1"># we expect low values</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=== NOT ===&quot;</span><span class="p">)</span>
+<span class="n">run_gate</span><span class="p">(</span><span class="s2">&quot;~B&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;B&quot;</span><span class="p">:</span> <span class="n">crisp_inputs</span><span class="p">[</span><span class="s2">&quot;B&quot;</span><span class="p">]})</span>
+<span class="n">run_gate</span><span class="p">(</span><span class="s2">&quot;~B&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;B&quot;</span><span class="p">:</span> <span class="n">fuzzy_inputs</span><span class="p">[</span><span class="s2">&quot;B&quot;</span><span class="p">]})</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=== NAND ===&quot;</span><span class="p">)</span>
+<span class="n">run_gate</span><span class="p">(</span><span class="s2">&quot;~(A &amp; B)&quot;</span><span class="p">,</span> <span class="n">crisp_inputs</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=== NOR ===&quot;</span><span class="p">)</span>
+<span class="n">run_gate</span><span class="p">(</span><span class="s2">&quot;~(A | B)&quot;</span><span class="p">,</span> <span class="n">crisp_inputs</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=== XOR ===&quot;</span><span class="p">)</span>
+<span class="n">run_gate</span><span class="p">(</span><span class="s2">&quot;(A &amp; ~B) | (~A &amp; B)&quot;</span><span class="p">,</span> <span class="n">crisp_inputs</span><span class="p">)</span>
+<span class="n">run_gate</span><span class="p">(</span><span class="s2">&quot;(A &amp; ~B) | (~A &amp; B)&quot;</span><span class="p">,</span> <span class="n">fuzzy_inputs</span><span class="p">)</span>   <span class="c1"># interesting – XOR is sensitive to uncertainty</span>
+
+<span class="n">gates</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;AND&quot;</span><span class="p">,</span> <span class="s2">&quot;OR&quot;</span><span class="p">,</span> <span class="s2">&quot;NOT A&quot;</span><span class="p">,</span> <span class="s2">&quot;NAND&quot;</span><span class="p">,</span> <span class="s2">&quot;NOR&quot;</span><span class="p">,</span> <span class="s2">&quot;XOR&quot;</span><span class="p">]</span>
+<span class="n">crisp_widths</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">fuzzy_widths</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="k">for</span> <span class="n">gate</span> <span class="ow">in</span> <span class="n">gates</span><span class="p">:</span>
+    <span class="c1"># Crisp</span>
+    <span class="k">if</span> <span class="n">gate</span> <span class="o">==</span> <span class="s2">&quot;NOT A&quot;</span><span class="p">:</span>
+        <span class="n">rule</span> <span class="o">=</span> <span class="s2">&quot;~A&quot;</span>
+        <span class="n">inp</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;A&quot;</span><span class="p">:</span> <span class="n">crisp_inputs</span><span class="p">[</span><span class="s2">&quot;A&quot;</span><span class="p">]}</span>
+    <span class="k">elif</span> <span class="n">gate</span> <span class="o">==</span> <span class="s2">&quot;XOR&quot;</span><span class="p">:</span>
+        <span class="n">rule</span> <span class="o">=</span> <span class="s2">&quot;(A &amp; ~B) | (~A &amp; B)&quot;</span>
+        <span class="n">inp</span> <span class="o">=</span> <span class="n">crisp_inputs</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">rule</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;A </span><span class="si">{</span><span class="s1">&#39;&amp;&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="s1">&#39;AND&#39;</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">gate</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="s1">&#39;NAND&#39;</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">gate</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;|&#39;</span><span class="si">}</span><span class="s2"> B&quot;</span>
+        <span class="k">if</span> <span class="s1">&#39;NAND&#39;</span> <span class="ow">in</span> <span class="n">gate</span> <span class="ow">or</span> <span class="s1">&#39;NOR&#39;</span> <span class="ow">in</span> <span class="n">gate</span><span class="p">:</span>
+            <span class="n">rule</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;~(</span><span class="si">{</span><span class="n">rule</span><span class="si">}</span><span class="s2">)&quot;</span>
+        <span class="n">inp</span> <span class="o">=</span> <span class="n">crisp_inputs</span>
+
+    <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">w_crisp</span> <span class="o">=</span> <span class="n">run_gate</span><span class="p">(</span><span class="n">rule</span><span class="p">,</span> <span class="n">inp</span><span class="p">)</span>
+    <span class="n">crisp_widths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">w_crisp</span><span class="p">)</span>
+
+    <span class="c1"># Fuzzy – we correctly pass the keys from inp</span>
+    <span class="n">inp_f</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">fuzzy_inputs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">inp</span><span class="p">}</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">w_fuzzy</span> <span class="o">=</span> <span class="n">run_gate</span><span class="p">(</span><span class="n">rule</span><span class="p">,</span> <span class="n">inp_f</span><span class="p">)</span>
+    <span class="n">fuzzy_widths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">w_fuzzy</span><span class="p">)</span>
+
+<span class="c1"># Check lengths (debug)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Gates: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">gates</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Crisp widths: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">crisp_widths</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Fuzzy widths: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">fuzzy_widths</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># If duplicates – take only the last unique values ​​(if the loop ran twice)</span>
+<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">crisp_widths</span><span class="p">)</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">gates</span><span class="p">):</span>
+    <span class="n">crisp_widths</span> <span class="o">=</span> <span class="n">crisp_widths</span><span class="p">[</span><span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="n">gates</span><span class="p">):]</span>
+    <span class="n">fuzzy_widths</span> <span class="o">=</span> <span class="n">fuzzy_widths</span><span class="p">[</span><span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="n">gates</span><span class="p">):]</span>
+
+<span class="n">x</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">gates</span><span class="p">))</span>
+<span class="n">bar_width</span> <span class="o">=</span> <span class="mf">0.35</span>
+
+<span class="c1"># Fuzzy – full columns</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">bar</span><span class="p">([</span><span class="n">i</span> <span class="o">+</span> <span class="n">bar_width</span><span class="o">/</span><span class="mi">2</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">x</span><span class="p">],</span> <span class="n">fuzzy_widths</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="n">bar_width</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Fuzzy inputs&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;orange&#39;</span><span class="p">)</span>
+
+<span class="c1"># Crisp – thin columns or just dots at zero</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">w</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">crisp_widths</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">w</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">i</span> <span class="o">-</span> <span class="n">bar_width</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="n">bar_width</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;skyblue&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Crisp inputs&#39;</span> <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">i</span> <span class="o">-</span> <span class="n">bar_width</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;skyblue&#39;</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Crisp inputs (width=0)&#39;</span> <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">gates</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">45</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Uncertainty width (U - L)&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Output uncertainty for various Boolean operations&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;gray&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figtext</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.15</span><span class="p">,</span>
+            <span class="s2">&quot;Note: Crisp inputs (0/1) always have width 0 → blue columns are invisible (exact logic).&quot;</span><span class="p">,</span>
+            <span class="n">ha</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;gray&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
-</section>
-<section id="tutorial-summary">
-<h2>Tutorial summary<a class="headerlink" href="#tutorial-summary" title="Link to this heading">¶</a></h2>
-<ul class="simple">
-<li><p><strong>Symbols to Graph:</strong> JLNN converts logic rules to NNX graphs.</p></li>
-<li><p><strong>Interval Logic:</strong> We work with intervals [L, U], not fixed points.</p></li>
-<li><p><strong>No Training:</strong> In this mode, all parameters are set manually and the model is used for direct logical inference.</p></li>
-</ul>
 </section>
 <section id="download">
 <h2>Download<a class="headerlink" href="#download" title="Link to this heading">¶</a></h2>
 <p>You can also download the raw notebook file for local use:
-<a class="reference download external" download="" href="https://github.com/RadimKozl/JLNN/blob/main/examples/JLNN_basic_inference.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">JLNN_basic_inference.ipynb</span></code></a></p>
+<a class="reference download external" download="" href="https://github.com/RadimKozl/JLNN/blob/main/examples/JLNN_basic_boolean_gates.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">JLNN_basic_boolean_gates.ipynb</span></code></a></p>
 <div class="admonition tip">
 <p class="admonition-title">Tip</p>
 <p>To run the notebook locally, make sure you have installed the package using <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-e</span> <span class="pre">.[test]</span></code>.</p>
@@ -461,23 +514,23 @@ In this example, we consider an implication with a weight of 0.8:</p>
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="JLNN_basic_boolean_gates.html">
+          <a class="next-page" href="../theory.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Basic Boolean Gates</div>
+                <div class="title">Theoretical foundations of JLNN</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="introduction_tutorial.html">
+          <a class="prev-page" href="basic_inference_tutorial.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Introductory Example: JLNN Base</div>
+                <div class="title">Base Example: Basic inference and manual grounding</div>
                 
               </div>
             </a>
@@ -511,10 +564,8 @@ In this example, we consider an implication with a weight of 0.8:</p>
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">Base Example: Basic inference and manual grounding</a><ul>
-<li><a class="reference internal" href="#key-concepts">Key concepts</a></li>
-<li><a class="reference internal" href="#rule-definition">Rule definition</a></li>
-<li><a class="reference internal" href="#tutorial-summary">Tutorial summary</a></li>
+<li><a class="reference internal" href="#">Basic Boolean Gates</a><ul>
+<li><a class="reference internal" href="#content-overview">Content Overview</a></li>
 <li><a class="reference internal" href="#download">Download</a></li>
 </ul>
 </li>
