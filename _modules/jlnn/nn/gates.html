@@ -508,9 +508,9 @@
 <div class="viewcode-block" id="WeightedNot.__init__">
 <a class="viewcode-back" href="../../../modules/nn/gates.html#jlnn.nn.gates.WeightedNot.__init__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rngs</span><span class="p">:</span> <span class="n">nnx</span><span class="o">.</span><span class="n">Rngs</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">weight</span> <span class="o">=</span> <span class="n">nnx</span><span class="o">.</span><span class="n">Param</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="mf">1.0</span><span class="p">))</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[DEBUG] WeightedNot weight initialized to: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">weight</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">weight</span> <span class="o">=</span> <span class="n">nnx</span><span class="o">.</span><span class="n">Param</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="mf">1.0</span><span class="p">))</span></div>
 
+        <span class="c1">#print(f&quot;[DEBUG] WeightedNot weight initialized to: {self.weight.value}&quot;)</span>
 
 <div class="viewcode-block" id="WeightedNot.__call__">
 <a class="viewcode-back" href="../../../modules/nn/gates.html#jlnn.nn.gates.WeightedNot.__call__">[docs]</a>
