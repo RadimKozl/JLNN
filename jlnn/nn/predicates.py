@@ -54,3 +54,34 @@ class LearnedPredicate(nnx.Module):
         
         # Pack lower and upper bounds into a single interval representation [L, U].
         return intervals.create_interval(lower, upper)
+      
+class FixedPredicate(nnx.Module):
+    """
+    Non-trainable predicate that returns the input interval unchanged.
+
+    This module serves as an identity transformation for truth intervals, 
+    preserving the original lower and upper bounds. It is primarily utilized 
+    for crisp boolean logic scenarios where fixed truth values are required 
+    without neural weight updates.
+
+    Attributes:
+        None
+    """
+    def __init__(self):
+        """
+        Initializes the FixedPredicate module.
+        """
+        pass
+
+    def __call__(self, x: jnp.ndarray) -> jnp.ndarray:
+        """
+        Passes the input interval through without modification.
+
+        Args:
+            x (jnp.ndarray): Input truth interval tensor of the form (..., 2) 
+                representing [L, U].
+
+        Returns:
+            jnp.ndarray: The identical input interval [L, U].
+        """
+        return x  # identity – [L, U] returns [L, U]
