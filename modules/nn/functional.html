@@ -361,18 +361,30 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="jlnn.nn.functional.weighted_not">
 <span class="sig-prename descclassname"><span class="pre">jlnn.nn.functional.</span></span><span class="sig-name descname"><span class="pre">weighted_not</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Array</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Array</span></span></span><a class="reference internal" href="../../_modules/jlnn/nn/functional.html#weighted_not"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jlnn.nn.functional.weighted_not" title="Link to this definition">¶</a></dt>
-<dd><p>Weighted negation of an interval.</p>
-<p>It first applies a weight to the interval boundaries (clipped to 1.0)
-and then performs an inversion of the boundaries.</p>
+<dd><p>Computes the weighted logical negation (NOT) of a truth interval.</p>
+<p>In JLNN interval logic, negation is defined by the transformation:
+[L, U] -&gt; [1 - U, 1 - L]. This function extends this principle by applying
+a scaling weight to the input boundaries before the inversion.</p>
+<p>The operation ensures that:
+1. <strong>Evidence Reversal:</strong> Strong evidence for truth (high L) is converted into</p>
+<blockquote>
+<div><p>strong evidence for falsehood (low U).</p>
+</div></blockquote>
+<ol class="arabic simple" start="2">
+<li><p><strong>Weight Scaling:</strong> Input importance is adjusted via the <cite>weight</cite> parameter,
+with results strictly clipped to the [0, 1] logical domain.</p></li>
+<li><p><strong>Invariant Preservation:</strong> The function explicitly prevents boundary inversion
+(negative width) ensuring the output interval always satisfies L &lt;= U.</p></li>
+</ol>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>x</strong> (<em>jnp.ndarray</em>) – Input interval [L, U].</p></li>
-<li><p><strong>weight</strong> (<em>jnp.ndarray</em>) – Scalar weight or tensor weight.</p></li>
+<li><p><strong>x</strong> (<em>jnp.ndarray</em>) – Input interval tensor of shape (…, 2).</p></li>
+<li><p><strong>weight</strong> (<em>jnp.ndarray</em>) – Scaling weight applied to the input signal.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Negated interval [1-U_w, 1-L_w].</p>
+<dd class="field-even"><p>The negated and consistent truth interval tensor.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>jnp.ndarray</p>

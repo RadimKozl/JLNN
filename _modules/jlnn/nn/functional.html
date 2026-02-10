@@ -342,24 +342,40 @@
 <a class="viewcode-back" href="../../../modules/nn/functional.html#jlnn.nn.functional.weighted_not">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">weighted_not</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">weight</span><span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Weighted negation of an interval.</span>
+<span class="sd">    Computes the weighted logical negation (NOT) of a truth interval.</span>
 
-<span class="sd">    It first applies a weight to the interval boundaries (clipped to 1.0) </span>
-<span class="sd">    and then performs an inversion of the boundaries.</span>
+<span class="sd">    In JLNN interval logic, negation is defined by the transformation:</span>
+<span class="sd">    [L, U] -&gt; [1 - U, 1 - L]. This function extends this principle by applying </span>
+<span class="sd">    a scaling weight to the input boundaries before the inversion.</span>
+
+<span class="sd">    The operation ensures that:</span>
+<span class="sd">    1. **Evidence Reversal:** Strong evidence for truth (high L) is converted into </span>
+<span class="sd">       strong evidence for falsehood (low U).</span>
+<span class="sd">    2. **Weight Scaling:** Input importance is adjusted via the `weight` parameter, </span>
+<span class="sd">       with results strictly clipped to the [0, 1] logical domain.</span>
+<span class="sd">    3. **Invariant Preservation:** The function explicitly prevents boundary inversion </span>
+<span class="sd">       (negative width) ensuring the output interval always satisfies L &lt;= U.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        x (jnp.ndarray): Input interval [L, U].</span>
-<span class="sd">        weight (jnp.ndarray): Scalar weight or tensor weight.</span>
+<span class="sd">        x (jnp.ndarray): Input interval tensor of shape (..., 2).</span>
+<span class="sd">        weight (jnp.ndarray): Scaling weight applied to the input signal.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        jnp.ndarray: Negated interval [1-U_w, 1-L_w].</span>
+<span class="sd">        jnp.ndarray: The negated and consistent truth interval tensor.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">weighted_x</span> <span class="o">=</span> <span class="n">intervals</span><span class="o">.</span><span class="n">create_interval</span><span class="p">(</span>
-        <span class="n">jnp</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">intervals</span><span class="o">.</span><span class="n">get_lower</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">*</span> <span class="n">weight</span><span class="p">),</span>
-        <span class="n">jnp</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">intervals</span><span class="o">.</span><span class="n">get_upper</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">*</span> <span class="n">weight</span><span class="p">)</span>
-    <span class="p">)</span>
-    <span class="n">results</span> <span class="o">=</span> <span class="n">intervals</span><span class="o">.</span><span class="n">negate</span><span class="p">(</span><span class="n">weighted_x</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">intervals</span><span class="o">.</span><span class="n">ensure_interval</span><span class="p">(</span><span class="n">results</span><span class="p">)</span></div>
+    <span class="c1"># 1. Apply weight to both edges and crop to [0,1]</span>
+    <span class="n">l_w</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">intervals</span><span class="o">.</span><span class="n">get_lower</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">*</span> <span class="n">weight</span><span class="p">)</span>
+    <span class="n">u_w</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">intervals</span><span class="o">.</span><span class="n">get_upper</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">*</span> <span class="n">weight</span><span class="p">)</span>
+
+    <span class="c1"># 2. Perform negation – boundaries are swapped (1-U becomes new L)</span>
+    <span class="n">new_lower</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="n">u_w</span>
+    <span class="n">new_upper</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="n">l_w</span>
+
+    <span class="c1"># 3. Final safety check for numerical stability and consistency</span>
+    <span class="n">final_lower</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">new_lower</span><span class="p">,</span> <span class="n">new_upper</span><span class="p">)</span>
+    <span class="n">final_upper</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">new_lower</span><span class="p">,</span> <span class="n">new_upper</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">intervals</span><span class="o">.</span><span class="n">create_interval</span><span class="p">(</span><span class="n">final_lower</span><span class="p">,</span> <span class="n">final_upper</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="weighted_nand">
