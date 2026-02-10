@@ -156,7 +156,7 @@ class WeightedNot(nnx.Module):
     """
     def __init__(self, rngs: nnx.Rngs):
         self.weight = nnx.Param(jnp.array(1.0))
-        print(f"[DEBUG] WeightedNot weight initialized to: {self.weight.value}")
+        #print(f"[DEBUG] WeightedNot weight initialized to: {self.weight.value}")
 
     def __call__(self, x: jnp.ndarray) -> jnp.ndarray:
         return F.weighted_not(x, self.weight[...])
