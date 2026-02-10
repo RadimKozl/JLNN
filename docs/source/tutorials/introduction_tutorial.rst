@@ -44,7 +44,8 @@ In this tutorial, you will learn:
    except ImportError:
       print("🚀 Installing JLNN from GitHub and fixing JAX for Colab...")
       # Instalace frameworku
-      !pip install git+https://github.com/RadimKozl/JLNN.git
+      !pip install jax-lnn --quiet
+      #!pip install git+https://github.com/RadimKozl/JLNN.git --quiet
       # Fix JAX/CUDA compatibility for 2026 in Colab
       !pip install --upgrade "jax[cuda12_pip]" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html
 

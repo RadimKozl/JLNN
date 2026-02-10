@@ -6,6 +6,32 @@ All significant changes to the JLNN project will be documented in this file. The
 .. note::
    JLNN is currently in the **Alpha** phase. API may change based on feedback from research deployments.
 
+[0.1.rc1] - 2026-02-10
+-----------------------
+
+Release Candidate 1 – significant improvements in negation logic, crisp mode support, and documentation.
+
+**Added**
+^^^^^^^^^
+* **FixedPredicate** – non-trainable identity predicate for crisp (exact 0/1) logic examples
+* **Two new tutorials**:
+  - Introductory Example (training + checkpoint demo)
+  - Basic Boolean Gates (AND/OR/NOT/NAND/NOR/XOR with crisp vs fuzzy comparison)
+* Visualization of uncertainty propagation (width U-L) in boolean operations
+* Support for crisp logic mode (bypassing LearnedPredicate ramps)
+
+**Changed**
+^^^^^^^^^^^
+* **weighted_not** – corrected negation axiom: pure negation first ([1-U, 1-L]), then weight scaling
+* Ensured consistent L ≤ U after every logical operation (via ensure_interval)
+* Improved documentation structure with dedicated Tutorials section
+
+**Fixed**
+^^^^^^^^
+* Negation width preservation – fuzzy inputs now correctly transfer uncertainty (e.g. [0.95,1.0] → ~ = [0.0,0.05])
+* AttributeError in visualization loop (fixed key handling for fuzzy inputs)
+* Incorrect output for crisp negation (~0 → [1,1], ~1 → [0,0])
+
 [0.1.0] - 2026-02-06
 ---------------------
 First public release (Alpha Release). Implementation of the core framework built on JAX and Flax NNX.
