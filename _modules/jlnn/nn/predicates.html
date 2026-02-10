@@ -352,6 +352,40 @@
         <span class="c1"># Pack lower and upper bounds into a single interval representation [L, U].</span>
         <span class="k">return</span> <span class="n">intervals</span><span class="o">.</span><span class="n">create_interval</span><span class="p">(</span><span class="n">lower</span><span class="p">,</span> <span class="n">upper</span><span class="p">)</span></div>
 
+      
+<div class="viewcode-block" id="FixedPredicate">
+<a class="viewcode-back" href="../../../modules/nn/predicates.html#jlnn.nn.predicates.FixedPredicate">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">FixedPredicate</span><span class="p">(</span><span class="n">nnx</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Non-trainable predicate that returns the input interval unchanged.</span>
+
+<span class="sd">    This module serves as an identity transformation for truth intervals, </span>
+<span class="sd">    preserving the original lower and upper bounds. It is primarily utilized </span>
+<span class="sd">    for crisp boolean logic scenarios where fixed truth values are required </span>
+<span class="sd">    without neural weight updates.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes the FixedPredicate module.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Passes the input interval through without modification.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            x (jnp.ndarray): Input truth interval tensor of the form (..., 2) </span>
+<span class="sd">                representing [L, U].</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            jnp.ndarray: The identical input interval [L, U].</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">x</span>  <span class="c1"># identity – [L, U] returns [L, U]</span></div>
+
 </pre></div>
         </article>
       </div>
