@@ -99,33 +99,45 @@ def test_weighted_not_fuzzy_integrity():
 
 def test_weighted_not_consistency():
     """
-    Validates that the weighted NOT operation maintains interval invariant L <= U.
+    Validates boundary consistency and domain enforcement for weighted negation.
 
-    This test checks the robustness of the negation logic when scaling weights 
-    are applied. In neuro-symbolic models, weights greater than 1.0 or 
-    continuous transformations can shift interval boundaries in ways that 
-    threaten mathematical consistency. 
+    This test ensures that the NOT operator remains mathematically sound even when 
+    subjected to super-unit weights (weight > 1.0), which are common during 
+    neural network training. It specifically targets the prevention of 
+    'out-of-bounds' truth values and 'boundary inversion.'
 
-    The test verifies that:
-    1. The `weighted_not` function correctly handles scaled input intervals.
-    2. The internal `ensure_consistent` (or `ensure_interval`) call 
-       successfully prevents negative uncertainty widths, even under 
-       non-unit weighting.
-    3. The output remains a valid truth interval within the [0, 1] domain.
+    The test confirms the following pipeline:
+    1. **Negation:** Input [0.2, 0.8] is logically inverted to [0.2, 0.8].
+    2. **Amplification:** A weight of 1.5 scales the interval to [0.3, 1.2].
+    3. **Domain Clipping:** The upper bound is strictly capped at 1.0.
+    4. **Invariant Protection:** The relationship L <= U is maintained 
+       throughout the transformation.
+
+    Asserts:
+        - Invariant: Lower bound <= Upper bound.
+        - Domain: All values reside within the [0.0, 1.0] interval.
+        - Precision: The clipped results match expected mathematical values.
     """
-    # Input [0.2, 0.8] - a standard uncertain interval
+    # Input [0.2, 0.8] -> Negation is [0.2, 0.8]
     x = intervals.create_interval(jnp.array(0.2), jnp.array(0.8))
-    weight = jnp.array(1.5) # Weight > 1.0 can push bounds
+    weight = jnp.array(1.5) # 0.8 * 1.5 = 1.2 -> should be trimmed to 1.0
     
     res = F.weighted_not(x, weight)
     
-    # Axiom: Interval integrity must be preserved regardless of the weight magnitude
-    assert jnp.all(intervals.get_lower(res) <= intervals.get_upper(res)), \
-        f"Weighted NOT produced an inconsistent interval: {res}"
-        
-    # Domain check: Results must still be within logical bounds [0, 1]
-    assert jnp.all(res >= 0.0) and jnp.all(res <= 1.0)
+    lower = intervals.get_lower(res)
+    upper = intervals.get_upper(res)
+
+    # 1. Invariant check: L <= U
+    assert jnp.all(lower <= upper), f"Inconsistent boundaries: {res}"
     
+    # 2. Domain check: Must be in [0, 1]
+    assert jnp.all(res >= 0.0) and jnp.all(res <= 1.0), f"Out of bounds: {res}"
+    
+    # 3. Value check: Clipping check (0.8 * 1.5 = 1.2 -> 1.0)
+    assert jnp.isclose(upper, 1.0), f"Expected clipped upper 1.0, got {upper}"
+    assert jnp.isclose(lower, 0.3), f"Expected lower 0.3, got {lower}"
+
+ 
 def test_weighted_nand_consistency():
     """
     Validates that the weighted NAND operation prevents negative uncertainty widths.

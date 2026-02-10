@@ -39,40 +39,34 @@ def weighted_or(x: jnp.ndarray, weights: jnp.ndarray, beta: jnp.ndarray) -> jnp.
 
 def weighted_not(x: jnp.ndarray, weight: jnp.ndarray) -> jnp.ndarray:
     """
-    Computes the weighted logical negation (NOT) of a truth interval.
+    Computes a weighted logical negation (NOT) with confidence scaling.
 
-    In JLNN interval logic, negation is defined by the transformation:
-    [L, U] -> [1 - U, 1 - L]. This function extends this principle by applying 
-    a scaling weight to the input boundaries before the inversion.
-
-    The operation ensures that:
-    1. **Evidence Reversal:** Strong evidence for truth (high L) is converted into 
-       strong evidence for falsehood (low U).
-    2. **Weight Scaling:** Input importance is adjusted via the `weight` parameter, 
-       with results strictly clipped to the [0, 1] logical domain.
-    3. **Invariant Preservation:** The function explicitly prevents boundary inversion 
-       (negative width) ensuring the output interval always satisfies L <= U.
+    This operation follows a two-stage process:
+    1. **Pure Negation:** The input interval [L, U] is inverted to [1-U, 1-L] 
+       preserving the uncertainty width.
+    2. **Confidence Scaling:** The resulting negated interval is scaled by the 
+       `weight` parameter. If weight > 1.0, the truth values are amplified 
+       and then clipped to the [0, 1] domain.
 
     Args:
-        x (jnp.ndarray): Input interval tensor of shape (..., 2).
-        weight (jnp.ndarray): Scaling weight applied to the input signal.
+        x (jnp.ndarray): Input truth interval tensor of shape (..., 2).
+        weight (jnp.ndarray): Scaling factor (0.0 to 1.0+) representing 
+            the importance or confidence of the negation.
 
     Returns:
-        jnp.ndarray: The negated and consistent truth interval tensor.
+        jnp.ndarray: The scaled negated interval, clipped to [0, 1].
     """
-    # 1. Apply weight to both edges and crop to [0,1]
-    l_w = jnp.minimum(1.0, intervals.get_lower(x) * weight)
-    u_w = jnp.minimum(1.0, intervals.get_upper(x) * weight)
-
-    # 2. Perform negation – boundaries are swapped (1-U becomes new L)
-    new_lower = 1.0 - u_w
-    new_upper = 1.0 - l_w
-
-    # 3. Final safety check for numerical stability and consistency
-    final_lower = jnp.minimum(new_lower, new_upper)
-    final_upper = jnp.maximum(new_lower, new_upper)
-
-    return intervals.create_interval(final_lower, final_upper)
+    # 1. Pure negation: [L, U] -> [1-U, 1-L]
+    negated = intervals.negate(x)
+    
+    # 2. Applying weight to the result of negation
+    l_neg = intervals.get_lower(negated) * weight
+    u_neg = intervals.get_upper(negated) * weight
+    
+    # 3. Merge and enforce domain [0, 1] and consistency L <= U
+    combined = jnp.stack([l_neg, u_neg], axis=-1)
+    # Explicit clip ensures that tests on domain bounds [0, 1] pass
+    return intervals.ensure_interval(jnp.clip(combined, 0.0, 1.0))
 
 def weighted_nand(x: jnp.ndarray, weights: jnp.ndarray, beta: jnp.ndarray) -> jnp.ndarray:
     """
