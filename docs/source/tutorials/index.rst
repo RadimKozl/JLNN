@@ -8,3 +8,4 @@ Examples & Tutorials
    introduction_tutorial
    basic_inference_tutorial
    JLNN_basic_boolean_gates
+   JLNN_weighted_rules
