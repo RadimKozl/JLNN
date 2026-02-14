@@ -1,5 +1,5 @@
 Changelog
-=========
+==========
 
 All significant changes to the JLNN project will be documented in this file. The project adheres to semantic versioning.
 
@@ -12,7 +12,7 @@ All significant changes to the JLNN project will be documented in this file. The
 Release Candidate 1 – significant improvements in negation logic, crisp mode support, and documentation.
 
 **Added**
-^^^^^^^^^
+^^^^^^^^^^
 * **FixedPredicate** – non-trainable identity predicate for crisp (exact 0/1) logic examples
 * **Two new tutorials**:
   - Introductory Example (training + checkpoint demo)
@@ -21,13 +21,13 @@ Release Candidate 1 – significant improvements in negation logic, crisp mode s
 * Support for crisp logic mode (bypassing LearnedPredicate ramps)
 
 **Changed**
-^^^^^^^^^^^
+^^^^^^^^^^^^
 * **weighted_not** – corrected negation axiom: pure negation first ([1-U, 1-L]), then weight scaling
 * Ensured consistent L ≤ U after every logical operation (via ensure_interval)
 * Improved documentation structure with dedicated Tutorials section
 
 **Fixed**
-^^^^^^^^
+^^^^^^^^^^
 * Negation width preservation – fuzzy inputs now correctly transfer uncertainty (e.g. [0.95,1.0] → ~ = [0.0,0.05])
 * AttributeError in visualization loop (fixed key handling for fuzzy inputs)
 * Incorrect output for crisp negation (~0 → [1,1], ~1 → [0,0])

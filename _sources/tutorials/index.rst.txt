@@ -10,3 +10,4 @@ Examples & Tutorials
    JLNN_basic_boolean_gates
    JLNN_weighted_rules
    JLNN_temporal_logic
+   JLNN_contradiction_detection
