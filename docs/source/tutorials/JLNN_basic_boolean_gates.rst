@@ -31,7 +31,7 @@ This tutorial explores the intersection of classical logic and neuro-symbolic re
 
 * **Define Boolean Gates as Logical Formulas**: Using JLNN's symbolic syntax to represent AND, OR, NOT, NAND, NOR, and XOR operations.
 * **Bridge Crisp and Fuzzy Inputs**: Observe how the system handles perfect certainty (0/1) versus real-world uncertainty (e.g., "almost true" intervals like [0.95, 1.0]).
-* **Monitor Interval Integrity**: Verify that the system maintains consistent boundaries ($L \le U$) even through complex nested operations like XOR.
+* **Monitor Interval Integrity**: Verify that the system maintains consistent boundaries (L ≤ U) even through complex nested operations like XOR.
 * **Analyze Uncertainty Widths**: Visualize how "ignorance" propagates through different logical gates using JAX-backed computations.
 
 
