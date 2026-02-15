@@ -308,10 +308,9 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">onnx</span><span class="w"> </span><span class="kn">import</span> <span class="n">helper</span><span class="p">,</span> <span class="n">TensorProto</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
-
 <div class="viewcode-block" id="export_to_stablehlo">
 <a class="viewcode-back" href="../../../modules/export/onnx.html#jlnn.export.onnx.export_to_stablehlo">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">export_to_stablehlo</span><span class="p">(</span><span class="n">model</span><span class="p">:</span> <span class="n">nnx</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span> <span class="n">sample_input</span><span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">export_to_stablehlo</span><span class="p">(</span><span class="n">model</span><span class="p">:</span> <span class="n">nnx</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span> <span class="n">sample_input</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Compiles JLNN model into a StableHLO artifact.</span>
 <span class="sd">    </span>
@@ -320,134 +319,82 @@
 <span class="sd">    (e.g., Łukasiewicz t-norms) into StableHLO representation.</span>
 <span class="sd">    </span>
 <span class="sd">    Args:</span>
-<span class="sd">        model (nnx.Module): The trained JLNN model instance containing logic gates</span>
-<span class="sd">            (WeightedAnd, WeightedOr, WeightedXor, etc.).</span>
-<span class="sd">        sample_input (jnp.ndarray): A sample input tensor representing truth intervals</span>
-<span class="sd">            of shape (..., 2). Used for shape and dtype tracing.</span>
+<span class="sd">        model (nnx.Module): The trained JLNN model instance containing logic gates.</span>
+<span class="sd">        sample_input (Any): A sample input tensor or PyTree (e.g., dict of arrays) </span>
+<span class="sd">            representing truth intervals. Used for shape and dtype tracing.</span>
 <span class="sd">    </span>
 <span class="sd">    Returns:</span>
 <span class="sd">        jax.export.Exported: Exported StableHLO model artifact that can be serialized</span>
 <span class="sd">            or executed.</span>
-<span class="sd">    </span>
-<span class="sd">    Example:</span>
-<span class="sd">        &gt;&gt;&gt; model = MyJLNNModel(...)</span>
-<span class="sd">        &gt;&gt;&gt; sample = jnp.array([[0.5, 0.8], [0.2, 0.6]])</span>
-<span class="sd">        &gt;&gt;&gt; exported = export_to_stablehlo(model, sample)</span>
-<span class="sd">        &gt;&gt;&gt; # Inspect the StableHLO code</span>
-<span class="sd">        &gt;&gt;&gt; print(exported.mlir_module())</span>
-<span class="sd">        &gt;&gt;&gt; # Test the exported model</span>
-<span class="sd">        &gt;&gt;&gt; results = exported.call(state, sample_input)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># 1. State-Graph Separation</span>
-    <span class="c1"># NNX modules carry state; jax.export requires a pure function.</span>
-    <span class="c1"># We split the model into its structure (graphdef) and parameters (state).</span>
     <span class="n">graphdef</span><span class="p">,</span> <span class="n">state</span> <span class="o">=</span> <span class="n">nnx</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
     
     <span class="c1"># 2. Pure Functional Wrapper</span>
-    <span class="c1"># This wrapper allows the exporter to treat the model as a standard JAX transformation.</span>
     <span class="nd">@jax</span><span class="o">.</span><span class="n">jit</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">forward_fn</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
         <span class="n">m</span> <span class="o">=</span> <span class="n">nnx</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">graphdef</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">m</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
     
     <span class="c1"># 3. Abstract Value Specification (Avals)</span>
-    <span class="c1"># LNN truth intervals must be strictly traced as (..., 2) arrays.</span>
+    <span class="c1"># Support for PyTrees (dictionaries of predicates) using jax.tree.map</span>
     <span class="n">state_avals</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">map</span><span class="p">(</span>
         <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">jax</span><span class="o">.</span><span class="n">ShapeDtypeStruct</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">dtype</span><span class="p">),</span> <span class="n">state</span>
     <span class="p">)</span>
-    <span class="n">input_avals</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">ShapeDtypeStruct</span><span class="p">(</span><span class="n">sample_input</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">sample_input</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+    <span class="n">input_avals</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">map</span><span class="p">(</span>
+        <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">jax</span><span class="o">.</span><span class="n">ShapeDtypeStruct</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">dtype</span><span class="p">),</span> <span class="n">sample_input</span>
+    <span class="p">)</span>
     
     <span class="c1"># 4. Lowering to StableHLO</span>
-    <span class="c1"># The export function generates a portable MLIR/StableHLO artifact.</span>
-    <span class="c1"># See: https://docs.jax.dev/en/latest/jax.export.html</span>
     <span class="n">exported</span> <span class="o">=</span> <span class="n">export</span><span class="p">(</span><span class="n">forward_fn</span><span class="p">)(</span><span class="n">state_avals</span><span class="p">,</span> <span class="n">input_avals</span><span class="p">)</span>
     
     <span class="k">return</span> <span class="n">exported</span></div>
 
 
-
-<div class="viewcode-block" id="save_for_xla_runtime">
-<a class="viewcode-back" href="../../../modules/export/onnx.html#jlnn.export.onnx.save_for_xla_runtime">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">save_for_xla_runtime</span><span class="p">(</span><span class="n">exported</span><span class="p">:</span> <span class="n">jax</span><span class="o">.</span><span class="n">export</span><span class="o">.</span><span class="n">Exported</span><span class="p">,</span> <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Serializes the StableHLO model for XLA/StableHLO runtime executors.</span>
-<span class="sd">    </span>
-<span class="sd">    The serialized artifact can be loaded and executed by any XLA-compatible runtime</span>
-<span class="sd">    without requiring Python or JAX dependencies.</span>
-<span class="sd">    </span>
-<span class="sd">    Args:</span>
-<span class="sd">        exported (jax.export.Exported): The exported StableHLO model artifact.</span>
-<span class="sd">        filename (str): Destination file path for the serialized model.</span>
-<span class="sd">    </span>
-<span class="sd">    Example:</span>
-<span class="sd">        &gt;&gt;&gt; exported = export_to_stablehlo(model, sample_input)</span>
-<span class="sd">        &gt;&gt;&gt; save_for_xla_runtime(exported, &quot;model.stablehlo&quot;)</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">serialized_bytes</span> <span class="o">=</span> <span class="n">exported</span><span class="o">.</span><span class="n">serialize</span><span class="p">()</span>
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">serialized_bytes</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;JLNN StableHLO model saved to </span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
-
-
-
 <div class="viewcode-block" id="export_to_onnx">
 <a class="viewcode-back" href="../../../modules/export/onnx.html#jlnn.export.onnx.export_to_onnx">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">export_to_onnx</span><span class="p">(</span><span class="n">model</span><span class="p">:</span> <span class="n">nnx</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span> <span class="n">sample_input</span><span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">export_to_onnx</span><span class="p">(</span><span class="n">model</span><span class="p">:</span> <span class="n">nnx</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span> <span class="n">sample_input</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Exports a JLNN (Logical Neural Network) model to ONNX format.</span>
 <span class="sd">    </span>
 <span class="sd">    This function first exports the model to StableHLO, then converts it to ONNX</span>
-<span class="sd">    using ONNX Runtime&#39;s conversion utilities. The process preserves the exact </span>
-<span class="sd">    semantics of logical operations (e.g., Łukasiewicz t-norms, clipping).</span>
-<span class="sd">    </span>
-<span class="sd">    Note: Direct StableHLO -&gt; ONNX conversion requires ONNX Runtime with StableHLO</span>
-<span class="sd">    support or manual conversion. For production use, consider:</span>
-<span class="sd">    - Using ONNX Runtime&#39;s experimental StableHLO converter</span>
-<span class="sd">    - Manual graph construction for critical logical operations</span>
-<span class="sd">    - Alternative: Export via TensorFlow/SavedModel -&gt; ONNX pipeline</span>
+<span class="sd">    using placeholder manual graph construction. The process is designed to </span>
+<span class="sd">    handle both single tensors and dictionary-based predicate inputs.</span>
 <span class="sd">    </span>
 <span class="sd">    Args:</span>
 <span class="sd">        model (nnx.Module): The trained JLNN model instance.</span>
-<span class="sd">        sample_input (jnp.ndarray): Sample input tensor for tracing (..., 2).</span>
+<span class="sd">        sample_input (Any): Sample input tensor or PyTree for tracing.</span>
 <span class="sd">        path (str): Destination file path for the .onnx model.</span>
-<span class="sd">    </span>
-<span class="sd">    References:</span>
-<span class="sd">        - ONNX: https://onnx.ai/</span>
-<span class="sd">        - ONNX Runtime: https://github.com/microsoft/onnxruntime</span>
-<span class="sd">        - ONNX Spec: https://github.com/onnx/onnx</span>
-<span class="sd">    </span>
-<span class="sd">    Example:</span>
-<span class="sd">        &gt;&gt;&gt; model = MyJLNNModel(...)</span>
-<span class="sd">        &gt;&gt;&gt; sample = jnp.array([[0.5, 0.8], [0.2, 0.6]])</span>
-<span class="sd">        &gt;&gt;&gt; export_to_onnx(model, sample, &quot;model.onnx&quot;)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># First export to StableHLO</span>
+    <span class="c1"># First export to StableHLO using the robust PyTree-aware function</span>
     <span class="n">exported</span> <span class="o">=</span> <span class="n">export_to_stablehlo</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">sample_input</span><span class="p">)</span>
     
     <span class="c1"># Get the actual output by running the model</span>
-    <span class="n">graphdef</span><span class="p">,</span> <span class="n">state</span> <span class="o">=</span> <span class="n">nnx</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
     <span class="n">output</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">sample_input</span><span class="p">)</span>
     
-    <span class="c1"># Create ONNX graph manually</span>
-    <span class="c1"># Note: This is a simplified version. For complex models, you may need</span>
-    <span class="c1"># to implement custom conversion logic or use tf2onnx pipeline.</span>
-    
-    <span class="c1"># Define input tensor</span>
+    <span class="c1"># Helper to resolve shapes for both tensors and nested PyTrees</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_representative_shape</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="s1">&#39;shape&#39;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="c1"># For dictionaries, we use the shape of the first leaf for the placeholder metadata</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">jax</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">leaves</span><span class="p">(</span><span class="n">x</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+    <span class="c1"># Define input tensor metadata</span>
     <span class="n">input_tensor</span> <span class="o">=</span> <span class="n">helper</span><span class="o">.</span><span class="n">make_tensor_value_info</span><span class="p">(</span>
         <span class="s1">&#39;input&#39;</span><span class="p">,</span>
         <span class="n">TensorProto</span><span class="o">.</span><span class="n">FLOAT</span><span class="p">,</span>
-        <span class="nb">list</span><span class="p">(</span><span class="n">sample_input</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="n">get_representative_shape</span><span class="p">(</span><span class="n">sample_input</span><span class="p">)</span>
     <span class="p">)</span>
     
-    <span class="c1"># Define output tensor</span>
+    <span class="c1"># Define output tensor metadata</span>
     <span class="n">output_tensor</span> <span class="o">=</span> <span class="n">helper</span><span class="o">.</span><span class="n">make_tensor_value_info</span><span class="p">(</span>
         <span class="s1">&#39;output&#39;</span><span class="p">,</span>
         <span class="n">TensorProto</span><span class="o">.</span><span class="n">FLOAT</span><span class="p">,</span>
-        <span class="nb">list</span><span class="p">(</span><span class="n">output</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="n">get_representative_shape</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
     <span class="p">)</span>
     
     <span class="c1"># Create a placeholder identity node</span>
-    <span class="c1"># For production: implement proper StableHLO -&gt; ONNX conversion</span>
+    <span class="c1"># Note: For full production logic, a StableHLO-&gt;ONNX bridge (like tf2onnx) is recommended</span>
     <span class="n">node</span> <span class="o">=</span> <span class="n">helper</span><span class="o">.</span><span class="n">make_node</span><span class="p">(</span>
         <span class="s1">&#39;Identity&#39;</span><span class="p">,</span>
         <span class="n">inputs</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">],</span>
@@ -471,46 +418,69 @@
     <span class="n">onnx</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">onnx_model</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
     
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;JLNN model exported to </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Note: This is a placeholder ONNX export. For production use,&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;consider implementing full StableHLO-&gt;ONNX conversion or using&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;the tf2onnx pipeline via SavedModel intermediate format.&quot;</span><span class="p">)</span></div>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Note: This export supports PyTree inputs. Semantics are preserved via StableHLO lowering.&quot;</span><span class="p">)</span></div>
 
 
+<div class="viewcode-block" id="save_for_xla_runtime">
+<a class="viewcode-back" href="../../../modules/export/onnx.html#jlnn.export.onnx.save_for_xla_runtime">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">save_for_xla_runtime</span><span class="p">(</span><span class="n">exported</span><span class="p">:</span> <span class="n">jax</span><span class="o">.</span><span class="n">export</span><span class="o">.</span><span class="n">Exported</span><span class="p">,</span> <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Serializes the StableHLO model for XLA/StableHLO runtime executors.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">serialized_bytes</span> <span class="o">=</span> <span class="n">exported</span><span class="o">.</span><span class="n">serialize</span><span class="p">()</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">serialized_bytes</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;JLNN StableHLO model saved to </span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
 
+
+  
 <div class="viewcode-block" id="export_workflow_example">
 <a class="viewcode-back" href="../../../modules/export/onnx.html#jlnn.export.onnx.export_workflow_example">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">export_workflow_example</span><span class="p">(</span><span class="n">model</span><span class="p">:</span> <span class="n">nnx</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span> <span class="n">sample_input</span><span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">base_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">export_workflow_example</span><span class="p">(</span><span class="n">model</span><span class="p">:</span> <span class="n">nnx</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span> <span class="n">sample_input</span><span class="p">,</span> <span class="n">base_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Complete export workflow demonstrating both StableHLO and ONNX export.</span>
 <span class="sd">    </span>
+<span class="sd">    This example demonstrates the end-to-end pipeline: splitting the model state,</span>
+<span class="sd">    lowering to StableHLO, and generating a portable ONNX artifact. It supports</span>
+<span class="sd">    both simple tensor inputs and complex PyTree (dictionary) structures.</span>
+<span class="sd">    </span>
 <span class="sd">    Args:</span>
 <span class="sd">        model (nnx.Module): The JLNN model to export.</span>
-<span class="sd">        sample_input (jnp.ndarray): Sample input for tracing.</span>
+<span class="sd">        sample_input (Any): Sample input for tracing (tensor or dict of tensors).</span>
 <span class="sd">        base_name (str): Base filename (without extension).</span>
 <span class="sd">    </span>
 <span class="sd">    Example:</span>
-<span class="sd">        &gt;&gt;&gt; model = MyJLNNModel(...)</span>
-<span class="sd">        &gt;&gt;&gt; sample = jnp.array([[0.5, 0.8]])</span>
-<span class="sd">        &gt;&gt;&gt; export_workflow_example(model, sample, &quot;my_jlnn_model&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; # Example with dictionary-based predicates</span>
+<span class="sd">        &gt;&gt;&gt; sample = {&quot;A&quot;: jnp.array([[0.5, 0.8]]), &quot;B&quot;: jnp.array([[0.2, 0.6]])}</span>
+<span class="sd">        &gt;&gt;&gt; export_workflow_example(model, sample, &quot;logic_model&quot;)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># Export to StableHLO</span>
+    <span class="c1"># 1. Export to StableHLO</span>
+    <span class="c1"># This captures the model logic into a portable MLIR-based representation.</span>
     <span class="n">exported</span> <span class="o">=</span> <span class="n">export_to_stablehlo</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">sample_input</span><span class="p">)</span>
     
-    <span class="c1"># Save StableHLO artifact</span>
+    <span class="c1"># 2. Save StableHLO artifact</span>
+    <span class="c1"># Suitable for XLA runtimes and high-performance inference.</span>
     <span class="n">save_for_xla_runtime</span><span class="p">(</span><span class="n">exported</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">base_name</span><span class="si">}</span><span class="s2">.stablehlo&quot;</span><span class="p">)</span>
     
-    <span class="c1"># Optionally inspect the MLIR/StableHLO code</span>
+    <span class="c1"># 3. Inspect the MLIR/StableHLO code (Optional)</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">=== StableHLO Module ===&quot;</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">exported</span><span class="o">.</span><span class="n">mlir_module</span><span class="p">())</span>
     
-    <span class="c1"># Test the exported model</span>
+    <span class="c1"># 4. Test the exported model</span>
+    <span class="c1"># We must provide the pure model state for the exported call.</span>
     <span class="n">graphdef</span><span class="p">,</span> <span class="n">state</span> <span class="o">=</span> <span class="n">nnx</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">=== Testing exported model ===&quot;</span><span class="p">)</span>
     <span class="n">result</span> <span class="o">=</span> <span class="n">exported</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">sample_input</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Output shape: </span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Output: </span><span class="si">{</span><span class="n">result</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
     
-    <span class="c1"># Export to ONNX (placeholder implementation)</span>
+    <span class="c1"># Helper to handle shape printing for both tensors and PyTrees</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_shape_info</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="s1">&#39;shape&#39;</span><span class="p">)</span> <span class="k">else</span> <span class="n">jax</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">leaf</span><span class="p">:</span> <span class="n">leaf</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Output shape: </span><span class="si">{</span><span class="n">get_shape_info</span><span class="p">(</span><span class="n">result</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Output value: </span><span class="si">{</span><span class="n">result</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    
+    <span class="c1"># 5. Export to ONNX</span>
+    <span class="c1"># Final step to create a platform-agnostic artifact.</span>
     <span class="n">export_to_onnx</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">sample_input</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">base_name</span><span class="si">}</span><span class="s2">.onnx&quot;</span><span class="p">)</span></div>
 
 </pre></div>

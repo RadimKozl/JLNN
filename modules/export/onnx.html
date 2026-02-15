@@ -307,42 +307,25 @@
 <span id="onnx-export"></span><h1>ONNX Export<a class="headerlink" href="#module-jlnn.export.onnx" title="Link to this heading">¶</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="jlnn.export.onnx.export_to_onnx">
-<span class="sig-prename descclassname"><span class="pre">jlnn.export.onnx.</span></span><span class="sig-name descname"><span class="pre">export_to_onnx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Module</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_input</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/jlnn/export/onnx.html#export_to_onnx"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jlnn.export.onnx.export_to_onnx" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">jlnn.export.onnx.</span></span><span class="sig-name descname"><span class="pre">export_to_onnx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Module</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_input</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/jlnn/export/onnx.html#export_to_onnx"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jlnn.export.onnx.export_to_onnx" title="Link to this definition">¶</a></dt>
 <dd><p>Exports a JLNN (Logical Neural Network) model to ONNX format.</p>
 <p>This function first exports the model to StableHLO, then converts it to ONNX
-using ONNX Runtime’s conversion utilities. The process preserves the exact
-semantics of logical operations (e.g., Łukasiewicz t-norms, clipping).</p>
-<p>Note: Direct StableHLO -&gt; ONNX conversion requires ONNX Runtime with StableHLO
-support or manual conversion. For production use, consider:
-- Using ONNX Runtime’s experimental StableHLO converter
-- Manual graph construction for critical logical operations
-- Alternative: Export via TensorFlow/SavedModel -&gt; ONNX pipeline</p>
+using placeholder manual graph construction. The process is designed to
+handle both single tensors and dictionary-based predicate inputs.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>model</strong> (<em>nnx.Module</em>) – The trained JLNN model instance.</p></li>
-<li><p><strong>sample_input</strong> (<em>jnp.ndarray</em>) – Sample input tensor for tracing (…, 2).</p></li>
+<li><p><strong>sample_input</strong> (<em>Any</em>) – Sample input tensor or PyTree for tracing.</p></li>
 <li><p><strong>path</strong> (<em>str</em>) – Destination file path for the .onnx model.</p></li>
 </ul>
 </dd>
 </dl>
-<p class="rubric">References</p>
-<ul class="simple">
-<li><p>ONNX: <a class="reference external" href="https://onnx.ai/">https://onnx.ai/</a></p></li>
-<li><p>ONNX Runtime: <a class="reference external" href="https://github.com/microsoft/onnxruntime">https://github.com/microsoft/onnxruntime</a></p></li>
-<li><p>ONNX Spec: <a class="reference external" href="https://github.com/onnx/onnx">https://github.com/onnx/onnx</a></p></li>
-</ul>
-<p class="rubric">Example</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">MyJLNNModel</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">sample</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">]])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">export_to_onnx</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="s2">&quot;model.onnx&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="jlnn.export.onnx.export_to_stablehlo">
-<span class="sig-prename descclassname"><span class="pre">jlnn.export.onnx.</span></span><span class="sig-name descname"><span class="pre">export_to_stablehlo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Module</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_input</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Array</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/jlnn/export/onnx.html#export_to_stablehlo"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jlnn.export.onnx.export_to_stablehlo" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">jlnn.export.onnx.</span></span><span class="sig-name descname"><span class="pre">export_to_stablehlo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Module</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_input</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/jlnn/export/onnx.html#export_to_stablehlo"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jlnn.export.onnx.export_to_stablehlo" title="Link to this definition">¶</a></dt>
 <dd><p>Compiles JLNN model into a StableHLO artifact.</p>
 <p>This function bridges the gap between stateful Flax NNX modules and the stateless
 requirements of the JAX export pipeline. It lowers the model’s logical operations
@@ -350,10 +333,9 @@ requirements of the JAX export pipeline. It lowers the model’s logical operati
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>model</strong> (<em>nnx.Module</em>) – The trained JLNN model instance containing logic gates
-(WeightedAnd, WeightedOr, WeightedXor, etc.).</p></li>
-<li><p><strong>sample_input</strong> (<em>jnp.ndarray</em>) – A sample input tensor representing truth intervals
-of shape (…, 2). Used for shape and dtype tracing.</p></li>
+<li><p><strong>model</strong> (<em>nnx.Module</em>) – The trained JLNN model instance containing logic gates.</p></li>
+<li><p><strong>sample_input</strong> (<em>Any</em>) – A sample input tensor or PyTree (e.g., dict of arrays)
+representing truth intervals. Used for shape and dtype tracing.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -367,35 +349,28 @@ of shape (…, 2). Used for shape and dtype tracing.</p></li>
 <dd class="field-odd"><p>jax.export.Exported</p>
 </dd>
 </dl>
-<p class="rubric">Example</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">MyJLNNModel</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">sample</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">]])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">exported</span> <span class="o">=</span> <span class="n">export_to_stablehlo</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">sample</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Inspect the StableHLO code</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">exported</span><span class="o">.</span><span class="n">mlir_module</span><span class="p">())</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Test the exported model</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">results</span> <span class="o">=</span> <span class="n">exported</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">sample_input</span><span class="p">)</span>
-</pre></div>
-</div>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="jlnn.export.onnx.export_workflow_example">
-<span class="sig-prename descclassname"><span class="pre">jlnn.export.onnx.</span></span><span class="sig-name descname"><span class="pre">export_workflow_example</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Module</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_input</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/jlnn/export/onnx.html#export_workflow_example"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jlnn.export.onnx.export_workflow_example" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">jlnn.export.onnx.</span></span><span class="sig-name descname"><span class="pre">export_workflow_example</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Module</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_input</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/jlnn/export/onnx.html#export_workflow_example"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jlnn.export.onnx.export_workflow_example" title="Link to this definition">¶</a></dt>
 <dd><p>Complete export workflow demonstrating both StableHLO and ONNX export.</p>
+<p>This example demonstrates the end-to-end pipeline: splitting the model state,
+lowering to StableHLO, and generating a portable ONNX artifact. It supports
+both simple tensor inputs and complex PyTree (dictionary) structures.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>model</strong> (<em>nnx.Module</em>) – The JLNN model to export.</p></li>
-<li><p><strong>sample_input</strong> (<em>jnp.ndarray</em>) – Sample input for tracing.</p></li>
+<li><p><strong>sample_input</strong> (<em>Any</em>) – Sample input for tracing (tensor or dict of tensors).</p></li>
 <li><p><strong>base_name</strong> (<em>str</em>) – Base filename (without extension).</p></li>
 </ul>
 </dd>
 </dl>
 <p class="rubric">Example</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">MyJLNNModel</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">sample</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">]])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">export_workflow_example</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="s2">&quot;my_jlnn_model&quot;</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Example with dictionary-based predicates</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sample</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;A&quot;</span><span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">]]),</span> <span class="s2">&quot;B&quot;</span><span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">]])}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">export_workflow_example</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="s2">&quot;logic_model&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -404,21 +379,6 @@ of shape (…, 2). Used for shape and dtype tracing.</p></li>
 <dt class="sig sig-object py" id="jlnn.export.onnx.save_for_xla_runtime">
 <span class="sig-prename descclassname"><span class="pre">jlnn.export.onnx.</span></span><span class="sig-name descname"><span class="pre">save_for_xla_runtime</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">exported</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Exported</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/jlnn/export/onnx.html#save_for_xla_runtime"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jlnn.export.onnx.save_for_xla_runtime" title="Link to this definition">¶</a></dt>
 <dd><p>Serializes the StableHLO model for XLA/StableHLO runtime executors.</p>
-<p>The serialized artifact can be loaded and executed by any XLA-compatible runtime
-without requiring Python or JAX dependencies.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>exported</strong> (<em>jax.export.Exported</em>) – The exported StableHLO model artifact.</p></li>
-<li><p><strong>filename</strong> (<em>str</em>) – Destination file path for the serialized model.</p></li>
-</ul>
-</dd>
-</dl>
-<p class="rubric">Example</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">exported</span> <span class="o">=</span> <span class="n">export_to_stablehlo</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">sample_input</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">save_for_xla_runtime</span><span class="p">(</span><span class="n">exported</span><span class="p">,</span> <span class="s2">&quot;model.stablehlo&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
 </dd></dl>
 
 <p>This module ensures the transformation of JLNN models into the <strong>Open Neural Network Exchange (ONNX)</strong> format.</p>
