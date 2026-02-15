@@ -6,6 +6,34 @@ All significant changes to the JLNN project will be documented in this file. The
 .. note::
    JLNN is currently in the **Alpha** phase. API may change based on feedback from research deployments.
 
+[0.1.rc2] - 2026-02-15
+-----------------------
+
+This Release Candidate brings a major fix to the export pipeline and refines the core logical consistency of the framework.
+
+**Added**
+^^^^^^^^^^
+* **FixedPredicate:** Introduced a non-trainable identity predicate specifically for crisp (exact 0/1) logic examples.
+* **Robust PyTree Support:** The export pipeline now fully supports dictionary-based predicate inputs (e.g., `{"A": tensor, "B": tensor}`) using `jax.tree.map`.
+* **Metadata Resolution:** Added `get_representative_shape` helper to ensure correct ONNX `value_info` metadata generation even for complex nested inputs.
+
+**Changed**
+^^^^^^^^^^^^
+
+* **Export Pipeline Refactoring:** Updated `export_to_stablehlo` and `export_to_onnx` to handle structured PyTrees instead of requiring flat `jnp.ndarray` inputs.
+* **Negation Axiom (weighted_not):** Corrected the order of operations to apply pure negation ([1-U, 1-L]) before weight scaling.
+* **Workflow Consistency:** The `export_workflow_example` now demonstrates end-to-end StableHLO and ONNX export using dictionary-based inputs.
+* **Interval Enforcement:** Ensured consistent L≤U after every logical operation via the `ensure_interval` mechanism.
+
+**Fixed**
+^^^^^^^^^^
+
+* **AttributeError in Export:** Resolved the critical error where the exporter attempted to call `.shape` on dictionary objects.
+* **AttributeError in Visualization:** Fixed key handling for fuzzy inputs within visualization loops.
+* **Crisp Negation Logic:** Fixed incorrect output values for crisp negation (e.g., ∼0→[1,1] and ∼1→[0,0]).
+* **Uncertainty Preservation:** Negation now correctly preserves uncertainty widths in fuzzy inputs (e.g., [0.95,1.0]→[0.0,0.05]).
+
+
 [0.1.rc1] - 2026-02-10
 -----------------------
 
