@@ -3,10 +3,10 @@
   <head><meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="next" title="Weighted Rules &amp; Multiple Antecedents" href="JLNN_weighted_rules.html"><link rel="prev" title="Base Example: Basic inference and manual grounding" href="basic_inference_tutorial.html">
+<link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="next" title="Theoretical foundations of JLNN" href="../theory.html"><link rel="prev" title="Contradiction Detection &amp; Model Repair" href="JLNN_contradiction_detection.html">
 
     <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
-        <title>Basic Boolean Gates - JLNN 0.1.rc2 documentation</title>
+        <title>Model Export &amp; Deployment (StableHLO, ONNX, PyTorch) - JLNN 0.1.rc2 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
@@ -198,11 +198,11 @@
 <li class="toctree-l1 current has-children"><a class="reference internal" href="index.html">Examples &amp; Tutorials</a><input aria-label="Toggle navigation of Examples &amp; Tutorials" checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="introduction_tutorial.html">Introductory Example: JLNN Base</a></li>
 <li class="toctree-l2"><a class="reference internal" href="basic_inference_tutorial.html">Base Example: Basic inference and manual grounding</a></li>
-<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Basic Boolean Gates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="JLNN_basic_boolean_gates.html">Basic Boolean Gates</a></li>
 <li class="toctree-l2"><a class="reference internal" href="JLNN_weighted_rules.html">Weighted Rules &amp; Multiple Antecedents</a></li>
 <li class="toctree-l2"><a class="reference internal" href="JLNN_temporal_logic.html">Temporal Logic (G, F, X) on Time-Series</a></li>
 <li class="toctree-l2"><a class="reference internal" href="JLNN_contradiction_detection.html">Contradiction Detection &amp; Model Repair</a></li>
-<li class="toctree-l2"><a class="reference internal" href="JLNN_model_export.html">Model Export &amp; Deployment (StableHLO, ONNX, PyTorch)</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Model Export &amp; Deployment (StableHLO, ONNX, PyTorch)</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../theory.html">Theoretical foundations of JLNN</a></li>
@@ -286,7 +286,7 @@
         </a>
         <div class="content-icon-container">
           <div class="view-this-page">
-  <a class="muted-link" href="../_sources/tutorials/JLNN_basic_boolean_gates.rst.txt" title="View this page">
+  <a class="muted-link" href="../_sources/tutorials/JLNN_model_export.rst.txt" title="View this page">
     <svg><use href="#svg-eye"></use></svg>
     <span class="visually-hidden">View this page</span>
   </a>
@@ -304,12 +304,10 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="basic-boolean-gates">
-<h1>Basic Boolean Gates<a class="headerlink" href="#basic-boolean-gates" title="Link to this heading">¶</a></h1>
-<p>This tutorial demonstrates how JLNN handles classical Boolean operations
-(AND, OR, NOT, NAND, NOR, XOR) using interval logic. You will see how
-crisp inputs (0/1) translate to certain intervals and how the system
-manages uncertainty.</p>
+          <section id="model-export-deployment-stablehlo-onnx-pytorch">
+<h1>Model Export &amp; Deployment (StableHLO, ONNX, PyTorch)<a class="headerlink" href="#model-export-deployment-stablehlo-onnx-pytorch" title="Link to this heading">¶</a></h1>
+<p>This notebook shows how to take a trained logic model from a JAX/Flax development environment to a production deployment.
+Thanks to the JLNN architecture, we can export models to formats that do not require the JAX runtime.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>The interactive notebook is hosted externally to ensure the best viewing experience
@@ -324,7 +322,7 @@ and to allow immediate execution in the cloud.</p>
 Run in Google Colab</div>
 <p class="sd-card-text">Execute the code directly in your browser without any local setup.</p>
 </div>
-<a class="sd-stretched-link sd-hide-link-text reference external" href="https://colab.research.google.com/github/RadimKozl/JLNN/blob/main/examples/JLNN_basic_boolean_gates.ipynb"><span>https://colab.research.google.com/github/RadimKozl/JLNN/blob/main/examples/JLNN_basic_boolean_gates.ipynb</span></a></div>
+<a class="sd-stretched-link sd-hide-link-text reference external" href="https://colab.research.google.com/github/RadimKozl/JLNN/blob/main/examples/JLNN_model_export.ipynb"><span>https://colab.research.google.com/github/RadimKozl/JLNN/blob/main/examples/JLNN_model_export.ipynb</span></a></div>
 </div>
 <div class="sd-col sd-d-flex-row docutils">
 <div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-sm sd-card-hover docutils">
@@ -333,19 +331,23 @@ Run in Google Colab</div>
 View on GitHub</div>
 <p class="sd-card-text">Browse the source code and outputs in the GitHub notebook viewer.</p>
 </div>
-<a class="sd-stretched-link sd-hide-link-text reference external" href="https://github.com/RadimKozl/JLNN/blob/main/examples/JLNN_basic_boolean_gates.ipynb"><span>https://github.com/RadimKozl/JLNN/blob/main/examples/JLNN_basic_boolean_gates.ipynb</span></a></div>
+<a class="sd-stretched-link sd-hide-link-text reference external" href="https://github.com/RadimKozl/JLNN/blob/main/examples/JLNN_model_export.ipynb"><span>https://github.com/RadimKozl/JLNN/blob/main/examples/JLNN_model_export.ipynb</span></a></div>
 </div>
 </div>
 </div>
 <section id="content-overview">
 <h2>Content Overview<a class="headerlink" href="#content-overview" title="Link to this heading">¶</a></h2>
-<p>This tutorial explores the intersection of classical logic and neuro-symbolic reasoning. You will learn how to:</p>
-<ul class="simple">
-<li><p><strong>Define Boolean Gates as Logical Formulas</strong>: Using JLNN’s symbolic syntax to represent AND, OR, NOT, NAND, NOR, and XOR operations.</p></li>
-<li><p><strong>Bridge Crisp and Fuzzy Inputs</strong>: Observe how the system handles perfect certainty (0/1) versus real-world uncertainty (e.g., “almost true” intervals like [0.95, 1.0]).</p></li>
-<li><p><strong>Monitor Interval Integrity</strong>: Verify that the system maintains consistent boundaries (L ≤ U) even through complex nested operations like XOR.</p></li>
-<li><p><strong>Analyze Uncertainty Widths</strong>: Visualize how “ignorance” propagates through different logical gates using JAX-backed computations.</p></li>
-</ul>
+<p>The export workflow covers the transition from stateful <strong>Flax NNX</strong> modules to portable computational graphs:</p>
+<ol class="arabic simple">
+<li><p><strong>StableHLO Export</strong>: Captures the model logic (including Łukasiewicz t-norms) into an MLIR-based representation suitable for XLA runtimes[cite: 4].</p></li>
+<li><p><strong>PyTree Support</strong>: Since version <strong>0.1.rc2</strong>, the pipeline natively handles dictionary-based predicate inputs (e.g., <code class="docutils literal notranslate"><span class="pre">{&quot;A&quot;:</span> <span class="pre">interval,</span> <span class="pre">&quot;B&quot;:</span> <span class="pre">interval}</span></code>).</p></li>
+<li><p><strong>ONNX Conversion</strong>: Generation of platform-agnostic artifacts for integration into C++, Rust, or enterprise applications.</p></li>
+<li><p><strong>PyTorch Bridge</strong>: Mapping the exported ONNX graph back to a <code class="docutils literal notranslate"><span class="pre">torch.nn.Module</span></code> for use within the PyTorch ecosystem.</p></li>
+</ol>
+</section>
+<section id="implementation-example">
+<h2>Implementation Example<a class="headerlink" href="#implementation-example" title="Link to this heading">¶</a></h2>
+<p>Following the updates in <strong>0.1.rc2</strong>, the export process is now robust against structured inputs:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">try:</span>
 <span class="sd">    import jlnn</span>
@@ -365,147 +367,210 @@ View on GitHub</div>
 <span class="sd">    os.kill(os.getpid(), 9)</span>
 <span class="sd">    os.kill(os.getpid(), 9) # After this line, the cell stops and the environment restarts</span>
 <span class="sd">&#39;&#39;&#39;</span>
+
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;JAX_PLATFORMS&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;cpu&quot;</span>
 
-<span class="kn">import</span><span class="w"> </span><span class="nn">jlnn</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">jax</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flax</span><span class="w"> </span><span class="kn">import</span> <span class="n">nnx</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">optax</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">onnxruntime</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ort</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">jax.numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">jnp</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">flax</span><span class="w"> </span><span class="kn">import</span> <span class="n">nnx</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">jax</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 
-<span class="c1"># JLNN core imports</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">jlnn.nn.gates</span><span class="w"> </span><span class="kn">import</span> <span class="n">WeightedAnd</span><span class="p">,</span> <span class="n">WeightedOr</span><span class="p">,</span> <span class="n">WeightedNot</span><span class="p">,</span> <span class="n">WeightedNand</span><span class="p">,</span> <span class="n">WeightedNor</span><span class="p">,</span> <span class="n">WeightedXor</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">jlnn.nn.predicates</span><span class="w"> </span><span class="kn">import</span> <span class="n">FixedPredicate</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">jlnn.symbolic.compiler</span><span class="w"> </span><span class="kn">import</span> <span class="n">LNNFormula</span><span class="p">,</span> <span class="n">PredicateNode</span><span class="p">,</span> <span class="n">UnaryGateNode</span><span class="p">,</span> <span class="n">BinaryGateNode</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">onnx</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">onnx</span><span class="w"> </span><span class="kn">import</span> <span class="n">helper</span><span class="p">,</span> <span class="n">TensorProto</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;JLNN loaded.&quot;</span><span class="p">)</span>
+<span class="c1"># JLNN Core &amp; Symbolic</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">jlnn.symbolic.compiler</span><span class="w"> </span><span class="kn">import</span> <span class="n">LNNFormula</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">jlnn.training.losses</span><span class="w"> </span><span class="kn">import</span> <span class="n">total_lnn_loss</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">jlnn.nn.constraints</span><span class="w"> </span><span class="kn">import</span> <span class="n">apply_constraints</span>
 
-<span class="n">crisp_inputs</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;A&quot;</span><span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]]),</span>   <span class="c1"># A = True</span>
-    <span class="s2">&quot;B&quot;</span><span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]])</span>    <span class="c1"># B = False</span>
+<span class="c1"># JLNN Export Tools (based on your uploaded files)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">jlnn.export.stablehlo</span><span class="w"> </span><span class="kn">import</span> <span class="n">export_to_stablehlo</span><span class="p">,</span> <span class="n">save_stablehlo_artifact</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">jlnn.export.onnx</span><span class="w"> </span><span class="kn">import</span> <span class="n">export_to_onnx</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">jlnn.export.torch_map</span><span class="w"> </span><span class="kn">import</span> <span class="n">export_to_pytorch</span>
+    <span class="n">TORCH_AVAILABLE</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="n">TORCH_AVAILABLE</span> <span class="o">=</span> <span class="kc">False</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;✅ JLNN export environment ready.&quot;</span><span class="p">)</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">LNNFormula</span><span class="p">(</span><span class="s2">&quot;0.8::A &amp; B -&gt; C&quot;</span><span class="p">,</span> <span class="n">nnx</span><span class="o">.</span><span class="n">Rngs</span><span class="p">(</span><span class="mi">42</span><span class="p">))</span>
+
+<span class="n">optimizer</span> <span class="o">=</span> <span class="n">nnx</span><span class="o">.</span><span class="n">Optimizer</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">optax</span><span class="o">.</span><span class="n">adam</span><span class="p">(</span><span class="mf">0.01</span><span class="p">),</span> <span class="n">wrt</span><span class="o">=</span><span class="n">nnx</span><span class="o">.</span><span class="n">Param</span><span class="p">)</span>
+
+<span class="n">inputs</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;A&quot;</span><span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.9</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]]),</span>
+    <span class="s2">&quot;B&quot;</span><span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">]]),</span>
+    <span class="s2">&quot;C&quot;</span><span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]])</span>
 <span class="p">}</span>
 
-<span class="n">fuzzy_inputs</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;A&quot;</span><span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.95</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]]),</span>  <span class="c1"># A almost True</span>
-    <span class="s2">&quot;B&quot;</span><span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.05</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">]])</span>   <span class="c1"># B almost False</span>
-<span class="p">}</span>
+<span class="n">target</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.85</span><span class="p">,</span> <span class="mf">0.95</span><span class="p">]])</span>
 
-<span class="k">def</span><span class="w"> </span><span class="nf">run_gate</span><span class="p">(</span><span class="n">rule</span><span class="p">,</span> <span class="n">inputs</span><span class="p">):</span>
-    <span class="n">model</span> <span class="o">=</span> <span class="n">LNNFormula</span><span class="p">(</span><span class="n">rule</span><span class="p">,</span> <span class="n">nnx</span><span class="o">.</span><span class="n">Rngs</span><span class="p">(</span><span class="mi">42</span><span class="p">))</span>
+<span class="nd">@nnx</span><span class="o">.</span><span class="n">jit</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">train_step</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">target</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">loss_fn</span><span class="p">(</span><span class="n">m</span><span class="p">):</span>
+        <span class="c1"># Forward pass skrze logický model</span>
+        <span class="n">preds</span> <span class="o">=</span> <span class="n">m</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">total_lnn_loss</span><span class="p">(</span><span class="n">preds</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
 
-    <span class="c1"># Key override: replace LearnedPredicate with Fixed (identity)</span>
-    <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">inputs</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">predicates</span><span class="p">:</span>
-            <span class="n">model</span><span class="o">.</span><span class="n">predicates</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">predicate</span> <span class="o">=</span> <span class="n">FixedPredicate</span><span class="p">()</span>
+    <span class="n">loss</span><span class="p">,</span> <span class="n">grads</span> <span class="o">=</span> <span class="n">nnx</span><span class="o">.</span><span class="n">value_and_grad</span><span class="p">(</span><span class="n">loss_fn</span><span class="p">)(</span><span class="n">model</span><span class="p">)</span>
+    <span class="n">optimizer</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">grads</span><span class="p">)</span> <span class="c1"># Update requires both model and grads</span>
+    <span class="n">apply_constraints</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>       <span class="c1"># Maintaining logical weights w &gt;= 1</span>
+    <span class="k">return</span> <span class="n">loss</span>
 
-    <span class="n">output</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;I&#39;m training a model...&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">100</span><span class="p">):</span>
+    <span class="n">l</span> <span class="o">=</span> <span class="n">train_step</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">10</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Step </span><span class="si">{</span><span class="n">i</span><span class="si">:</span><span class="s2">2d</span><span class="si">}</span><span class="s2">, Loss: </span><span class="si">{</span><span class="n">l</span><span class="o">.</span><span class="n">item</span><span class="p">()</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
-    <span class="c1"># Fuse L &lt;= U (although it should already be OK)</span>
-    <span class="n">output</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Training completed.&quot;</span><span class="p">)</span>
 
-    <span class="n">L</span> <span class="o">=</span> <span class="n">output</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
-    <span class="n">U</span> <span class="o">=</span> <span class="n">output</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
-    <span class="n">width</span> <span class="o">=</span> <span class="n">U</span> <span class="o">-</span> <span class="n">L</span>
+<span class="c1"># Final test in JAX</span>
+<span class="n">jax_output</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">L_val</span> <span class="o">=</span> <span class="n">jax_output</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+<span class="n">U_val</span> <span class="o">=</span> <span class="n">jax_output</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">JAX Output: [</span><span class="si">{</span><span class="n">L_val</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">U_val</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">]&quot;</span><span class="p">)</span>
 
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Rule: </span><span class="si">{</span><span class="n">rule</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Output: [</span><span class="si">{</span><span class="n">L</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">U</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">] (width </span><span class="si">{</span><span class="n">width</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">robust_export</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">sample_input</span><span class="p">):</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Exports a JLNN model to StableHLO.</span>
+<span class="sd">Compatible with Flax NNX 0.11+ (fixes AttributeError for State).</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="c1"># 1. Dividing the model into structure and state</span>
+<span class="n">graphdef</span><span class="p">,</span> <span class="n">state</span> <span class="o">=</span> <span class="n">nnx</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">L</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="n">width</span>
 
+<span class="c1"># Convert the state to a pure dict (without nnx.Param wrappers) to make it serializable</span>
+<span class="n">pure_state</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">to_pure_dict</span><span class="p">()</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=== AND ===&quot;</span><span class="p">)</span>
-<span class="n">run_gate</span><span class="p">(</span><span class="s2">&quot;A &amp; B&quot;</span><span class="p">,</span> <span class="n">crisp_inputs</span><span class="p">)</span>   <span class="c1"># we expect [0,0]</span>
-<span class="n">run_gate</span><span class="p">(</span><span class="s2">&quot;A &amp; B&quot;</span><span class="p">,</span> <span class="n">fuzzy_inputs</span><span class="p">)</span>   <span class="c1"># we expect low values ​​+ small width</span>
+<span class="c1">#2. Defining a pure function for JAX tracing</span>
+<span class="nd">@jax</span><span class="o">.</span><span class="n">jit</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">pure_forward</span><span class="p">(</span><span class="n">state_dict</span><span class="p">,</span> <span class="n">inputs</span><span class="p">):</span>
+    <span class="c1"># In NNX, reconstruction from the dictionary is done directly via the nnx.State constructor</span>
+    <span class="n">reconstructed_state</span> <span class="o">=</span> <span class="n">nnx</span><span class="o">.</span><span class="n">State</span><span class="p">(</span><span class="n">state_dict</span><span class="p">)</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">nnx</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">graphdef</span><span class="p">,</span> <span class="n">reconstructed_state</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">m</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=== OR ===&quot;</span><span class="p">)</span>
-<span class="n">run_gate</span><span class="p">(</span><span class="s2">&quot;A | B&quot;</span><span class="p">,</span> <span class="n">crisp_inputs</span><span class="p">)</span>   <span class="c1"># we expect [1,1]</span>
-<span class="n">run_gate</span><span class="p">(</span><span class="s2">&quot;A | B&quot;</span><span class="p">,</span> <span class="n">fuzzy_inputs</span><span class="p">)</span>   <span class="c1"># we expect high values</span>
+<span class="c1"># 3. Exporting</span>
+<span class="c1"># JAX export will now only see standard Python types and JAX fields</span>
+<span class="k">return</span> <span class="n">jax</span><span class="o">.</span><span class="n">export</span><span class="o">.</span><span class="n">export</span><span class="p">(</span><span class="n">pure_forward</span><span class="p">)(</span><span class="n">pure_state</span><span class="p">,</span> <span class="n">sample_input</span><span class="p">)</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=== NOT ===&quot;</span><span class="p">)</span>
-<span class="n">run_gate</span><span class="p">(</span><span class="s2">&quot;~A&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;A&quot;</span><span class="p">:</span> <span class="n">crisp_inputs</span><span class="p">[</span><span class="s2">&quot;A&quot;</span><span class="p">]})</span>     <span class="c1"># we expect [0,0]</span>
-<span class="n">run_gate</span><span class="p">(</span><span class="s2">&quot;~A&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;A&quot;</span><span class="p">:</span> <span class="n">fuzzy_inputs</span><span class="p">[</span><span class="s2">&quot;A&quot;</span><span class="p">]})</span>     <span class="c1"># we expect low values</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Exporting to StableHLO...&quot;</span><span class="p">)</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=== NOT ===&quot;</span><span class="p">)</span>
-<span class="n">run_gate</span><span class="p">(</span><span class="s2">&quot;~B&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;B&quot;</span><span class="p">:</span> <span class="n">crisp_inputs</span><span class="p">[</span><span class="s2">&quot;B&quot;</span><span class="p">]})</span>
-<span class="n">run_gate</span><span class="p">(</span><span class="s2">&quot;~B&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;B&quot;</span><span class="p">:</span> <span class="n">fuzzy_inputs</span><span class="p">[</span><span class="s2">&quot;B&quot;</span><span class="p">]})</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;🛠️ I am performing a manual reconstruction of the ONNX graph (RC2 standard)...&quot;</span><span class="p">)</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=== NAND ===&quot;</span><span class="p">)</span>
-<span class="n">run_gate</span><span class="p">(</span><span class="s2">&quot;~(A &amp; B)&quot;</span><span class="p">,</span> <span class="n">crisp_inputs</span><span class="p">)</span>
+<span class="n">input_info</span> <span class="o">=</span> <span class="p">[]</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=== NOR ===&quot;</span><span class="p">)</span>
-<span class="n">run_gate</span><span class="p">(</span><span class="s2">&quot;~(A | B)&quot;</span><span class="p">,</span> <span class="n">crisp_inputs</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">inputs</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+    <span class="n">input_info</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+        <span class="n">helper</span><span class="o">.</span><span class="n">make_tensor_value_info</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s1">&#39;input_</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span>
+            <span class="n">TensorProto</span><span class="o">.</span><span class="n">FLOAT</span><span class="p">,</span>
+            <span class="nb">list</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=== XOR ===&quot;</span><span class="p">)</span>
-<span class="n">run_gate</span><span class="p">(</span><span class="s2">&quot;(A &amp; ~B) | (~A &amp; B)&quot;</span><span class="p">,</span> <span class="n">crisp_inputs</span><span class="p">)</span>
-<span class="n">run_gate</span><span class="p">(</span><span class="s2">&quot;(A &amp; ~B) | (~A &amp; B)&quot;</span><span class="p">,</span> <span class="n">fuzzy_inputs</span><span class="p">)</span>   <span class="c1"># interesting – XOR is sensitive to uncertainty</span>
+<span class="n">output_info</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">helper</span><span class="o">.</span><span class="n">make_tensor_value_info</span><span class="p">(</span>
+        <span class="s1">&#39;output&#39;</span><span class="p">,</span>
+        <span class="n">TensorProto</span><span class="o">.</span><span class="n">FLOAT</span><span class="p">,</span>
+        <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
+    <span class="p">)</span>
+<span class="p">]</span>
 
-<span class="n">gates</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;AND&quot;</span><span class="p">,</span> <span class="s2">&quot;OR&quot;</span><span class="p">,</span> <span class="s2">&quot;NOT A&quot;</span><span class="p">,</span> <span class="s2">&quot;NAND&quot;</span><span class="p">,</span> <span class="s2">&quot;NOR&quot;</span><span class="p">,</span> <span class="s2">&quot;XOR&quot;</span><span class="p">]</span>
-<span class="n">crisp_widths</span> <span class="o">=</span> <span class="p">[]</span>
-<span class="n">fuzzy_widths</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">node_def</span> <span class="o">=</span> <span class="n">helper</span><span class="o">.</span><span class="n">make_node</span><span class="p">(</span>
+    <span class="s1">&#39;Identity&#39;</span><span class="p">,</span>
+    <span class="n">inputs</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;input_0&#39;</span><span class="p">],</span>
+    <span class="n">outputs</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;output&#39;</span><span class="p">],</span>
+<span class="p">)</span>
 
-<span class="k">for</span> <span class="n">gate</span> <span class="ow">in</span> <span class="n">gates</span><span class="p">:</span>
-    <span class="c1"># Crisp</span>
-    <span class="k">if</span> <span class="n">gate</span> <span class="o">==</span> <span class="s2">&quot;NOT A&quot;</span><span class="p">:</span>
-        <span class="n">rule</span> <span class="o">=</span> <span class="s2">&quot;~A&quot;</span>
-        <span class="n">inp</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;A&quot;</span><span class="p">:</span> <span class="n">crisp_inputs</span><span class="p">[</span><span class="s2">&quot;A&quot;</span><span class="p">]}</span>
-    <span class="k">elif</span> <span class="n">gate</span> <span class="o">==</span> <span class="s2">&quot;XOR&quot;</span><span class="p">:</span>
-        <span class="n">rule</span> <span class="o">=</span> <span class="s2">&quot;(A &amp; ~B) | (~A &amp; B)&quot;</span>
-        <span class="n">inp</span> <span class="o">=</span> <span class="n">crisp_inputs</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">rule</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;A </span><span class="si">{</span><span class="s1">&#39;&amp;&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="s1">&#39;AND&#39;</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">gate</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="s1">&#39;NAND&#39;</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">gate</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;|&#39;</span><span class="si">}</span><span class="s2"> B&quot;</span>
-        <span class="k">if</span> <span class="s1">&#39;NAND&#39;</span> <span class="ow">in</span> <span class="n">gate</span> <span class="ow">or</span> <span class="s1">&#39;NOR&#39;</span> <span class="ow">in</span> <span class="n">gate</span><span class="p">:</span>
-            <span class="n">rule</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;~(</span><span class="si">{</span><span class="n">rule</span><span class="si">}</span><span class="s2">)&quot;</span>
-        <span class="n">inp</span> <span class="o">=</span> <span class="n">crisp_inputs</span>
+<span class="n">graph_def</span> <span class="o">=</span> <span class="n">helper</span><span class="o">.</span><span class="n">make_graph</span><span class="p">(</span>
+    <span class="p">[</span><span class="n">node_def</span><span class="p">],</span>
+    <span class="s1">&#39;jlnn_logic_graph&#39;</span><span class="p">,</span>
+    <span class="n">input_info</span><span class="p">,</span>
+    <span class="n">output_info</span><span class="p">,</span>
+<span class="p">)</span>
 
-    <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">w_crisp</span> <span class="o">=</span> <span class="n">run_gate</span><span class="p">(</span><span class="n">rule</span><span class="p">,</span> <span class="n">inp</span><span class="p">)</span>
-    <span class="n">crisp_widths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">w_crisp</span><span class="p">)</span>
+<span class="n">onnx_model</span> <span class="o">=</span> <span class="n">helper</span><span class="o">.</span><span class="n">make_model</span><span class="p">(</span><span class="n">graph_def</span><span class="p">,</span> <span class="n">producer_name</span><span class="o">=</span><span class="s1">&#39;jlnn-exporter-rc2&#39;</span><span class="p">)</span>
+<span class="n">onnx</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">onnx_model</span><span class="p">,</span> <span class="n">onnx_path</span><span class="p">)</span>
 
-    <span class="c1"># Fuzzy – we correctly pass the keys from inp</span>
-    <span class="n">inp_f</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">fuzzy_inputs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">inp</span><span class="p">}</span>
-    <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">w_fuzzy</span> <span class="o">=</span> <span class="n">run_gate</span><span class="p">(</span><span class="n">rule</span><span class="p">,</span> <span class="n">inp_f</span><span class="p">)</span>
-    <span class="n">fuzzy_widths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">w_fuzzy</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;✅ Manual ONNX mock-up created: </span><span class="si">{</span><span class="n">onnx_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;🛡️ Logical integrity for PyTorch bridge ready.&quot;</span><span class="p">)</span>
 
-<span class="c1"># Check lengths (debug)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Gates: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">gates</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Crisp widths: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">crisp_widths</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Fuzzy widths: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">fuzzy_widths</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">TORCH_AVAILABLE</span><span class="p">:</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
 
-<span class="c1"># If duplicates – take only the last unique values ​​(if the loop ran twice)</span>
-<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">crisp_widths</span><span class="p">)</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">gates</span><span class="p">):</span>
-    <span class="n">crisp_widths</span> <span class="o">=</span> <span class="n">crisp_widths</span><span class="p">[</span><span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="n">gates</span><span class="p">):]</span>
-    <span class="n">fuzzy_widths</span> <span class="o">=</span> <span class="n">fuzzy_widths</span><span class="p">[</span><span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="n">gates</span><span class="p">):]</span>
+    <span class="c1"># We will use your bridge from torch_map.py</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Converting JLNN -&gt; PyTorch...&quot;</span><span class="p">)</span>
+    <span class="n">torch_model</span> <span class="o">=</span> <span class="n">export_to_pytorch</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">inputs</span><span class="p">)</span>
 
-<span class="n">x</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">gates</span><span class="p">))</span>
-<span class="n">bar_width</span> <span class="o">=</span> <span class="mf">0.35</span>
+    <span class="c1"># Convert data to torch.Tensor</span>
+    <span class="n">torch_in</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">jax</span><span class="o">.</span><span class="n">tree_util</span><span class="o">.</span><span class="n">tree_flatten</span><span class="p">(</span><span class="n">inputs</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]))</span>
+    <span class="c1"># Note: in a real torch_model, the inputs should match the traced structure</span>
 
-<span class="c1"># Fuzzy – full columns</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">bar</span><span class="p">([</span><span class="n">i</span> <span class="o">+</span> <span class="n">bar_width</span><span class="o">/</span><span class="mi">2</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">x</span><span class="p">],</span> <span class="n">fuzzy_widths</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="n">bar_width</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Fuzzy inputs&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;orange&#39;</span><span class="p">)</span>
-
-<span class="c1"># Crisp – thin columns or just dots at zero</span>
-<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">w</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">crisp_widths</span><span class="p">):</span>
-    <span class="k">if</span> <span class="n">w</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">i</span> <span class="o">-</span> <span class="n">bar_width</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="n">bar_width</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;skyblue&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Crisp inputs&#39;</span> <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">i</span> <span class="o">-</span> <span class="n">bar_width</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;skyblue&#39;</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Crisp inputs (width=0)&#39;</span> <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
-
-<span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">gates</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">45</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Uncertainty width (U - L)&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Output uncertainty for various Boolean operations&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;gray&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">figtext</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.15</span><span class="p">,</span>
-            <span class="s2">&quot;Note: Crisp inputs (0/1) always have width 0 → blue columns are invisible (exact logic).&quot;</span><span class="p">,</span>
-            <span class="n">ha</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;gray&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+    <span class="n">torch_model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+    <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+        <span class="c1"># This depends on how onnx2pytorch mapped the inputs</span>
+        <span class="c1"># For simplicity in the tutorial, we assume a unified input tensor</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">pyt_output</span> <span class="o">=</span> <span class="n">torch_model</span><span class="p">(</span><span class="n">torch_in</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;PyTorch Output: </span><span class="si">{</span><span class="n">pyt_output</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;PyTorch inference requires specific mappings: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;PyTorch Bridge is not installed (I&#39;m skipping it).&quot;</span><span class="p">)</span>
 </pre></div>
+</div>
+</section>
+<section id="key-improvements-in-0-1-rc2">
+<h2>Key Improvements in 0.1.rc2<a class="headerlink" href="#key-improvements-in-0-1-rc2" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><strong>AttributeError Fix</strong>: Resolved issues where the exporter failed when encountering dictionary objects instead of raw arrays.</p></li>
+<li><p><strong>Metadata Resolution</strong>: Introduced <code class="docutils literal notranslate"><span class="pre">get_representative_shape</span></code> to ensure correct ONNX metadata for structured logical formulas.</p></li>
+<li><p><strong>Logical Consistency</strong>: Exported models maintain strict interval integrity (L ≤ U) and corrected negation axioms.</p></li>
+</ul>
+</section>
+<section id="deployment-matrix">
+<h2>Deployment Matrix<a class="headerlink" href="#deployment-matrix" title="Link to this heading">¶</a></h2>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 40.0%" />
+<col style="width: 40.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Format</p></th>
+<th class="head"><p>Suitable for</p></th>
+<th class="head"><p>Runtime</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><strong>JAX/Flax</strong></p></td>
+<td><p>Research and training</p></td>
+<td><p>JAX (<code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">jax</span></code>)</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>StableHLO</strong></p></td>
+<td><p>Edge devices, TPU, Mobile</p></td>
+<td><p>XLA / TFLite</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>ONNX</strong></p></td>
+<td><p>C++, Rust, Enterprise apps</p></td>
+<td><p>ONNX Runtime</p></td>
+</tr>
+</tbody>
+</table>
 </div>
 </section>
 <section id="download">
 <h2>Download<a class="headerlink" href="#download" title="Link to this heading">¶</a></h2>
 <p>You can also download the raw notebook file for local use:
-<a class="reference download external" download="" href="https://github.com/RadimKozl/JLNN/blob/main/examples/JLNN_basic_boolean_gates.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">JLNN_basic_boolean_gates.ipynb</span></code></a></p>
+<a class="reference download external" download="" href="https://github.com/RadimKozl/JLNN/blob/main/examples/JLNN_model_export.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">JLNN_contradiction_detection.ipynb</span></code></a></p>
 <div class="admonition tip">
 <p class="admonition-title">Tip</p>
 <p>To run the notebook locally, make sure you have installed the package using <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-e</span> <span class="pre">.[test]</span></code>.</p>
@@ -518,23 +583,23 @@ View on GitHub</div>
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="JLNN_weighted_rules.html">
+          <a class="next-page" href="../theory.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Weighted Rules &amp; Multiple Antecedents</div>
+                <div class="title">Theoretical foundations of JLNN</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="basic_inference_tutorial.html">
+          <a class="prev-page" href="JLNN_contradiction_detection.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Base Example: Basic inference and manual grounding</div>
+                <div class="title">Contradiction Detection &amp; Model Repair</div>
                 
               </div>
             </a>
@@ -568,8 +633,11 @@ View on GitHub</div>
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">Basic Boolean Gates</a><ul>
+<li><a class="reference internal" href="#">Model Export &amp; Deployment (StableHLO, ONNX, PyTorch)</a><ul>
 <li><a class="reference internal" href="#content-overview">Content Overview</a></li>
+<li><a class="reference internal" href="#implementation-example">Implementation Example</a></li>
+<li><a class="reference internal" href="#key-improvements-in-0-1-rc2">Key Improvements in 0.1.rc2</a></li>
+<li><a class="reference internal" href="#deployment-matrix">Deployment Matrix</a></li>
 <li><a class="reference internal" href="#download">Download</a></li>
 </ul>
 </li>

@@ -30,8 +30,8 @@ This Release Candidate brings a major fix to the export pipeline and refines the
 
 * **AttributeError in Export:** Resolved the critical error where the exporter attempted to call `.shape` on dictionary objects.
 * **AttributeError in Visualization:** Fixed key handling for fuzzy inputs within visualization loops.
-* **Crisp Negation Logic:** Fixed incorrect output values for crisp negation (e.g., ∼0→[1,1] and ∼1→[0,0]).
-* **Uncertainty Preservation:** Negation now correctly preserves uncertainty widths in fuzzy inputs (e.g., [0.95,1.0]→[0.0,0.05]).
+* **Crisp Negation Logic:** Fixed incorrect output values for crisp negation (e.g., :math:`\sim 0 \rightarrow [1,1]` and :math:`\sim 1 \rightarrow [0,0]`).
+* **Uncertainty Preservation:** Negation now correctly transfers uncertainty widths in fuzzy inputs (e.g., :math:`[0.95, 1.0] \rightarrow [0.0, 0.05]`).
 
 
 [0.1.rc1] - 2026-02-10

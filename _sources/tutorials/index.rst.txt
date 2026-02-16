@@ -11,3 +11,4 @@ Examples & Tutorials
    JLNN_weighted_rules
    JLNN_temporal_logic
    JLNN_contradiction_detection
+   JLNN_model_export
