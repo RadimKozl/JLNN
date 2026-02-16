@@ -6,7 +6,7 @@ sys.path.insert(0, os.path.abspath('../../'))
 project = 'JLNN'
 copyright = '2026, Ing. Radim Közl'
 author = 'Ing. Radim Közl'
-release = '0.1.rc1'
+release = '0.1.rc2'
 
 extensions = [
     'sphinx.ext.autodoc',       # For automatic generation from docstrings
