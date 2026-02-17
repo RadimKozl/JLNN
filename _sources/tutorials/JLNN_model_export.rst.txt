@@ -249,7 +249,7 @@ Download
 ---------
 
 You can also download the raw notebook file for local use:
-:download:`JLNN_contradiction_detection.ipynb <https://github.com/RadimKozl/JLNN/blob/main/examples/JLNN_model_export.ipynb>`
+:download:`JLNN_model_export.ipynb <https://github.com/RadimKozl/JLNN/blob/main/examples/JLNN_model_export.ipynb>`
 
 .. tip::
    To run the notebook locally, make sure you have installed the package using ``pip install -e .[test]``.
