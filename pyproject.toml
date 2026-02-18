@@ -60,6 +60,7 @@ extra = [
     "pyarrow>=23.0.0",
     "polars>=1.37.1",
     "scipy>=1.17.0",
+    "scikit-learn>=1.8.0",
     "sympy>=1.14.0",
 ]
 
