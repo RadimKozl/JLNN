@@ -6,13 +6,13 @@ This tutorial demonstrates how to build a **Self-Reflective System** using JLNN.
 .. grid:: 2
 
     .. grid-item-card::  Run in Google Colab
-       :link: https://colab.research.google.com/github/RadimKozl/JLNN/blob/main/examples/JLNN_xarray_meta-learning.ipynb
+       :link: https://colab.research.google.com/github/RadimKozl/JLNN/blob/main/examples/JLNN_xarray_meta_learning.ipynb
        :link-type: url
 
        Execute the code directly in your browser without any local setup.
 
     .. grid-item-card::  View on GitHub
-       :link: https://github.com/RadimKozl/JLNN/blob/main/examples/JLNN_xarray_meta-learning.ipynb
+       :link: https://github.com/RadimKozl/JLNN/blob/main/examples/JLNN_xarray_meta_learning.ipynb
        :link-type: url
 
        Browse the source code and outputs in the GitHub notebook viewer.
@@ -266,7 +266,7 @@ In most neural networks, the training process is a "black box," but JLNN allows 
 as structured data that can be analyzed by other models.
 
 You can also download the raw notebook file for local use:
-:download:`JLNN_basic_boolean_gates.ipynb <https://github.com/RadimKozl/JLNN/blob/main/examples/JLNN_xarray_meta-learning.ipynb>`
+:download:`JLNN_basic_boolean_gates.ipynb <https://github.com/RadimKozl/JLNN/blob/main/examples/JLNN_xarray_meta_learning.ipynb>`
 
 .. tip::
    To run the notebook locally, make sure you have installed the package using ``pip install -e .[test]``.
