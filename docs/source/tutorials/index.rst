@@ -14,3 +14,4 @@ Examples & Tutorials
    JLNN_model_export
    JLNN_real_world_data_iris
    JLNN_xarray_meta_learning
+   JLNN_grand_cycle_optuna
