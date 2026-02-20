@@ -266,7 +266,7 @@ In most neural networks, the training process is a "black box," but JLNN allows 
 as structured data that can be analyzed by other models.
 
 You can also download the raw notebook file for local use:
-:download:`JLNN_basic_boolean_gates.ipynb <https://github.com/RadimKozl/JLNN/blob/main/examples/JLNN_xarray_meta_learning.ipynb>`
+:download:`JLNN_xarray_meta_learning.ipynb <https://github.com/RadimKozl/JLNN/blob/main/examples/JLNN_xarray_meta_learning.ipynb>`
 
 .. tip::
    To run the notebook locally, make sure you have installed the package using ``pip install -e .[test]``.
