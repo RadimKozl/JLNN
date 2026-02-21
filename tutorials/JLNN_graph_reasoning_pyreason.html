@@ -1,0 +1,890 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="next" title="Theoretical foundations of JLNN" href="../theory.html"><link rel="prev" title="The Grand Cycle: Autonomous Tuning" href="JLNN_grand_cycle_optuna.html">
+
+    <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
+        <title>Differentiable Reasoning on Graphs (JLNN vs. PyReason) - JLNN 0.1.rc2 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../index.html"><div class="brand">JLNN 0.1.rc2 documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
+  
+  <span class="sidebar-brand-text">JLNN 0.1.rc2 documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">User Guide:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quickstart</a></li>
+<li class="toctree-l1 current has-children"><a class="reference internal" href="index.html">Examples &amp; Tutorials</a><input aria-label="Toggle navigation of Examples &amp; Tutorials" checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="introduction_tutorial.html">Introductory Example: JLNN Base</a></li>
+<li class="toctree-l2"><a class="reference internal" href="basic_inference_tutorial.html">Base Example: Basic inference and manual grounding</a></li>
+<li class="toctree-l2"><a class="reference internal" href="JLNN_basic_boolean_gates.html">Basic Boolean Gates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="JLNN_weighted_rules.html">Weighted Rules &amp; Multiple Antecedents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="JLNN_temporal_logic.html">Temporal Logic (G, F, X) on Time-Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="JLNN_contradiction_detection.html">Contradiction Detection &amp; Model Repair</a></li>
+<li class="toctree-l2"><a class="reference internal" href="JLNN_model_export.html">Model Export &amp; Deployment (StableHLO, ONNX, PyTorch)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="JLNN_real_world_data_iris.html">Real Example: Iris dataset Classification</a></li>
+<li class="toctree-l2"><a class="reference internal" href="JLNN_xarray_meta_learning.html">Meta-Learning &amp; Self-Reflection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="JLNN_grand_cycle_optuna.html">The Grand Cycle: Autonomous Tuning</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Differentiable Reasoning on Graphs (JLNN vs. PyReason)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../theory.html">Theoretical foundations of JLNN</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../testing.html">Testing</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../modules/core/index.html">Core Logic Engine (jlnn.core)</a><input aria-label="Toggle navigation of Core Logic Engine (jlnn.core)" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../modules/core/activations.html">Activation Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules/core/intervals.html">Interval Arithmetic</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules/core/logic.html">Logical Kernels</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../modules/export/index.html">Model Export &amp; Deployment (jlnn.export)</a><input aria-label="Toggle navigation of Model Export &amp; Deployment (jlnn.export)" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../modules/export/data.html">Metadata &amp; State Export</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules/export/onnx.html">ONNX Export</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules/export/stablehlo.html">StableHLO Integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules/export/torch_map.html">PyTorch Mapping</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../modules/nn/index.html">Neural Network Components (jlnn.nn)</a><input aria-label="Toggle navigation of Neural Network Components (jlnn.nn)" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../modules/nn/base.html">Base Logical Elements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules/nn/constraints.html">Parameter Constraints</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules/nn/functional.html">Functional Logic Kernels</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules/nn/gates.html">Logical Gates (Stateful)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules/nn/predicates.html">Learned Predicates</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../modules/reasoning/index.html">Reasoning &amp; Inference Engine (jlnn.reasoning)</a><input aria-label="Toggle navigation of Reasoning &amp; Inference Engine (jlnn.reasoning)" class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../modules/reasoning/engine.html">JAX Execution Engine</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules/reasoning/inspector.html">Reasoning Inspector &amp; Audit</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules/reasoning/temporal.html">Temporal Logic Operators</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../modules/storage/index.html">Model Storage &amp; Persistence (jlnn.storage)</a><input aria-label="Toggle navigation of Model Storage &amp; Persistence (jlnn.storage)" class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../modules/storage/checkpoints.html">Model Checkpoints</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules/storage/metadata.html">Model Metadata</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../modules/symbolic/index.html">Symbolic Front-end (jlnn.symbolic)</a><input aria-label="Toggle navigation of Symbolic Front-end (jlnn.symbolic)" class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" role="switch" type="checkbox"/><label for="toctree-checkbox-7"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../modules/symbolic/parser.html">Formula Parser</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules/symbolic/compiler.html">JLNN Compiler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules/symbolic/graph.html">Graph &amp; NetworkX Integration</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../modules/training/index.html">Training &amp; Optimization (jlnn.training)</a><input aria-label="Toggle navigation of Training &amp; Optimization (jlnn.training)" class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" role="switch" type="checkbox"/><label for="toctree-checkbox-8"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../modules/training/losses.html">Logical Loss Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules/training/optimizers.html">Projected Optimizers</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../modules/utils/index.html">Utilities &amp; Visualization (jlnn.utils)</a><input aria-label="Toggle navigation of Utilities &amp; Visualization (jlnn.utils)" class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" role="switch" type="checkbox"/><label for="toctree-checkbox-9"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../modules/utils/helpers.html">Helper Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules/utils/metrics.html">Logical Metrics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules/utils/visualize.html">Visualization Tools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules/utils/xarray_utils.html">Xarray Integration</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">About the Project:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing to JLNN</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="../_sources/tutorials/JLNN_graph_reasoning_pyreason.rst.txt" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="differentiable-reasoning-on-graphs-jlnn-vs-pyreason">
+<h1>Differentiable Reasoning on Graphs (JLNN vs. PyReason)<a class="headerlink" href="#differentiable-reasoning-on-graphs-jlnn-vs-pyreason" title="Link to this heading">¶</a></h1>
+<p>This tutorial demonstrates how to use <strong>JLNN</strong> (Logical Neural Networks in JAX) for logical reasoning over graph data as a modern, educational alternative to tools like PyReason.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The interactive notebook is hosted externally to ensure the best viewing experience
+and to allow immediate execution in the cloud.</p>
+</div>
+<div class="sd-container-fluid sd-sphinx-override sd-mb-4 docutils">
+<div class="sd-row sd-row-cols-2 sd-row-cols-xs-2 sd-row-cols-sm-2 sd-row-cols-md-2 sd-row-cols-lg-2 docutils">
+<div class="sd-col sd-d-flex-row docutils">
+<div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-sm sd-card-hover docutils">
+<div class="sd-card-body docutils">
+<div class="sd-card-title sd-font-weight-bold docutils">
+Run in Google Colab</div>
+<p class="sd-card-text">Execute the code directly in your browser without any local setup.</p>
+</div>
+<a class="sd-stretched-link sd-hide-link-text reference external" href="https://colab.research.google.com/github/RadimKozl/JLNN/blob/main/examples/JLNN_graph_reasoning_pyreason.ipynb"><span>https://colab.research.google.com/github/RadimKozl/JLNN/blob/main/examples/JLNN_graph_reasoning_pyreason.ipynb</span></a></div>
+</div>
+<div class="sd-col sd-d-flex-row docutils">
+<div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-sm sd-card-hover docutils">
+<div class="sd-card-body docutils">
+<div class="sd-card-title sd-font-weight-bold docutils">
+View on GitHub</div>
+<p class="sd-card-text">View source code and outputs in the GitHub notebook browser.</p>
+</div>
+<a class="sd-stretched-link sd-hide-link-text reference external" href="https://github.com/RadimKozl/JLNN/blob/main/examples/JLNN_graph_reasoning_pyreason.ipynb"><span>https://github.com/RadimKozl/JLNN/blob/main/examples/JLNN_graph_reasoning_pyreason.ipynb</span></a></div>
+</div>
+</div>
+</div>
+<section id="key-concepts">
+<h2>🌟 Key concepts<a class="headerlink" href="#key-concepts" title="Link to this heading">¶</a></h2>
+<p>While traditional systems (e.g. PyReason) work with fixed rules and fixed thresholds, JLNN delivers:</p>
+<ul class="simple">
+<li><p><strong>Rule Weight Learning</strong>: The model automatically optimizes the weight of “social influence” versus “own attributes” based on the data.</p></li>
+<li><p><strong>Semantic Grounding</strong>: Allows learning of fuzzy boundaries using trainable parameters (e.g. a sigmoidal function determining what exactly defines a “cool car”).</p></li>
+<li><p><strong>End-to-end training</strong>: The entire chain of reasoning is fully differentiable through graph operations thanks to the JAX and Flax frameworks.</p></li>
+</ul>
+</section>
+<section id="model-architecture">
+<h2>🛠️ Model architecture<a class="headerlink" href="#model-architecture" title="Link to this heading">¶</a></h2>
+<p>The model solves the spread of “popularity” in a social network using two chained rules:</p>
+<section id="local-rule-node-attributes">
+<h3>1. Local rule (Node attributes)<a class="headerlink" href="#local-rule-node-attributes" title="Link to this heading">¶</a></h3>
+<p>It defines the local trendiness of a node based on its direct properties:</p>
+<div class="math-wrapper docutils container">
+<div class="math notranslate nohighlight">
+\[0.92 :: (has\_cool\_pet \land has\_cool\_car) \to is\_trendy\_local\]</div>
+</div>
+</section>
+<section id="social-rule-graphic-reasoning">
+<h3>2. Social Rule (Graphic Reasoning)<a class="headerlink" href="#social-rule-graphic-reasoning" title="Link to this heading">¶</a></h3>
+<p>It defines the resulting social popularity by combining the influence of neighbors and local status:</p>
+<div class="math-wrapper docutils container">
+<div class="math notranslate nohighlight">
+\[0.85 :: (is\_friend \land is\_trendy\_local) \to is\_trendy\_social\]</div>
+</div>
+</section>
+</section>
+<section id="implementation-details">
+<h2>💻 Implementation details<a class="headerlink" href="#implementation-details" title="Link to this heading">¶</a></h2>
+<section id="working-with-intervals-in-jax">
+<h3>Working with intervals in JAX<a class="headerlink" href="#working-with-intervals-in-jax" title="Link to this heading">¶</a></h3>
+<p>JLNN represents truth as intervals <span class="math notranslate nohighlight">\([L, U]\)</span> (Lower, Upper bound).</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Propagation of truth intervals over the adjacency matrix (adj)</span>
+<span class="c1"># Result is the average truth around the node</span>
+<span class="n">friend_influence</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">adj</span><span class="p">,</span> <span class="n">local_trendy_interval</span><span class="p">)</span> <span class="o">/</span> <span class="n">jnp</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">adj</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="symbol-initialization">
+<h3>Symbol initialization<a class="headerlink" href="#symbol-initialization" title="Link to this heading">¶</a></h3>
+<p>When calling <code class="docutils literal notranslate"><span class="pre">LNNFormula</span></code>, the input dictionary <code class="docutils literal notranslate"><span class="pre">inputs</span></code> must contain all symbols. For predicates that are results (consequents), we initialize the state “unknown” <span class="math notranslate nohighlight">\([0, 1]\)</span>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">inputs</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;has_cool_pet&quot;</span><span class="p">:</span> <span class="n">pet_data</span><span class="p">,</span>    <span class="c1"># Pozorovaná data (vstupy)</span>
+    <span class="s2">&quot;is_trendy_local&quot;</span><span class="p">:</span> <span class="n">unknown</span><span class="p">,</span>  <span class="c1"># Cíl výpočtu (inicializováno na [0.0, 1.0])</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="training-and-results">
+<h2>📈 Training and results<a class="headerlink" href="#training-and-results" title="Link to this heading">¶</a></h2>
+<p>The model uses <code class="docutils literal notranslate"><span class="pre">total_lnn_loss</span></code>, which penalizes:</p>
+<ol class="arabic simple">
+<li><p><strong>Logical contradictions</strong>: For example, a situation where the lower limit exceeds the upper limit (<span class="math notranslate nohighlight">\(L &gt; U\)</span>).</p></li>
+<li><p><strong>Prediction Error</strong>: Euclidean distance between the predicted interval and the target value.</p></li>
+</ol>
+<p><strong>Tutorial Outputs:</strong></p>
+<ul class="simple">
+<li><p><strong>Visual graph map</strong>: Color coding of nodes corresponding to learned logical truth.</p></li>
+<li><p><strong>Optimized Parameters</strong>: The model after training contains specific learned thresholds for interpreting the input data.</p></li>
+</ul>
+<section id="example">
+<h3>Example<a class="headerlink" href="#example" title="Link to this heading">¶</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">try:</span>
+<span class="sd">    import jlnn</span>
+<span class="sd">    from flax import nnx</span>
+<span class="sd">    import jax.numpy as jnp</span>
+<span class="sd">    import xarray as xr</span>
+<span class="sd">    import pandas as pd</span>
+<span class="sd">    import optuna</span>
+<span class="sd">    import matplotlib.pyplot as plt</span>
+<span class="sd">    import sklearn</span>
+<span class="sd">    print(&quot;✅ JLNN and JAX are ready.&quot;)</span>
+<span class="sd">except ImportError:</span>
+<span class="sd">    print(&quot;🚀 Installing JLNN from GitHub and fixing JAX for Colab...&quot;)</span>
+<span class="sd">    # Instalace frameworku</span>
+<span class="sd">    #!pip install jax-lnn --quiet</span>
+<span class="sd">    !pip install git+https://github.com/RadimKozl/JLNN.git --quiet</span>
+<span class="sd">    !pip install optuna optuna-dashboard pandas scikit-learn matplotlib</span>
+<span class="sd">    # Fix JAX/CUDA compatibility for 2026 in Colab</span>
+<span class="sd">    !pip install --upgrade &quot;jax[cuda12_pip]&quot; -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html</span>
+<span class="sd">    !pip install  scikit-learn pandas</span>
+
+<span class="sd">    import os</span>
+<span class="sd">    print(&quot;\n🔄 RESTARTING ENVIRONMENT... Please wait a second and then run the cell again.&quot;)</span>
+<span class="sd">    os.kill(os.getpid(), 9)</span>
+<span class="sd">    os.kill(os.getpid(), 9) # After this line, the cell stops and the environment restarts</span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">jax</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">jax.numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">jnp</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flax</span><span class="w"> </span><span class="kn">import</span> <span class="n">nnx</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">optax</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">networkx</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">nx</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">jlnn.symbolic.compiler</span><span class="w"> </span><span class="kn">import</span> <span class="n">LNNFormula</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">jlnn.training.losses</span><span class="w"> </span><span class="kn">import</span> <span class="n">total_lnn_loss</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">optuna</span>
+<span class="n">optuna</span><span class="o">.</span><span class="n">logging</span><span class="o">.</span><span class="n">set_verbosity</span><span class="p">(</span><span class="n">optuna</span><span class="o">.</span><span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span><span class="p">)</span>   <span class="c1"># keep output clean</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.metrics</span><span class="w"> </span><span class="kn">import</span> <span class="n">accuracy_score</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;JAX Device: </span><span class="si">{</span><span class="n">jax</span><span class="o">.</span><span class="n">devices</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="n">G</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">()</span>
+
+<span class="n">people</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Alice&quot;</span><span class="p">,</span> <span class="s2">&quot;Bob&quot;</span><span class="p">,</span> <span class="s2">&quot;Charlie&quot;</span><span class="p">,</span> <span class="s2">&quot;Dana&quot;</span><span class="p">,</span> <span class="s2">&quot;Eve&quot;</span><span class="p">,</span> <span class="s2">&quot;Frank&quot;</span><span class="p">,</span> <span class="s2">&quot;Grace&quot;</span><span class="p">,</span> <span class="s2">&quot;Hank&quot;</span><span class="p">]</span>
+<span class="n">G</span><span class="o">.</span><span class="n">add_nodes_from</span><span class="p">(</span><span class="n">people</span><span class="p">)</span>
+
+<span class="n">friendships</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">(</span><span class="s2">&quot;Alice&quot;</span><span class="p">,</span> <span class="s2">&quot;Bob&quot;</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;Alice&quot;</span><span class="p">,</span> <span class="s2">&quot;Charlie&quot;</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;Bob&quot;</span><span class="p">,</span> <span class="s2">&quot;Dana&quot;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">&quot;Charlie&quot;</span><span class="p">,</span> <span class="s2">&quot;Eve&quot;</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;Dana&quot;</span><span class="p">,</span> <span class="s2">&quot;Frank&quot;</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;Eve&quot;</span><span class="p">,</span> <span class="s2">&quot;Grace&quot;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">&quot;Frank&quot;</span><span class="p">,</span> <span class="s2">&quot;Hank&quot;</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;Grace&quot;</span><span class="p">,</span> <span class="s2">&quot;Hank&quot;</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;Bob&quot;</span><span class="p">,</span> <span class="s2">&quot;Eve&quot;</span><span class="p">)</span>
+<span class="p">]</span>
+<span class="n">G</span><span class="o">.</span><span class="n">add_edges_from</span><span class="p">(</span><span class="n">friendships</span><span class="p">)</span>
+<span class="n">node_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">G</span><span class="o">.</span><span class="n">nodes</span><span class="p">())</span>
+
+<span class="n">pet_scores_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Alice&quot;</span><span class="p">:</span> <span class="mf">0.8</span><span class="p">,</span> <span class="s2">&quot;Bob&quot;</span><span class="p">:</span> <span class="mf">0.3</span><span class="p">,</span> <span class="s2">&quot;Charlie&quot;</span><span class="p">:</span> <span class="mf">0.9</span><span class="p">,</span> <span class="s2">&quot;Dana&quot;</span><span class="p">:</span> <span class="mf">0.4</span><span class="p">,</span>
+               <span class="s2">&quot;Eve&quot;</span><span class="p">:</span> <span class="mf">0.7</span><span class="p">,</span>   <span class="s2">&quot;Frank&quot;</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">,</span> <span class="s2">&quot;Grace&quot;</span><span class="p">:</span> <span class="mf">0.85</span><span class="p">,</span> <span class="s2">&quot;Hank&quot;</span><span class="p">:</span> <span class="mf">0.6</span><span class="p">}</span>
+
+<span class="n">car_scores_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Alice&quot;</span><span class="p">:</span> <span class="mf">0.6</span><span class="p">,</span> <span class="s2">&quot;Bob&quot;</span><span class="p">:</span> <span class="mf">0.9</span><span class="p">,</span> <span class="s2">&quot;Charlie&quot;</span><span class="p">:</span> <span class="mf">0.4</span><span class="p">,</span> <span class="s2">&quot;Dana&quot;</span><span class="p">:</span> <span class="mf">0.8</span><span class="p">,</span>
+               <span class="s2">&quot;Eve&quot;</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span>   <span class="s2">&quot;Frank&quot;</span><span class="p">:</span> <span class="mf">0.95</span><span class="p">,</span> <span class="s2">&quot;Grace&quot;</span><span class="p">:</span> <span class="mf">0.7</span><span class="p">,</span> <span class="s2">&quot;Hank&quot;</span><span class="p">:</span> <span class="mf">0.3</span><span class="p">}</span>
+
+<span class="n">nx</span><span class="o">.</span><span class="n">set_node_attributes</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">pet_scores_dict</span><span class="p">,</span> <span class="s2">&quot;pet_score&quot;</span><span class="p">)</span>
+<span class="n">nx</span><span class="o">.</span><span class="n">set_node_attributes</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">car_scores_dict</span><span class="p">,</span> <span class="s2">&quot;car_score&quot;</span><span class="p">)</span>
+
+<span class="n">pet_scores</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">pet_scores_dict</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">node_list</span><span class="p">])</span>
+<span class="n">car_scores</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">car_scores_dict</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">node_list</span><span class="p">])</span>
+<span class="n">adj_matrix</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">nx</span><span class="o">.</span><span class="n">to_numpy_array</span><span class="p">(</span><span class="n">G</span><span class="p">))</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+<span class="n">pos</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">spring_layout</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+<span class="n">nx</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">with_labels</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">node_color</span><span class="o">=</span><span class="s2">&quot;lightblue&quot;</span><span class="p">,</span> <span class="n">node_size</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span> <span class="n">font_weight</span><span class="o">=</span><span class="s2">&quot;bold&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Social Network: Friends + Ownership&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">TrainableFuzzy</span><span class="p">(</span><span class="n">nnx</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">init_center</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">init_steep</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">10.0</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">center</span> <span class="o">=</span> <span class="n">nnx</span><span class="o">.</span><span class="n">Param</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">init_center</span><span class="p">]))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">steep</span>  <span class="o">=</span> <span class="n">nnx</span><span class="o">.</span><span class="n">Param</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">init_steep</span><span class="p">]))</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="n">jnp</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">jnp</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">steep</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">center</span><span class="p">)))</span>
+
+<span class="n">degree</span>     <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">G</span><span class="o">.</span><span class="n">degree</span><span class="p">())</span>
+<span class="n">max_degree</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">degree</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+<span class="n">popularity</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">n</span><span class="p">:</span> <span class="n">degree</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">/</span> <span class="n">max_degree</span>
+    <span class="o">+</span> <span class="mf">0.3</span> <span class="o">*</span> <span class="n">pet_scores_dict</span><span class="p">[</span><span class="n">n</span><span class="p">]</span>
+    <span class="o">+</span> <span class="mf">0.2</span> <span class="o">*</span> <span class="n">car_scores_dict</span><span class="p">[</span><span class="n">n</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">G</span><span class="o">.</span><span class="n">nodes</span><span class="p">()</span>
+<span class="p">}</span>
+<span class="n">popularity</span> <span class="o">=</span> <span class="p">{</span><span class="n">n</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">))</span> <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">popularity</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;=&quot;</span><span class="o">*</span><span class="mi">60</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;EXPERIMENT A: Single-rule prototype&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="o">*</span><span class="mi">60</span><span class="p">)</span>
+
+<span class="n">rule_A</span> <span class="o">=</span> <span class="s2">&quot;0.92 :: (has_cool_pet &amp; has_cool_car) -&gt; is_trendy&quot;</span>
+<span class="n">logic_A</span> <span class="o">=</span> <span class="n">LNNFormula</span><span class="p">(</span><span class="n">rule_A</span><span class="p">,</span> <span class="n">rngs</span><span class="o">=</span><span class="n">nnx</span><span class="o">.</span><span class="n">Rngs</span><span class="p">(</span><span class="mi">42</span><span class="p">))</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">GraphLNN_A</span><span class="p">(</span><span class="n">nnx</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Single-rule LNN with fuzzy grounding.</span>
+
+<span class="sd">    Rule: (has_cool_pet &amp; has_cool_car) -&gt; is_trendy</span>
+
+<span class="sd">    LNNFormula always expects a dict[str, jnp.ndarray] where each value has</span>
+<span class="sd">    shape (batch, 2) representing a truth interval [lower, upper].</span>
+<span class="sd">    Passing a raw tensor causes a JAX string-indexing TypeError.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logic_model</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logic</span> <span class="o">=</span> <span class="n">logic_model</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">c_pet</span>  <span class="o">=</span> <span class="n">nnx</span><span class="o">.</span><span class="n">Param</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.5</span><span class="p">]))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">c_car</span>  <span class="o">=</span> <span class="n">nnx</span><span class="o">.</span><span class="n">Param</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.5</span><span class="p">]))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">steep</span>  <span class="o">=</span> <span class="n">nnx</span><span class="o">.</span><span class="n">Param</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">10.0</span><span class="p">]))</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pet_val</span><span class="p">,</span> <span class="n">car_val</span><span class="p">,</span> <span class="n">adj</span><span class="p">):</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">pet_val</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="c1"># Fuzzy grounding → scalar membership per node</span>
+        <span class="n">pet_f</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="n">jnp</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">jnp</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">steep</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">pet_val</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">c_pet</span><span class="p">)))</span>
+        <span class="n">car_f</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="n">jnp</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">jnp</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">steep</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">car_val</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">c_car</span><span class="p">)))</span>
+
+        <span class="c1"># Wrap scalars into [lower, upper] interval tensors of shape (n, 2).</span>
+        <span class="c1"># A small epsilon gap keeps the interval non-degenerate.</span>
+        <span class="n">pet_b</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">pet_f</span><span class="p">,</span> <span class="n">pet_f</span> <span class="o">+</span> <span class="mf">0.01</span><span class="p">],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>   <span class="c1"># (n, 2)</span>
+        <span class="n">car_b</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">car_f</span><span class="p">,</span> <span class="n">car_f</span> <span class="o">+</span> <span class="mf">0.01</span><span class="p">],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>   <span class="c1"># (n, 2)</span>
+
+        <span class="c1"># Maximally uncertain interval for the consequent prior</span>
+        <span class="n">unknown</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]),</span> <span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>   <span class="c1"># (n, 2)</span>
+
+        <span class="c1"># FIX: pass a dict with string keys – LNNFormula looks up literals by name.</span>
+        <span class="c1"># friend_f is NOT included here; this rule only has two antecedent literals.</span>
+        <span class="c1"># Graph diffusion is handled in Experiment B via the two-rule architecture.</span>
+        <span class="n">inputs</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;has_cool_pet&quot;</span><span class="p">:</span> <span class="n">pet_b</span><span class="p">,</span>
+            <span class="s2">&quot;has_cool_car&quot;</span><span class="p">:</span> <span class="n">car_b</span><span class="p">,</span>
+            <span class="s2">&quot;is_trendy&quot;</span><span class="p">:</span>    <span class="n">unknown</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">logic</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>   <span class="c1"># (n, 2)</span>
+
+<span class="n">graph_model_A</span> <span class="o">=</span> <span class="n">GraphLNN_A</span><span class="p">(</span><span class="n">logic_A</span><span class="p">)</span>
+<span class="n">optimizer_A</span>   <span class="o">=</span> <span class="n">nnx</span><span class="o">.</span><span class="n">Optimizer</span><span class="p">(</span><span class="n">graph_model_A</span><span class="p">,</span> <span class="n">optax</span><span class="o">.</span><span class="n">adamw</span><span class="p">(</span><span class="mf">0.01</span><span class="p">),</span> <span class="n">wrt</span><span class="o">=</span><span class="n">nnx</span><span class="o">.</span><span class="n">Param</span><span class="p">)</span>
+
+<span class="n">targets_A</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span>
+    <span class="p">[</span><span class="n">pet_scores</span> <span class="o">*</span> <span class="mf">0.5</span> <span class="o">+</span> <span class="n">car_scores</span> <span class="o">*</span> <span class="mf">0.5</span><span class="p">,</span>
+    <span class="n">pet_scores</span> <span class="o">*</span> <span class="mf">0.5</span> <span class="o">+</span> <span class="n">car_scores</span> <span class="o">*</span> <span class="mf">0.5</span> <span class="o">+</span> <span class="mf">0.05</span><span class="p">],</span>
+    <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="nd">@nnx</span><span class="o">.</span><span class="n">jit</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">train_step_A</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">opt</span><span class="p">,</span> <span class="n">p_data</span><span class="p">,</span> <span class="n">c_data</span><span class="p">,</span> <span class="n">adj</span><span class="p">,</span> <span class="n">targets</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">loss_fn</span><span class="p">(</span><span class="n">model_ptr</span><span class="p">):</span>
+        <span class="c1"># LNNFormula returns (n_nodes, n_literals, 2):</span>
+        <span class="c1">#   axis-1 index 0 = antecedent (has_cool_pet &amp; has_cool_car)</span>
+        <span class="c1">#   axis-1 index 1 = consequent (is_trendy)  ← this is what we train against</span>
+        <span class="n">preds</span> <span class="o">=</span> <span class="n">model_ptr</span><span class="p">(</span><span class="n">p_data</span><span class="p">,</span> <span class="n">c_data</span><span class="p">,</span> <span class="n">adj</span><span class="p">)</span>   <span class="c1"># (8, 2, 2)</span>
+        <span class="k">return</span> <span class="n">total_lnn_loss</span><span class="p">(</span><span class="n">preds</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">,</span> <span class="p">:],</span> <span class="n">targets</span><span class="p">,</span> <span class="n">contradiction_weight</span><span class="o">=</span><span class="mf">2.0</span><span class="p">)</span>
+    <span class="n">loss</span><span class="p">,</span> <span class="n">grads</span> <span class="o">=</span> <span class="n">nnx</span><span class="o">.</span><span class="n">value_and_grad</span><span class="p">(</span><span class="n">loss_fn</span><span class="p">)(</span><span class="n">m</span><span class="p">)</span>
+    <span class="n">opt</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">grads</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">loss</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Training Experiment A...&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1001</span><span class="p">):</span>
+    <span class="n">loss_A</span> <span class="o">=</span> <span class="n">train_step_A</span><span class="p">(</span><span class="n">graph_model_A</span><span class="p">,</span> <span class="n">optimizer_A</span><span class="p">,</span>
+                        <span class="n">pet_scores</span><span class="p">,</span> <span class="n">car_scores</span><span class="p">,</span> <span class="n">adj_matrix</span><span class="p">,</span> <span class="n">targets_A</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">step</span> <span class="o">%</span> <span class="mi">250</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Step </span><span class="si">{</span><span class="n">step</span><span class="si">:</span><span class="s2">4d</span><span class="si">}</span><span class="s2"> | Loss: </span><span class="si">{</span><span class="n">loss_A</span><span class="si">:</span><span class="s2">.6f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;=&quot;</span><span class="o">*</span><span class="mi">60</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;EXPERIMENT B: Two-rule graph diffusion&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="o">*</span><span class="mi">60</span><span class="p">)</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">GraphLNN_B</span><span class="p">(</span><span class="n">nnx</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Two-rule LNN: local trendiness propagated through the friendship graph.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rule_local</span>  <span class="o">=</span> <span class="n">LNNFormula</span><span class="p">(</span>
+            <span class="s2">&quot;0.92 :: (has_cool_pet &amp; has_cool_car) -&gt; is_trendy_local&quot;</span><span class="p">,</span>  <span class="n">nnx</span><span class="o">.</span><span class="n">Rngs</span><span class="p">(</span><span class="mi">42</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rule_social</span> <span class="o">=</span> <span class="n">LNNFormula</span><span class="p">(</span>
+            <span class="s2">&quot;0.85 :: (is_friend &amp; is_trendy_local) -&gt; is_trendy_social&quot;</span><span class="p">,</span> <span class="n">nnx</span><span class="o">.</span><span class="n">Rngs</span><span class="p">(</span><span class="mi">43</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">c_pet</span>  <span class="o">=</span> <span class="n">nnx</span><span class="o">.</span><span class="n">Param</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.5</span><span class="p">]))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">c_car</span>  <span class="o">=</span> <span class="n">nnx</span><span class="o">.</span><span class="n">Param</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.5</span><span class="p">]))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">steep</span>  <span class="o">=</span> <span class="n">nnx</span><span class="o">.</span><span class="n">Param</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">12.0</span><span class="p">]))</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pet_val</span><span class="p">,</span> <span class="n">car_val</span><span class="p">,</span> <span class="n">adj</span><span class="p">):</span>
+        <span class="n">batch_size</span> <span class="o">=</span> <span class="n">pet_val</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="c1"># Maximally uncertain interval [0, 1] – used as consequent prior.</span>
+        <span class="n">unknown</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]),</span> <span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>   <span class="c1"># (n, 2)</span>
+
+        <span class="c1"># 1. Fuzzy grounding → interval beliefs</span>
+        <span class="n">pet_f</span>  <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="n">jnp</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">jnp</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">steep</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">pet_val</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">c_pet</span><span class="p">)))</span>
+        <span class="n">car_f</span>  <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="n">jnp</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">jnp</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">steep</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">car_val</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">c_car</span><span class="p">)))</span>
+        <span class="n">pet_b</span>  <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">pet_f</span><span class="p">,</span>  <span class="n">pet_f</span>  <span class="o">+</span> <span class="mf">0.01</span><span class="p">],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>   <span class="c1"># (n, 2)</span>
+        <span class="n">car_b</span>  <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">car_f</span><span class="p">,</span>  <span class="n">car_f</span>  <span class="o">+</span> <span class="mf">0.01</span><span class="p">],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>   <span class="c1"># (n, 2)</span>
+
+        <span class="c1"># 2. Rule 1 – local trendiness</span>
+        <span class="n">inputs1</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;has_cool_pet&quot;</span><span class="p">:</span>   <span class="n">pet_b</span><span class="p">,</span>
+            <span class="s2">&quot;has_cool_car&quot;</span><span class="p">:</span>   <span class="n">car_b</span><span class="p">,</span>
+            <span class="s2">&quot;is_trendy_local&quot;</span><span class="p">:</span> <span class="n">unknown</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="n">local_trendy_full</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rule_local</span><span class="p">(</span><span class="n">inputs1</span><span class="p">)</span>     <span class="c1"># (n, 3, 2): [antecedent_and, pet, car, consequent]</span>
+        <span class="n">local_trendy</span> <span class="o">=</span> <span class="n">local_trendy_full</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">,</span> <span class="p">:]</span>          <span class="c1"># (n, 2): consequent is_trendy_local only</span>
+
+        <span class="c1"># 3. Graph diffusion – average neighbour belief</span>
+        <span class="c1"># adj: (n, n), local_trendy: (n, 2) → friend_sum: (n, 2)</span>
+        <span class="n">friend_sum</span>   <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">adj</span><span class="p">,</span> <span class="n">local_trendy</span><span class="p">)</span>
+        <span class="n">friend_count</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">adj</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>          <span class="c1"># (n, 1)</span>
+        <span class="n">friend_b</span>     <span class="o">=</span> <span class="n">friend_sum</span> <span class="o">/</span> <span class="n">jnp</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">friend_count</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="n">friend_count</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+
+        <span class="c1"># 4. Rule 2 – social trendiness</span>
+        <span class="n">inputs2</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;is_friend&quot;</span><span class="p">:</span>        <span class="n">friend_b</span><span class="p">,</span>
+            <span class="s2">&quot;is_trendy_local&quot;</span><span class="p">:</span>  <span class="n">local_trendy</span><span class="p">,</span>
+            <span class="s2">&quot;is_trendy_social&quot;</span><span class="p">:</span> <span class="n">unknown</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">rule_social</span><span class="p">(</span><span class="n">inputs2</span><span class="p">)</span>   <span class="c1"># (n, 2)</span>
+
+<span class="n">model_B</span>     <span class="o">=</span> <span class="n">GraphLNN_B</span><span class="p">()</span>
+<span class="n">optimizer_B</span> <span class="o">=</span> <span class="n">nnx</span><span class="o">.</span><span class="n">Optimizer</span><span class="p">(</span><span class="n">model_B</span><span class="p">,</span> <span class="n">optax</span><span class="o">.</span><span class="n">adamw</span><span class="p">(</span><span class="mf">0.02</span><span class="p">),</span> <span class="n">wrt</span><span class="o">=</span><span class="n">nnx</span><span class="o">.</span><span class="n">Param</span><span class="p">)</span>
+
+<span class="n">degree_vec</span>   <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">adj_matrix</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>                        <span class="c1"># (n,)</span>
+<span class="n">safe_degree</span>  <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">degree_vec</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="n">degree_vec</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+<span class="n">neigh_pet</span>    <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">adj_matrix</span><span class="p">,</span> <span class="n">pet_scores</span><span class="p">)</span> <span class="o">/</span> <span class="n">safe_degree</span>   <span class="c1"># mean neighbour pet score</span>
+
+<span class="n">target_val</span>      <span class="o">=</span> <span class="n">pet_scores</span> <span class="o">*</span> <span class="mf">0.4</span> <span class="o">+</span> <span class="n">car_scores</span> <span class="o">*</span> <span class="mf">0.2</span> <span class="o">+</span> <span class="n">neigh_pet</span> <span class="o">*</span> <span class="mf">0.4</span>
+<span class="n">target_val</span>      <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">target_val</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>                  <span class="c1"># FIX: clip to valid range</span>
+<span class="n">target_interval</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">target_val</span><span class="p">,</span> <span class="n">target_val</span> <span class="o">+</span> <span class="mf">0.05</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="nd">@nnx</span><span class="o">.</span><span class="n">jit</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">train_step_B</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">opt</span><span class="p">,</span> <span class="n">p_data</span><span class="p">,</span> <span class="n">c_data</span><span class="p">,</span> <span class="n">adj</span><span class="p">,</span> <span class="n">targets</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">loss_fn</span><span class="p">(</span><span class="n">model_ptr</span><span class="p">):</span>
+        <span class="c1"># rule_social has 3 literals: is_friend, is_trendy_local, is_trendy_social</span>
+        <span class="c1"># LNNFormula output shape: (n_nodes, n_literals, 2) = (8, 3, 2)</span>
+        <span class="c1">#   index 0 = is_friend</span>
+        <span class="c1">#   index 1 = is_trendy_local</span>
+        <span class="c1">#   index 2 = is_trendy_social  ← consequent, train against this</span>
+        <span class="n">preds</span> <span class="o">=</span> <span class="n">model_ptr</span><span class="p">(</span><span class="n">p_data</span><span class="p">,</span> <span class="n">c_data</span><span class="p">,</span> <span class="n">adj</span><span class="p">)</span>   <span class="c1"># (8, 3, 2)</span>
+        <span class="k">return</span> <span class="n">total_lnn_loss</span><span class="p">(</span><span class="n">preds</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">,</span> <span class="p">:],</span> <span class="n">targets</span><span class="p">,</span> <span class="n">contradiction_weight</span><span class="o">=</span><span class="mf">3.0</span><span class="p">)</span>
+    <span class="n">loss</span><span class="p">,</span> <span class="n">grads</span> <span class="o">=</span> <span class="n">nnx</span><span class="o">.</span><span class="n">value_and_grad</span><span class="p">(</span><span class="n">loss_fn</span><span class="p">)(</span><span class="n">m</span><span class="p">)</span>
+    <span class="n">opt</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">grads</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">loss</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Training Experiment B...&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1201</span><span class="p">):</span>
+    <span class="n">loss_B</span> <span class="o">=</span> <span class="n">train_step_B</span><span class="p">(</span><span class="n">model_B</span><span class="p">,</span> <span class="n">optimizer_B</span><span class="p">,</span>
+                        <span class="n">pet_scores</span><span class="p">,</span> <span class="n">car_scores</span><span class="p">,</span> <span class="n">adj_matrix</span><span class="p">,</span> <span class="n">target_interval</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">step</span> <span class="o">%</span> <span class="mi">300</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Step </span><span class="si">{</span><span class="n">step</span><span class="si">:</span><span class="s2">4d</span><span class="si">}</span><span class="s2"> | Loss: </span><span class="si">{</span><span class="n">loss_B</span><span class="si">:</span><span class="s2">.6f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="n">final_preds</span>  <span class="o">=</span> <span class="n">model_B</span><span class="p">(</span><span class="n">pet_scores</span><span class="p">,</span> <span class="n">car_scores</span><span class="p">,</span> <span class="n">adj_matrix</span><span class="p">)</span>  <span class="c1"># (8, 3, 2)</span>
+<span class="n">trendy_lower</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">final_preds</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>               <span class="c1"># consequent lower bound → colour</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="n">pos</span>   <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">spring_layout</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+<span class="n">nodes</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">draw_networkx_nodes</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">node_color</span><span class="o">=</span><span class="n">trendy_lower</span><span class="p">,</span>
+                            <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;viridis&quot;</span><span class="p">,</span> <span class="n">node_size</span><span class="o">=</span><span class="mi">800</span><span class="p">)</span>
+<span class="n">nx</span><span class="o">.</span><span class="n">draw_networkx_edges</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span>
+<span class="n">nx</span><span class="o">.</span><span class="n">draw_networkx_labels</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">font_size</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Final Learned Trendiness (lower bound)&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">nodes</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;=&quot;</span><span class="o">*</span><span class="mi">60</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;EXPERIMENT C: Optuna hyperparameter search&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="o">*</span><span class="mi">60</span><span class="p">)</span>
+
+<span class="n">popularity_gt</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.9</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">,</span> <span class="mf">0.7</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">,</span> <span class="mf">0.85</span><span class="p">,</span> <span class="mf">0.55</span><span class="p">])</span>
+<span class="n">degrees_c</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">adj_matrix</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="mf">1e-6</span>   <span class="c1"># avoid div-by-zero</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">fuzzy_high</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">center</span><span class="p">,</span> <span class="n">steepness</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Sigmoid membership: 1 when x &gt;&gt; center, 0 when x &lt;&lt; center.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="n">jnp</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">steepness</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">center</span><span class="p">)))</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">aggregate_friends</span><span class="p">(</span><span class="n">popularity</span><span class="p">,</span> <span class="n">adj</span><span class="p">,</span> <span class="n">deg</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Weighted-average popularity of graph neighbours.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">jnp</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">adj</span><span class="p">,</span> <span class="n">popularity</span><span class="p">)</span> <span class="o">/</span> <span class="n">deg</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">model_forward_c</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">car</span><span class="p">,</span> <span class="n">pet</span><span class="p">,</span> <span class="n">adj</span><span class="p">,</span> <span class="n">deg</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns a [0,1] popularity score for each of the 8 nodes.</span>
+
+<span class="sd">    Fuzzy rule: high_car AND high_pet  → direct trendiness</span>
+<span class="sd">    Propagation: blend direct score with neighbourhood average (2 steps).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">high_car</span> <span class="o">=</span> <span class="n">fuzzy_high</span><span class="p">(</span><span class="n">car</span><span class="p">,</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;c_car&quot;</span><span class="p">],</span>  <span class="n">params</span><span class="p">[</span><span class="s2">&quot;steepness&quot;</span><span class="p">])</span>
+    <span class="n">high_pet</span> <span class="o">=</span> <span class="n">fuzzy_high</span><span class="p">(</span><span class="n">pet</span><span class="p">,</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;c_pet&quot;</span><span class="p">],</span>  <span class="n">params</span><span class="p">[</span><span class="s2">&quot;steepness&quot;</span><span class="p">])</span>
+
+    <span class="c1"># Fuzzy AND = product (differentiable; min is not)</span>
+    <span class="n">direct</span> <span class="o">=</span> <span class="n">high_car</span> <span class="o">*</span> <span class="n">high_pet</span> <span class="o">*</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;rule_strength&quot;</span><span class="p">]</span>
+
+    <span class="n">pop</span> <span class="o">=</span> <span class="n">direct</span>
+    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+        <span class="n">pop</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;friend_influence&quot;</span><span class="p">])</span> <span class="o">*</span> <span class="n">pop</span> \
+            <span class="o">+</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;friend_influence&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">aggregate_friends</span><span class="p">(</span><span class="n">pop</span><span class="p">,</span> <span class="n">adj</span><span class="p">,</span> <span class="n">deg</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">pop</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">loss_c</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">car</span><span class="p">,</span> <span class="n">pet</span><span class="p">,</span> <span class="n">adj</span><span class="p">,</span> <span class="n">deg</span><span class="p">,</span> <span class="n">gt</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;MSE + small L2 regularisation on steep / friend_influence.&quot;&quot;&quot;</span>
+    <span class="n">pred</span> <span class="o">=</span> <span class="n">model_forward_c</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">car</span><span class="p">,</span> <span class="n">pet</span><span class="p">,</span> <span class="n">adj</span><span class="p">,</span> <span class="n">deg</span><span class="p">)</span>
+    <span class="n">mse</span>  <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">mean</span><span class="p">((</span><span class="n">pred</span> <span class="o">-</span> <span class="n">gt</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="n">reg</span>  <span class="o">=</span> <span class="mf">0.01</span> <span class="o">*</span> <span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;steepness&quot;</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;friend_influence&quot;</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">mse</span> <span class="o">+</span> <span class="n">reg</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">train_one_trial</span><span class="p">(</span><span class="n">init_params_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">n_steps</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">600</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Run gradient descent for one Optuna trial; return best accuracy + params.&quot;&quot;&quot;</span>
+
+    <span class="c1"># Convert Python scalars → JAX arrays so jax.grad can differentiate through them</span>
+    <span class="n">params</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">v</span><span class="p">))</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">init_params_dict</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+
+    <span class="n">tx</span>    <span class="o">=</span> <span class="n">optax</span><span class="o">.</span><span class="n">adam</span><span class="p">(</span><span class="n">learning_rate</span><span class="o">=</span><span class="mf">0.01</span><span class="p">)</span>
+    <span class="n">state</span> <span class="o">=</span> <span class="n">tx</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+
+    <span class="c1"># FIX: argnums=0 → gradient flows into `params`, not into data arrays</span>
+    <span class="n">grad_fn</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">jit</span><span class="p">(</span><span class="n">jax</span><span class="o">.</span><span class="n">value_and_grad</span><span class="p">(</span><span class="n">loss_c</span><span class="p">,</span> <span class="n">argnums</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+
+    <span class="n">best_loss</span>   <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;inf&quot;</span><span class="p">)</span>
+    <span class="n">best_params</span> <span class="o">=</span> <span class="n">params</span>   <span class="c1"># FIX: initialise so it is always defined</span>
+
+    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_steps</span><span class="p">):</span>
+        <span class="n">loss_val</span><span class="p">,</span> <span class="n">grads</span> <span class="o">=</span> <span class="n">grad_fn</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">pet_scores</span><span class="p">,</span> <span class="n">car_scores</span><span class="p">,</span>
+                                <span class="n">adj_matrix</span><span class="p">,</span> <span class="n">degrees_c</span><span class="p">,</span> <span class="n">popularity_gt</span><span class="p">)</span>
+        <span class="n">updates</span><span class="p">,</span> <span class="n">state</span>  <span class="o">=</span> <span class="n">tx</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">grads</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>   <span class="c1"># FIX: proper optax update</span>
+        <span class="n">params</span>          <span class="o">=</span> <span class="n">optax</span><span class="o">.</span><span class="n">apply_updates</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">updates</span><span class="p">)</span>
+
+        <span class="n">loss_py</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">loss_val</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">loss_py</span> <span class="o">&lt;</span> <span class="n">best_loss</span><span class="p">:</span>
+            <span class="n">best_loss</span>   <span class="o">=</span> <span class="n">loss_py</span>
+            <span class="n">best_params</span> <span class="o">=</span> <span class="n">params</span>
+
+    <span class="n">best_pred</span> <span class="o">=</span> <span class="n">model_forward_c</span><span class="p">(</span><span class="n">best_params</span><span class="p">,</span> <span class="n">pet_scores</span><span class="p">,</span> <span class="n">car_scores</span><span class="p">,</span>
+                                <span class="n">adj_matrix</span><span class="p">,</span> <span class="n">degrees_c</span><span class="p">)</span>
+    <span class="n">pred_bin</span>  <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">best_pred</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">0.5</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+    <span class="n">gt_bin</span>    <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">popularity_gt</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">0.5</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+
+    <span class="n">acc</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">accuracy_score</span><span class="p">(</span><span class="n">gt_bin</span><span class="p">,</span> <span class="n">pred_bin</span><span class="p">))</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;best_loss&quot;</span><span class="p">:</span> <span class="n">best_loss</span><span class="p">,</span> <span class="s2">&quot;accuracy&quot;</span><span class="p">:</span> <span class="n">acc</span><span class="p">,</span> <span class="s2">&quot;params&quot;</span><span class="p">:</span> <span class="n">best_params</span><span class="p">}</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">objective</span><span class="p">(</span><span class="n">trial</span><span class="p">:</span> <span class="n">optuna</span><span class="o">.</span><span class="n">Trial</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="n">init_params</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;c_car&quot;</span><span class="p">:</span>            <span class="n">trial</span><span class="o">.</span><span class="n">suggest_float</span><span class="p">(</span><span class="s2">&quot;c_car&quot;</span><span class="p">,</span>             <span class="mf">0.30</span><span class="p">,</span> <span class="mf">0.80</span><span class="p">),</span>
+        <span class="s2">&quot;c_pet&quot;</span><span class="p">:</span>            <span class="n">trial</span><span class="o">.</span><span class="n">suggest_float</span><span class="p">(</span><span class="s2">&quot;c_pet&quot;</span><span class="p">,</span>             <span class="mf">0.20</span><span class="p">,</span> <span class="mf">0.70</span><span class="p">),</span>
+        <span class="s2">&quot;steepness&quot;</span><span class="p">:</span>        <span class="n">trial</span><span class="o">.</span><span class="n">suggest_float</span><span class="p">(</span><span class="s2">&quot;steepness&quot;</span><span class="p">,</span>         <span class="mf">5.0</span><span class="p">,</span>  <span class="mf">20.0</span><span class="p">),</span>
+        <span class="s2">&quot;rule_strength&quot;</span><span class="p">:</span>    <span class="n">trial</span><span class="o">.</span><span class="n">suggest_float</span><span class="p">(</span><span class="s2">&quot;rule_strength&quot;</span><span class="p">,</span>     <span class="mf">0.60</span><span class="p">,</span>  <span class="mf">1.00</span><span class="p">),</span>
+        <span class="s2">&quot;friend_influence&quot;</span><span class="p">:</span> <span class="n">trial</span><span class="o">.</span><span class="n">suggest_float</span><span class="p">(</span><span class="s2">&quot;friend_influence&quot;</span><span class="p">,</span>  <span class="mf">0.10</span><span class="p">,</span>  <span class="mf">0.60</span><span class="p">),</span>
+    <span class="p">}</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">train_one_trial</span><span class="p">(</span><span class="n">init_params</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;accuracy&quot;</span><span class="p">]</span>   <span class="c1"># Optuna maximises this</span>
+
+<span class="n">study_c</span> <span class="o">=</span> <span class="n">optuna</span><span class="o">.</span><span class="n">create_study</span><span class="p">(</span><span class="n">direction</span><span class="o">=</span><span class="s2">&quot;maximize&quot;</span><span class="p">,</span>
+                          <span class="n">sampler</span><span class="o">=</span><span class="n">optuna</span><span class="o">.</span><span class="n">samplers</span><span class="o">.</span><span class="n">TPESampler</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="mi">42</span><span class="p">))</span>
+<span class="n">study_c</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span><span class="n">objective</span><span class="p">,</span> <span class="n">n_trials</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">600</span><span class="p">,</span> <span class="n">show_progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Best accuracy : </span><span class="si">{</span><span class="n">study_c</span><span class="o">.</span><span class="n">best_value</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Best params   : </span><span class="si">{</span><span class="n">study_c</span><span class="o">.</span><span class="n">best_params</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="n">best_result</span> <span class="o">=</span> <span class="n">train_one_trial</span><span class="p">(</span><span class="n">study_c</span><span class="o">.</span><span class="n">best_params</span><span class="p">,</span> <span class="n">n_steps</span><span class="o">=</span><span class="mi">1200</span><span class="p">)</span>
+<span class="n">final_pop</span>   <span class="o">=</span> <span class="n">model_forward_c</span><span class="p">(</span><span class="n">best_result</span><span class="p">[</span><span class="s2">&quot;params&quot;</span><span class="p">],</span> <span class="n">pet_scores</span><span class="p">,</span> <span class="n">car_scores</span><span class="p">,</span>
+                            <span class="n">adj_matrix</span><span class="p">,</span> <span class="n">degrees_c</span><span class="p">)</span>
+<span class="n">trendy_c</span>    <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">final_pop</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="n">nodes_c</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">draw_networkx_nodes</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">node_color</span><span class="o">=</span><span class="n">trendy_c</span><span class="p">,</span>
+                                <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;plasma&quot;</span><span class="p">,</span> <span class="n">node_size</span><span class="o">=</span><span class="mi">800</span><span class="p">)</span>
+<span class="n">nx</span><span class="o">.</span><span class="n">draw_networkx_edges</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span>
+<span class="n">nx</span><span class="o">.</span><span class="n">draw_networkx_labels</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">font_size</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Experiment C: Optuna-tuned Popularity Score&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">nodes_c</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">✅ All done.&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="download">
+<h3>Download<a class="headerlink" href="#download" title="Link to this heading">¶</a></h3>
+<p>You can also download the raw notebook file for local use:
+<a class="reference download external" download="" href="https://github.com/RadimKozl/JLNN/blob/main/examples/JLNN_graph_reasoning_pyreason.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">JLNN_graph_reasoning_pyreason.ipynb</span></code></a></p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>To run the notebook locally, make sure you have installed the package using <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-e</span> <span class="pre">.[test]</span></code>.</p>
+</div>
+</section>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="../theory.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">Theoretical foundations of JLNN</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="JLNN_grand_cycle_optuna.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">The Grand Cycle: Autonomous Tuning</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2026, Ing. Radim Közl
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Differentiable Reasoning on Graphs (JLNN vs. PyReason)</a><ul>
+<li><a class="reference internal" href="#key-concepts">🌟 Key concepts</a></li>
+<li><a class="reference internal" href="#model-architecture">🛠️ Model architecture</a><ul>
+<li><a class="reference internal" href="#local-rule-node-attributes">1. Local rule (Node attributes)</a></li>
+<li><a class="reference internal" href="#social-rule-graphic-reasoning">2. Social Rule (Graphic Reasoning)</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#implementation-details">💻 Implementation details</a><ul>
+<li><a class="reference internal" href="#working-with-intervals-in-jax">Working with intervals in JAX</a></li>
+<li><a class="reference internal" href="#symbol-initialization">Symbol initialization</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#training-and-results">📈 Training and results</a><ul>
+<li><a class="reference internal" href="#example">Example</a></li>
+<li><a class="reference internal" href="#download">Download</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../_static/documentation_options.js?v=4d4badf9"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/scripts/furo.js?v=46bd48cc"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+    </body>
+</html>

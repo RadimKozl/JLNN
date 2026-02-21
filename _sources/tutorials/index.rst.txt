@@ -15,3 +15,4 @@ Examples & Tutorials
    JLNN_real_world_data_iris
    JLNN_xarray_meta_learning
    JLNN_grand_cycle_optuna
+   JLNN_graph_reasoning_pyreason
