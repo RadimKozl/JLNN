@@ -16,3 +16,4 @@ Examples & Tutorials
    JLNN_xarray_meta_learning
    JLNN_grand_cycle_optuna
    JLNN_graph_reasoning_pyreason
+   JLNN_explainability_rule_extraction_XAI
