@@ -235,10 +235,6 @@ Tutorial code
 Download
 ----------
 
-This tutorial demonstrates how to build a **Self-Reflective System** using JLNN. 
-In most neural networks, the training process is a "black box," but JLNN allows us to treat the training history 
-as structured data that can be analyzed by other models.
-
 You can also download the raw notebook file for local use:
 :download:`JLNN_grand_cycle_optuna.ipynb <https://github.com/RadimKozl/JLNN/blob/main/examples/JLNN_grand_cycle_optuna.ipynb>`
 

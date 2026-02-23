@@ -17,3 +17,4 @@ Examples & Tutorials
    JLNN_grand_cycle_optuna
    JLNN_graph_reasoning_pyreason
    JLNN_explainability_rule_extraction_XAI
+   JLNN_bayesian_svi_iris
