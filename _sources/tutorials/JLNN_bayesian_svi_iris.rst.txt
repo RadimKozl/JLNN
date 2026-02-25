@@ -1,13 +1,12 @@
-Bayesian JLNN: Probabilistic Logic
-====================================
+Bayesian JLNN: Logic in an Uncertain World
+============================================
 
-This module extends the standard JLNN (JAX Logic Neural Networks) framework 
-with the principles of Bayesian statistics. Instead of finding fixed ("point") values ​​for logical boundaries and weights, 
-this approach learns entire **probability distributions**.
+This tutorial presents the technological pinnacle of the **JLNN (Joint Logic Neural Network)** framework. While standard models try to "fit" the world into fixed boundaries, the Bayesian variant acknowledges reality: **data is noisy and the world is full of uncertainty**.
+
+Instead of finding fixed point values ​​for logical boundaries and rule weights, this approach learns entire **probability distributions** (Posteriors).
 
 .. note::
-    The interactive notebook is hosted externally to ensure the best viewing experience 
-    and to allow immediate execution in the cloud.
+    The interactive notebook is hosted externally, allowing for immediate launch in the cloud without the need for local installation.
 
 .. grid:: 2
 
@@ -23,11 +22,28 @@ this approach learns entire **probability distributions**.
 
        View source code and outputs in the GitHub notebook browser.
 
-Main benefits
----------------
-- **Uncertainty quantification:** The model can distinguish between "I know X is true" and "the data suggests X, but I'm not sure".
-- **Robustness:** The Bayesian approach naturally penalizes overconfidence on small or noisy datasets.
-- **Interpretovatelnost (XAI):** Pomocí intervalů nejvyšší hustoty (HDI) vidíme stabilitu naučených pravidel.
+Main benefits (LNN & BNN)
+---------------------------
+- **Confidence over Certainty:** The model can identify both sharp logical boundaries (narrow HDI) and vague areas where the rules encounter noise in the data.
+- **Explainable Uncertainty:** If the model is uncertain, the distribution of rule weights (``w_rules``) tells us whether the problem is conflicting observations or lack of evidence.
+- **Safety-First AI:** The output is not just a number, but a probability distribution. This is key for critical applications where the answer "I don't know" is more valuable than a wrong guess.
+- **Seamless Integration:** Full integration of the JLNN symbolic compiler with the NumPyro library and the JAX ecosystem.
+
+Technical pillars of implementation
+--------------------------------------
+
+1. **LNNFormula Compiler:**
+Automatic conversion of text rules (e.g. ``"petal_length > 2.5 -> Virginica"``) into a computational graph built on Flax NNX.
+
+2. **Stochastic Variable Grounding:**
+Predicate parameters (slope and shift of the logical sigmoid) are transformed into latent variables in the NumPyro model.
+
+3. **Stochastic Variational Inference (SVI):**
+Instead of the laborious MCMC, we use SVI to approximate the posterior, which allows us to scale logical reasoning to more complex problems.
+
+4. **Xarray & ArviZ Integration:**
+The results are not just numbers, but named multidimensional datasets ready for meta-learning and automatic model reflection.
+
 
 Theoretical basis
 -------------------
@@ -42,23 +58,22 @@ Logical parameters are modeled as follows:
 - **Steepnesses:** HalfNormal(σ) – determines the sharpness/vagueness of the rule.
 - **Weights:** Normal(0, σ) – determines the importance of the rule in the logical sum.
 
-Key visualizations
---------------------
-
-The tutorial documentation includes several essential graphical outputs for model analysis:
-
-1. **HDI Pásy (Sigmoid Nebula):** Vizualizace nejistoty v groundingu jednotlivých predikátů.
-2. **Uncertainty Contour:** A 2D surface showing the areas in the feature space where the model is most uncertain.
-3. **Posterior Traces:** Diagnostika konvergence parametrů.
 
 Integration with xarray
 -------------------------
 
-All inference results are stored in an `xarray.Dataset` object. This allows you to:
+All inference results are stored in an ``xarray.Dataset`` object. This allows:
 
 - Efficient storage of thousands of posterior samples.
-- Easy calculation of statistics (mean, std, percentiles) across `draw`, `rule` and `feature` dimensions.
-- Direct export to NetCDF format for archiving logical models.
+- Easy calculation of statistics (mean, std, percentiles) across ``draw``, ``rule`` and ``feature`` dimensions.
+- Direct export to NetCDF format for archiving logical model states.
+
+Key Outputs
+-------------
+
+1. **SVI Convergence (ELBO):** Diagnostics of loss function decline to verify successful posterior approximation.
+2. **Rule Weights (Credible Intervals):** Forest plot showing confidence intervals for rule weights. If the interval crosses zero, the rule has no support in the data in the given context.
+3. **Epistemic Uncertainty Tracking:** Quantification of uncertainty for individual samples, allowing for in-depth auditing of the decision process.
 
 Tutorial code
 ---------------
@@ -83,7 +98,7 @@ Tutorial code
         #!pip install jax-lnn --quiet
         !pip install git+https://github.com/RadimKozl/JLNN.git --quiet
         !pip install optuna optuna-dashboard pandas scikit-learn matplotlib --quiet
-        !pip install numpyro --quiet
+        !pip install numpyro jraph arviz --quiet
         # Fix JAX/CUDA compatibility for 2026 in Colab
         !pip install --upgrade "jax[cuda12_pip]" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html --quiet
         !pip install  scikit-learn pandas --quiet
@@ -94,139 +109,162 @@ Tutorial code
         os.kill(os.getpid(), 9) # After this line, the cell stops and the environment restarts
     '''
 
-    import jax
     import warnings
+    import jax
     import jax.numpy as jnp
-    import numpyro
-    import numpyro.distributions as dist
-    from numpyro.infer import SVI, Trace_ELBO, Predictive, autoguide
-    import optax
-    import arviz as az
-    import xarray as xr
     import numpy as np
     import matplotlib.pyplot as plt
     import seaborn as sns
+    import arviz as az
     from sklearn.datasets import load_iris
-    from sklearn.preprocessing import StandardScaler
+    from sklearn.model_selection import train_test_split
 
+    import numpyro
+    import numpyro.distributions as dist
+    from numpyro.infer import SVI, Trace_ELBO, autoguide, Predictive
+    from flax import nnx
+
+    # Imports from JLNN
+    from jlnn.symbolic.compiler import LNNFormula
+
+    jax.config.update("jax_enable_x64", True)
+
+    warnings.filterwarnings("ignore")
     sns.set(style="whitegrid")
     numpyro.set_platform("cpu")
 
     print(f"JAX Device: {jax.devices()[0]}")
 
-    warnings.filterwarnings("ignore")
-    sns.set(style="whitegrid")
-
     iris = load_iris()
-    X_raw = iris.data[:, [2, 3]] # Petal length, Petal width
-    y = jnp.array((iris.target == 0).astype(float))
-    feature_names = ["petal_length", "petal_width"]
 
-    scaler = StandardScaler()
-    X = jnp.array(scaler.fit_transform(X_raw))
+    X = iris.data[:, [2, 3]].astype(jnp.float64)
+    y = (iris.target == 0).astype(jnp.float64)  # Is Setosa?
 
-    print(f"Data připravena. X_scaled shape: {X.shape}")
+    X_mean, X_std = X.mean(axis=0), X.std(axis=0)
+    X = (X - X_mean) / X_std
 
-    def bayesian_jlnn_model(X, y=None, n_rules=4):
-        n_samples, n_features = X.shape
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-        # Priors using .expand().to_event() for correct shapes
-        centers = numpyro.sample("centers",
-            dist.Normal(0.0, 1.2).expand([n_rules, n_features]).to_event(2))
+    rule_formulas = [
+        "(petal_length_small & petal_width_small) -> is_setosa",
+        "petal_length_large -> ~is_setosa"
+    ]
 
-        steepnesses = numpyro.sample("steepnesses",
-            dist.HalfNormal(10.0).expand([n_rules, n_features]).to_event(2))
+    n_rules = len(rule_formulas)
+    n_features = X.shape[1]
 
-        rule_weights = numpyro.sample("rule_weights",
-            dist.Normal(0.0, 1.5).expand([n_rules]).to_event(1))
+    rngs = nnx.Rngs(42)
+    rule_models = [LNNFormula(f, rngs) for f in rule_formulas]
+    n_rules = len(rule_models)
+    n_features = X.shape[1]
 
-        # Logical Forward Pass
-        diff = X[:, None, :] - centers[None, :, :]
-        mem = jax.nn.sigmoid(steepnesses[None, :, :] * diff)
-        rule_act = jnp.min(mem, axis=-1) # Fuzzy AND
-        logits = jnp.sum(rule_act * rule_weights[None, :], axis=-1)
+    print("✅ Symbolic rules compiled:")
+    for i, f in enumerate(rule_formulas):
+        print(f"  R{i}: {f}")
 
+    def ramp_sigmoid(x, slope, offset):
+        """Grounding function converting the input to fuzzy truth [0, 1]."""
+        return jax.nn.sigmoid(slope * (x - offset))
+
+    def bayesian_jlnn_model(X_data, y_obs=None):
+        n_samples, n_feats = X_data.shape
+
+        # Predicate parameters (LNN Grounding)
+        # We use plate to vectorize parameters across rules and flags
+        with numpyro.plate("rules_plate", n_rules, dim=-2):
+            with numpyro.plate("features_plate", n_feats, dim=-1):
+                s_l = numpyro.sample("s_l", dist.HalfNormal(5.0))
+                o_l = numpyro.sample("o_l", dist.Normal(0.0, 1.0))
+                s_u = numpyro.sample("s_u", dist.HalfNormal(5.0))
+                o_u = numpyro.sample("o_u", dist.Normal(0.0, 1.0))
+
+                # Deterministic sites allow Predictive to pull these values ​​into the posterior
+                numpyro.deterministic("slope_l", s_l)
+                numpyro.deterministic("offset_l", o_l)
+
+        # Rule weights (Importance of each rule)
+        with numpyro.plate("weights_plate", n_rules):
+            w = numpyro.sample("w", dist.Normal(1.0, 0.5))
+            numpyro.deterministic("w_rules", w)
+
+        # --- VECTORIZED LOGICAL INFERENCE ---
+        # L, U represent the lower and upper bounds of truth
+        L = ramp_sigmoid(X_data[:, None, :], s_l[None, :, :], o_l[None, :, :])
+        U = ramp_sigmoid(X_data[:, None, :], s_u[None, :, :], o_u[None, :, :])
+
+        # Aggregation: T-norm AND (minimum) over features
+        rule_activations = jnp.min(L, axis=-1)
+
+        # Final prediction (Logit combination)
+        logits = jnp.sum(rule_activations * w[None, :], axis=-1)
+        numpyro.deterministic("logits", logits)
+
+        # Tracking logical contradictions
+        contra = jnp.mean(jnp.maximum(0, L - U))
+        numpyro.deterministic("logical_contradiction", contra)
+
+        # Observation (Likelihood)
         with numpyro.plate("data", n_samples):
-            numpyro.sample("obs", dist.BernoulliLogits(logits), obs=y)
-
+            numpyro.sample("obs", dist.BernoulliLogits(logits), obs=y_obs)
+    
+    print("🚀 Running SVI optimization (Stochastic Variational Inference)...")
 
     guide = autoguide.AutoDiagonalNormal(bayesian_jlnn_model)
-    svi = SVI(bayesian_jlnn_model, guide, optax.adamw(3e-3), Trace_ELBO(num_particles=10))
-    print("Starting training (SVI optimization)...")
-    svi_result = svi.run(jax.random.PRNGKey(0), 12000, X, y)
+    optimizer = numpyro.optim.Adam(step_size=0.005)
+    svi = SVI(bayesian_jlnn_model, guide, optimizer, loss=Trace_ELBO())
 
-    predictive = Predictive(bayesian_jlnn_model, guide=guide, params=svi_result.params,
-                        num_samples=1000, return_sites=["centers", "steepnesses", "rule_weights", "obs"])
-    samples = predictive(jax.random.PRNGKey(1), X)
+    print("Starting SVI optimisation (12 000 steps) …")
+    svi_result = svi.run(jax.random.PRNGKey(42), 12_000, X_train, y_train)
+    params = svi_result.params
+    print(f"Final ELBO loss: {svi_result.losses[-1]:.4f}")
 
-    ds = xr.Dataset({
-        "centers": (["draw", "rule", "feature"], samples['centers']),
-        "steepnesses": (["draw", "rule", "feature"], samples['steepnesses']),
-        "weights": (["draw", "rule"], samples['rule_weights'])
-    }, coords={"draw": np.arange(1000), "rule": [f"R{i}" for i in range(4)], "feature": feature_names})
+    print("📊 I generate posterior samples for uncertainty analysis...")
+    predictive = Predictive(bayesian_jlnn_model, guide=guide, params=params, num_samples=1000)
+    posterior_samples = predictive(jax.random.PRNGKey(123), X_data=X_test)
 
-    print("Success: Logical brain model saved to Xarray.")
+    idata = az.from_dict(
+        posterior={
+            "slope_l": posterior_samples["slope_l"][None, ...],
+            "w_rules": posterior_samples["w_rules"][None, ...]
+        },
+        observed_data={"y": y_test}
+    )
 
-    fig, ax = plt.subplots(1, 2, figsize=(15, 5))
-    ax[0].plot(svi_result.losses); ax[0].set_title("ELBO Loss"); ax[0].set_yscale('log')
-
-    # Posterior density for steepness (sharpness of the boundary) for Rule 0
-    az.plot_posterior(ds.sel(rule="R0", feature="petal_length"), var_names=["steepnesses"], ax=ax[1])
-    ax[1].set_title("Posterior Steepness (R0, Petal Length)")
+    plt.figure(figsize=(8, 4))
+    plt.plot(svi_result.losses)
+    plt.title("SVI Convergence (ELBO)")
+    plt.yscale("log")
+    plt.xlabel("Iteration") 
+    plt.ylabel("Loss")
     plt.show()
 
-    xx, yy = np.meshgrid(np.linspace(-2.5, 2.5, 100), np.linspace(-2.5, 2.5, 100))
-    X_grid = jnp.column_stack([xx.ravel(), yy.ravel()])
+    print("\n✅ Statistical overview of rule weights (Interpretability):")
+    summary = az.summary(idata, var_names=["w_rules"], stat_focus="mean")
+    print(summary)
 
-    # Get predictions for the grid
-    # Use return_sites=["obs"], which returns 0/1 (int32)
-    grid_predictive = Predictive(bayesian_jlnn_model, guide=guide, params=svi_result.params, num_samples=500)
-    grid_samples_raw = grid_predictive(jax.random.PRNGKey(2), X_grid)["obs"]
-
-    # Convert to float32 so JAX can calculate statistics
-    grid_samples = grid_samples_raw.astype(jnp.float32)
-
-    # Calculation of average probability and uncertainty (Std Dev)
-    # Since these are already Bernoulli samples (0/1), we do not apply sigmoid anymore!
-    # The average of zeros and ones will give us the probability (e.g. 0.8 means that in 80% of the samples it was Setosa).
-    prob_grid = grid_samples.mean(axis=0).reshape(xx.shape)
-    unc_grid = grid_samples.std(axis=0).reshape(xx.shape)
-
-    # Rendering
-    fig, axs = plt.subplots(1, 2, figsize=(16, 6))
-
-    # Probability map
-    c1 = axs[0].contourf(xx, yy, prob_grid, levels=20, cmap='RdBu_r')
-    axs[0].scatter(X[:,0], X[:,1], c=y, edgecolors='k', alpha=0.5)
-    axs[0].set_title("Mean Probability P(Setosa) - Posterior Predictive")
-    fig.colorbar(c1, ax=axs[0])
-
-    # Uncertainty map (where the model hesitates)
-    c2 = axs[1].contourf(xx, yy, unc_grid, levels=20, cmap='viridis')
-    axs[1].scatter(X[:,0], X[:,1], c='white', edgecolors='k', s=20, alpha=0.3)
-    axs[1].set_title("Epistemic Uncertainty (Standard Deviation)")
-    fig.colorbar(c2, ax=axs[1])
-
+    az.plot_forest(idata, var_names=["w_rules"], combined=True, figsize=(8, 4))
+    plt.title("Rule Weights: Credible Intervals")
+    plt.axvline(0, color='r', linestyle='--')
     plt.show()
 
-    def print_hdi_report(ds):
-        print("--- BAYESIAN LOGIC REPORT ---")
-        for r in ds.rule.values[:2]: # For clarity, only the first two rules
-            for f in ds.feature.values:
-                s_vals = ds.steepnesses.sel(rule=r, feature=f).values
-                hdi = az.hdi(s_vals, hdi_prob=0.90)
-                mean_s = s_vals.mean()
+    probs = jax.nn.sigmoid(posterior_samples["logits"])
+    mean_pred = probs.mean(axis=0)
+    uncertainty = probs.std(axis=0)
 
-                uncertainty = hdi[1] - hdi[0]
-                status = "VYSOKÁ JISTOTA" if uncertainty < 5 else "HESITATION / VAGUE"
-                print(f"[{r} | {f}]: Steepness {mean_s:.1f} | 90% HDI: [{hdi[0]:.1f} - {hdi[1]:.1f}] -> {status}")
+    accuracy = jnp.mean((mean_pred > 0.5) == y_test)
+    print(f"\n🎯 Accuracy on the test set: {accuracy:.2%}")
+    print(f"⚠️ Average logical contradiction: {jnp.mean(posterior_samples['logical_contradiction']):.6f}")
 
-    print_hdi_report(ds)
+    # Show uncertainty for the first 5 samples
+    print("\n🔍 Epistemic Uncertainty:")
+    for i in range(5):
+        print(f"Sample {i}: Prediction={mean_pred[i]:.4f}, Uncertainty (std)={uncertainty[i]:.4f}")
 
-    plt.figure(figsize=(8, 2))
-    sns.heatmap(ds.weights.mean(dim="draw").to_pandas().to_frame().T, annot=True, cmap="coolwarm")
-    plt.title("Mean Posterior Rule Weights (Rule Influence)")
-    plt.show()
+
+Conclusion
+------------
+
+Bayesian JLNN changes the way we think about AI. Instead of a black box that is always sure, you get a partner that understands logic and is not afraid to admit doubt where the data ends.
 
 
 Download
