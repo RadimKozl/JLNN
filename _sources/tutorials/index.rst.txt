@@ -18,3 +18,4 @@ Examples & Tutorials
    JLNN_graph_reasoning_pyreason
    JLNN_explainability_rule_extraction_XAI
    JLNN_bayesian_svi_iris
+   JLNN_NS_Bayesian_GraphSAGE
