@@ -210,6 +210,8 @@
 <li class="toctree-l2"><a class="reference internal" href="tutorials/JLNN_explainability_rule_extraction_XAI.html">JLNN Explainability – From scales to symbolic rules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tutorials/JLNN_bayesian_svi_iris.html">Bayesian JLNN: Logic in an Uncertain World</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tutorials/JLNN_NS_Bayesian_GraphSAGE.html">Neuro-Symbolic Bayesian GraphSAGE + JLNN</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/JLNN_gpu_tpu_acceleration.html">JLNN – Accelerated Interval Logic</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/JLNN_gpu_tpu_acceleration.html#conclusion">Conclusion</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="theory.html">Theoretical foundations of JLNN</a></li>
@@ -363,6 +365,8 @@
 <li class="toctree-l2"><a class="reference internal" href="tutorials/JLNN_explainability_rule_extraction_XAI.html">JLNN Explainability – From scales to symbolic rules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tutorials/JLNN_bayesian_svi_iris.html">Bayesian JLNN: Logic in an Uncertain World</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tutorials/JLNN_NS_Bayesian_GraphSAGE.html">Neuro-Symbolic Bayesian GraphSAGE + JLNN</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/JLNN_gpu_tpu_acceleration.html">JLNN – Accelerated Interval Logic</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/JLNN_gpu_tpu_acceleration.html#conclusion">Conclusion</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="theory.html">Theoretical foundations of JLNN</a><ul>
@@ -446,9 +450,90 @@
 </section>
 <section id="example-of-use">
 <h2>Example of use<a class="headerlink" href="#example-of-use" title="Link to this heading">¶</a></h2>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># code example</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">jax</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">jax.numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">jnp</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flax</span><span class="w"> </span><span class="kn">import</span> <span class="n">nnx</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">jlnn.symbolic.compiler</span><span class="w"> </span><span class="kn">import</span> <span class="n">LNNFormula</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">jlnn.nn.constraints</span><span class="w"> </span><span class="kn">import</span> <span class="n">apply_constraints</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">jlnn.training.losses</span><span class="w"> </span><span class="kn">import</span> <span class="n">total_lnn_loss</span><span class="p">,</span> <span class="n">logical_mse_loss</span><span class="p">,</span> <span class="n">contradiction_loss</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">jlnn.storage.checkpoints</span><span class="w"> </span><span class="kn">import</span> <span class="n">save_checkpoint</span><span class="p">,</span> <span class="n">load_checkpoint</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">optax</span>
+
+<span class="c1"># 1. Define and compile the formula</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">LNNFormula</span><span class="p">(</span><span class="s2">&quot;0.8::A &amp; B -&gt; C&quot;</span><span class="p">,</span> <span class="n">nnx</span><span class="o">.</span><span class="n">Rngs</span><span class="p">(</span><span class="mi">42</span><span class="p">))</span>
+
+<span class="c1"># 2. Ground inputs (including initial state for C)</span>
+<span class="n">inputs</span> <span class="o">=</span> <span class="p">{</span>
+   <span class="s2">&quot;A&quot;</span><span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.9</span><span class="p">]]),</span>
+   <span class="s2">&quot;B&quot;</span><span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.7</span><span class="p">]]),</span>
+   <span class="s2">&quot;C&quot;</span><span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.5</span><span class="p">]])</span>   <span class="c1"># MANDATORY – consequent must have grounding!</span>
+<span class="p">}</span>
+
+<span class="n">target</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.6</span><span class="p">,</span> <span class="mf">0.85</span><span class="p">]])</span>
+
+<span class="c1"># 3. Loss function</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">loss_fn</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">target</span><span class="p">):</span>
+   <span class="n">pred</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>
+   <span class="n">pred</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">nan_to_num</span><span class="p">(</span><span class="n">pred</span><span class="p">,</span> <span class="n">nan</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">posinf</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">neginf</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>  <span class="c1"># protection against NaN</span>
+   <span class="k">return</span> <span class="n">total_lnn_loss</span><span class="p">(</span><span class="n">pred</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
+
+<span class="c1"># 4. Initialize Optimizer</span>
+<span class="n">optimizer</span> <span class="o">=</span> <span class="n">nnx</span><span class="o">.</span><span class="n">Optimizer</span><span class="p">(</span>
+   <span class="n">model</span><span class="p">,</span>
+   <span class="n">wrt</span><span class="o">=</span><span class="n">nnx</span><span class="o">.</span><span class="n">Param</span><span class="p">,</span>
+   <span class="n">tx</span><span class="o">=</span><span class="n">optax</span><span class="o">.</span><span class="n">chain</span><span class="p">(</span>
+      <span class="n">optax</span><span class="o">.</span><span class="n">clip_by_global_norm</span><span class="p">(</span><span class="mf">1.0</span><span class="p">),</span>
+      <span class="n">optax</span><span class="o">.</span><span class="n">adam</span><span class="p">(</span><span class="n">learning_rate</span><span class="o">=</span><span class="mf">0.001</span><span class="p">)</span>
+   <span class="p">)</span>
+<span class="p">)</span>
+
+<span class="c1"># 5. Training Step</span>
+<span class="nd">@nnx</span><span class="o">.</span><span class="n">jit</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">train_step</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">target</span><span class="p">):</span>
+   <span class="c1"># Gradients to the model – closure is traceable (inputs/target are arrays)</span>
+   <span class="n">grads</span> <span class="o">=</span> <span class="n">nnx</span><span class="o">.</span><span class="n">grad</span><span class="p">(</span><span class="k">lambda</span> <span class="n">m</span><span class="p">:</span> <span class="n">loss_fn</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">target</span><span class="p">))(</span><span class="n">model</span><span class="p">)</span>
+
+   <span class="c1"># Loss before update (for debug)</span>
+   <span class="n">loss</span> <span class="o">=</span> <span class="n">loss_fn</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
+
+   <span class="n">optimizer</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">grads</span><span class="p">)</span>
+   <span class="n">apply_constraints</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+
+   <span class="n">final_loss</span> <span class="o">=</span> <span class="n">loss_fn</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
+   <span class="n">final_pred</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>
+
+   <span class="k">return</span> <span class="n">loss</span><span class="p">,</span> <span class="n">final_loss</span><span class="p">,</span> <span class="n">final_pred</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=== Starting training ===&quot;</span><span class="p">)</span>
+<span class="n">steps</span> <span class="o">=</span> <span class="mi">50</span>
+<span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">steps</span><span class="p">):</span>
+   <span class="n">loss</span><span class="p">,</span> <span class="n">final_loss</span><span class="p">,</span> <span class="n">pred</span> <span class="o">=</span> <span class="n">train_step</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
+
+   <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Step </span><span class="si">{</span><span class="n">step</span><span class="si">:</span><span class="s2">3d</span><span class="si">}</span><span class="s2"> | Loss before/after constraints: </span><span class="si">{</span><span class="n">loss</span><span class="si">:</span><span class="s2">.6f</span><span class="si">}</span><span class="s2"> → </span><span class="si">{</span><span class="n">final_loss</span><span class="si">:</span><span class="s2">.6f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+   <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Prediction: </span><span class="si">{</span><span class="n">pred</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+   <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;─&quot;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+
+   <span class="k">if</span> <span class="n">jnp</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">final_loss</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
+      <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;❌ NaN detected! Stopping.&quot;</span><span class="p">)</span>
+      <span class="k">break</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=== Training completed ===&quot;</span><span class="p">)</span>
+
+<span class="c1"># 6. Result after training</span>
+
+<span class="n">final_pred</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Final prediction after training:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">final_pred</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Target interval: </span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Final loss: </span><span class="si">{</span><span class="n">total_lnn_loss</span><span class="p">(</span><span class="n">final_pred</span><span class="p">,</span><span class="w"> </span><span class="n">target</span><span class="p">)</span><span class="si">:</span><span class="s2">.6f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
+<section id="discord-channel">
+<h3><strong>Discord channel:</strong><a class="headerlink" href="#discord-channel" title="Link to this heading">¶</a></h3>
+<a class="reference internal image-reference" href="_images/URL_QR_Code_def.png"><img alt="Discord channel" class="align-center" src="_images/URL_QR_Code_def.png" style="width: 250px;" />
+</a>
+</section>
 </section>
 </section>
 <section id="indexes">
@@ -510,7 +595,10 @@
 <li><a class="reference internal" href="#key-components">Key Components</a><ul>
 </ul>
 </li>
-<li><a class="reference internal" href="#example-of-use">Example of use</a></li>
+<li><a class="reference internal" href="#example-of-use">Example of use</a><ul>
+<li><a class="reference internal" href="#discord-channel"><strong>Discord channel:</strong></a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li><a class="reference internal" href="#indexes">Indexes</a></li>
