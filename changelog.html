@@ -348,33 +348,33 @@
 <ul class="simple">
 <li><p><strong>API Stabilization</strong>: Tested on tutorials</p></li>
 </ul>
-<section id="id3">
-<h4><strong>[0.1.1] - 2026-03-01</strong><a class="headerlink" href="#id3" title="Link to this heading">¶</a></h4>
-<ul class="simple">
-<li><p>Pre-release version focused on debugging the formula parser and fixing bugs in NNX state management.</p></li>
-</ul>
-</section>
 <section id="rc2-2026-02-15">
 <h4><strong>[0.1.rc2] - 2026-02-15</strong><a class="headerlink" href="#rc2-2026-02-15" title="Link to this heading">¶</a></h4>
 <ul class="simple">
-<li><p>Release candidate with export pipeline fixes (StableHLO/ONNX).</p></li>
+<li><p>Pre-release version brings a major fix to the export pipeline and refines the core logical consistency of the framework..</p></li>
+</ul>
+</section>
+<section id="rc1-2026-02-10">
+<h4><strong>[0.1.rc1] - 2026-02-10</strong><a class="headerlink" href="#rc1-2026-02-10" title="Link to this heading">¶</a></h4>
+<ul class="simple">
+<li><p>Pre-release version, significant improvements in negation logic, crisp mode support, and documentation.</p></li>
 </ul>
 </section>
 </section>
 </section>
-<section id="id4">
-<h2>[0.1.rc2] - 2026-02-15<a class="headerlink" href="#id4" title="Link to this heading">¶</a></h2>
+<section id="id3">
+<h2>[0.1.rc2] - 2026-02-15<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h2>
 <p>This Release Candidate brings a major fix to the export pipeline and refines the core logical consistency of the framework.</p>
-<section id="id5">
-<h3><strong>Added</strong><a class="headerlink" href="#id5" title="Link to this heading">¶</a></h3>
+<section id="id4">
+<h3><strong>Added</strong><a class="headerlink" href="#id4" title="Link to this heading">¶</a></h3>
 <ul class="simple">
 <li><p><strong>FixedPredicate:</strong> Introduced a non-trainable identity predicate specifically for crisp (exact 0/1) logic examples.</p></li>
 <li><p><strong>Robust PyTree Support:</strong> The export pipeline now fully supports dictionary-based predicate inputs (e.g., <cite>{“A”: tensor, “B”: tensor}</cite>) using <cite>jax.tree.map</cite>.</p></li>
 <li><p><strong>Metadata Resolution:</strong> Added <cite>get_representative_shape</cite> helper to ensure correct ONNX <cite>value_info</cite> metadata generation even for complex nested inputs.</p></li>
 </ul>
 </section>
-<section id="id6">
-<h3><strong>Changed</strong><a class="headerlink" href="#id6" title="Link to this heading">¶</a></h3>
+<section id="id5">
+<h3><strong>Changed</strong><a class="headerlink" href="#id5" title="Link to this heading">¶</a></h3>
 <ul class="simple">
 <li><p><strong>Export Pipeline Refactoring:</strong> Updated <cite>export_to_stablehlo</cite> and <cite>export_to_onnx</cite> to handle structured PyTrees instead of requiring flat <cite>jnp.ndarray</cite> inputs.</p></li>
 <li><p><strong>Negation Axiom (weighted_not):</strong> Corrected the order of operations to apply pure negation ([1-U, 1-L]) before weight scaling.</p></li>
@@ -382,8 +382,8 @@
 <li><p><strong>Interval Enforcement:</strong> Ensured consistent L≤U after every logical operation via the <cite>ensure_interval</cite> mechanism.</p></li>
 </ul>
 </section>
-<section id="id7">
-<h3><strong>Fixed</strong><a class="headerlink" href="#id7" title="Link to this heading">¶</a></h3>
+<section id="id6">
+<h3><strong>Fixed</strong><a class="headerlink" href="#id6" title="Link to this heading">¶</a></h3>
 <ul class="simple">
 <li><p><strong>AttributeError in Export:</strong> Resolved the critical error where the exporter attempted to call <cite>.shape</cite> on dictionary objects.</p></li>
 <li><p><strong>AttributeError in Visualization:</strong> Fixed key handling for fuzzy inputs within visualization loops.</p></li>
@@ -392,8 +392,8 @@
 </ul>
 </section>
 </section>
-<section id="rc1-2026-02-10">
-<h2>[0.1.rc1] - 2026-02-10<a class="headerlink" href="#rc1-2026-02-10" title="Link to this heading">¶</a></h2>
+<section id="id7">
+<h2>[0.1.rc1] - 2026-02-10<a class="headerlink" href="#id7" title="Link to this heading">¶</a></h2>
 <p>Release Candidate 1 – significant improvements in negation logic, crisp mode support, and documentation.</p>
 <section id="id8">
 <h3><strong>Added</strong><a class="headerlink" href="#id8" title="Link to this heading">¶</a></h3>
