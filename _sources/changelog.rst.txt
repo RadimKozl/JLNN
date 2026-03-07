@@ -6,6 +6,29 @@ All significant changes to the JLNN project will be documented in this file. The
 .. note::
    JLNN is currently in the **Alpha** phase. API may change based on feedback from research deployments.
 
+[1.0.0] - 2026-03-07
+----------------------
+
+First stable production-ready release. This version marks the transition from Alpha to a robust framework for high-throughput neuro-symbolic reasoning.
+
+Added
+^^^^^
+* **Stable Gradient Propagation**: Implemented structural consistency forcing in ``LNNFormula`` to prevent JAX key-mismatch errors during JIT-compiled training.
+* **Modern RDKit Integration**: Tutorials updated to use ``rdFingerprintGenerator`` for high-performance chemical screening.
+* **Enhanced Visualizer**: Added support for multi-node interval visualization with automatic shape-resolution for complex formulas.
+
+Fixed
+^^^^^
+* **KeyError (HighToxicity)**: Resolved issue where target symbols were not properly initialized in the grounding dictionary.
+* **ValueError (Shape Mismatch)**: Fixed Matplotlib visualization to handle flattened truth intervals from hierarchical logical trees.
+* **Gradient Pruning**: Ensured all gate parameters (gate, left, right) remain in the JAX computation graph even with zero gradients.
+
+Changed
+^^^^^^^
+* Refactored ``train_step`` to be fully compatible with the latest **Flax NNX** state management.
+* Optimized ``get_grounding`` performance for massive batches on GPU/TPU.
+
+
 [0.1.rc2] - 2026-02-15
 -----------------------
 
