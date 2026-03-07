@@ -6,27 +6,39 @@ All significant changes to the JLNN project will be documented in this file. The
 .. note::
    JLNN is currently in the **Alpha** phase. API may change based on feedback from research deployments.
 
+Changelog
+==========
+
+All significant changes to the JLNN project will be documented in this file. The project adheres to semantic versioning.
+
 [1.0.0] - 2026-03-07
 ----------------------
 
-First stable production-ready release. This version marks the transition from Alpha to a robust framework for high-throughput neuro-symbolic reasoning.
+First stable version (Production-Ready). This version concludes the phase of intensive tuning on real bioinformatics data and brings a robust API for neuro-symbolic learning.
 
 Added
-^^^^^
-* **Stable Gradient Propagation**: Implemented structural consistency forcing in ``LNNFormula`` to prevent JAX key-mismatch errors during JIT-compiled training.
-* **Modern RDKit Integration**: Tutorials updated to use ``rdFingerprintGenerator`` for high-performance chemical screening.
-* **Enhanced Visualizer**: Added support for multi-node interval visualization with automatic shape-resolution for complex formulas.
+^^^^^^^^
+* **Basic tutorials**: A set of educational materials has been created (including toxicity screening on the ToxCast dataset) that demonstrate the practical use of JLNN from data processing to interpretation of results.
+* **Validation on real data**: The core of the library has been successfully tested on massive datasets using GPU/TPU acceleration.
+* **Improved gradient stability**: Implemented forced preservation of structural keys in NNX modules, which ensures the stability of ``jax.grad`` even for complex logical formulas.
 
 Fixed
-^^^^^
-* **KeyError (HighToxicity)**: Resolved issue where target symbols were not properly initialized in the grounding dictionary.
-* **ValueError (Shape Mismatch)**: Fixed Matplotlib visualization to handle flattened truth intervals from hierarchical logical trees.
-* **Gradient Pruning**: Ensured all gate parameters (gate, left, right) remain in the JAX computation graph even with zero gradients.
+^^^^^^^
+* **Symbolic Initialization**: Fixed an error (KeyError) where dynamically defined symbols in formulas were not correctly mapped to input grounding dictionaries.
+* **Logical Integrity**: Fixed edge states in the implementation of Łukasiewicz logic that could cause numerical instability at very narrow intervals.
+* **Shape Resolution**: Fixed the mechanism for deriving dimensions (shapes) in hierarchical graphs, which solves problems with tensor incompatibility during visualization and export.
 
 Changed
-^^^^^^^
-* Refactored ``train_step`` to be fully compatible with the latest **Flax NNX** state management.
-* Optimized ``get_grounding`` performance for massive batches on GPU/TPU.
+^^^^^^^^^
+* **API Stabilization**: Tested on tutorials
+
+[0.1.1] - 2026-03-01
+--------------------
+* Pre-release version focused on debugging the formula parser and fixing bugs in NNX state management.
+
+[0.1.rc2] - 2026-02-15
+----------------------
+* Release candidate with export pipeline fixes (StableHLO/ONNX).
 
 
 [0.1.rc2] - 2026-02-15
