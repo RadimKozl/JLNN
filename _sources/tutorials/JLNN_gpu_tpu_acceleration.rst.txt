@@ -328,12 +328,12 @@ Example
    plt.show()
 
 Conclusion
-==========
+~~~~~~~~~~~~~
 
 JLNN provides a transparent way to handle biological screening. Unlike "black-box" models, we can see exactly where the model is uncertain, allowing scientists to prioritize molecules that require further experimental validation.
 
 Download
----------
+----------
 
 You can also download the raw notebook file for local use:
 :download:`JLNN_gpu_tpu_acceleration.ipynb <https://github.com/RadimKozl/JLNN/blob/main/examples/JLNN_gpu_tpu_acceleration.ipynb>`
