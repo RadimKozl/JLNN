@@ -32,12 +32,12 @@ Changed
 ^^^^^^^^^
 * **API Stabilization**: Tested on tutorials
 
-[0.1.1] - 2026-03-01
---------------------
+**[0.1.1] - 2026-03-01**
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 * Pre-release version focused on debugging the formula parser and fixing bugs in NNX state management.
 
-[0.1.rc2] - 2026-02-15
-----------------------
+**[0.1.rc2] - 2026-02-15**
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 * Release candidate with export pipeline fixes (StableHLO/ONNX).
 
 
