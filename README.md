@@ -137,6 +137,7 @@ JLNN is inspired by and builds upon the foundations laid by several pioneering n
 - [***Introductory Tutorial***](https://radimkozl.github.io/JLNN/tutorials/introduction_tutorial.html)
 - [***API Reference***](https://radimkozl.github.io/JLNN/)
 - [***GitHub***](https://github.com/RadimKozl/JLNN)
+- [***PyPI***](https://pypi.org/project/jax-lnn/)
 
 ## **Discord channel**
 
