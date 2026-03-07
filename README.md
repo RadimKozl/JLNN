@@ -138,6 +138,15 @@ JLNN is inspired by and builds upon the foundations laid by several pioneering n
 - [***API Reference***](https://radimkozl.github.io/JLNN/)
 - [***GitHub***](https://github.com/RadimKozl/JLNN)
 
+## **Discord channel**
+
+
+<p align="left">
+  <img src="docs/source/_static/URL_QR_Code_def.png" width="200" alt="Discord link: https://discord.gg/ADehdYCM">
+</p>
+
+------------------------------------
+
 ## **License**
 
 This project is licensed under the MIT License - see the [***LICENSE***](https://radimkozl.github.io/JLNN/license.html) file for details.
