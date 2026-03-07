@@ -3,14 +3,6 @@ Changelog
 
 All significant changes to the JLNN project will be documented in this file. The project adheres to semantic versioning.
 
-.. note::
-   JLNN is currently in the **Alpha** phase. API may change based on feedback from research deployments.
-
-Changelog
-==========
-
-All significant changes to the JLNN project will be documented in this file. The project adheres to semantic versioning.
-
 [1.0.0] - 2026-03-07
 ----------------------
 
@@ -34,7 +26,7 @@ Changed
 
 **[0.1.rc2] - 2026-02-15**
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
-* Pre-release version brings a major fix to the export pipeline and refines the core logical consistency of the framework..
+* Pre-release version brings a major fix to the export pipeline and refines the core logical consistency of the framework.
 
 **[0.1.rc1] - 2026-02-10**
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
