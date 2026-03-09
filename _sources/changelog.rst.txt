@@ -3,6 +3,22 @@ Changelog
 
 All significant changes to the JLNN project will be documented in this file. The project adheres to semantic versioning.
 
+[1.0.0.post1] - 2026-03-09
+---------------------------
+
+Fixes:
+^^^^^^^
+
+* Fixed missing metadata and dependencies in the distribution package.
+* Resolved installation issues on Windows systems where requirements were not being pulled correctly.
+
+Technical changes:
+^^^^^^^^^^^^^^^^^^^^
+
+* Updated *pyproject.toml* to properly include project dependencies.
+* Verified build distribution (sdist and wheel) for cross-platform compatibility.
+
+
 [1.0.0] - 2026-03-07
 ----------------------
 
