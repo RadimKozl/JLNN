@@ -20,3 +20,4 @@ Examples & Tutorials
    JLNN_bayesian_svi_iris
    JLNN_NS_Bayesian_GraphSAGE
    JLNN_gpu_tpu_acceleration
+   JLNN_quantum_bell_inequalities
