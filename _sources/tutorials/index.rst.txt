@@ -21,3 +21,4 @@ Examples & Tutorials
    JLNN_NS_Bayesian_GraphSAGE
    JLNN_gpu_tpu_acceleration
    JLNN_quantum_bell_inequalities
+   JLNN_llm_rule_refinement

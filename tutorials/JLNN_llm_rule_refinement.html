@@ -1,0 +1,914 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="next" title="Theoretical foundations of JLNN" href="../theory.html"><link rel="prev" title="Quantum Logic and Bell Inequalities with JLNN" href="JLNN_quantum_bell_inequalities.html">
+
+    <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
+        <title>LLM Rule Refinement (The Grand Cycle) - JLNN 0.1.1.post1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../index.html"><div class="brand">JLNN 0.1.1.post1 documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
+  
+  <span class="sidebar-brand-text">JLNN 0.1.1.post1 documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">User Guide:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quickstart</a></li>
+<li class="toctree-l1 current has-children"><a class="reference internal" href="index.html">Examples &amp; Tutorials</a><input aria-label="Toggle navigation of Examples &amp; Tutorials" checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="introduction_tutorial.html">Introductory Example: JLNN Base</a></li>
+<li class="toctree-l2"><a class="reference internal" href="basic_inference_tutorial.html">Base Example: Basic inference and manual grounding</a></li>
+<li class="toctree-l2"><a class="reference internal" href="JLNN_basic_boolean_gates.html">Basic Boolean Gates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="JLNN_weighted_rules.html">Weighted Rules &amp; Multiple Antecedents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="JLNN_temporal_logic.html">Temporal Logic (G, F, X) on Time-Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="JLNN_contradiction_detection.html">Contradiction Detection &amp; Model Repair</a></li>
+<li class="toctree-l2"><a class="reference internal" href="JLNN_model_export.html">Model Export &amp; Deployment (StableHLO, ONNX, PyTorch)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="JLNN_real_world_data_iris.html">Real Example: Iris dataset Classification</a></li>
+<li class="toctree-l2"><a class="reference internal" href="JLNN_xarray_meta_learning.html">Meta-Learning &amp; Self-Reflection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="JLNN_grand_cycle_optuna.html">The Grand Cycle: Autonomous Tuning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="JLNN_graph_reasoning_pyreason.html">Differentiable Reasoning on Graphs (JLNN vs. PyReason)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="JLNN_explainability_rule_extraction_XAI.html">JLNN Explainability – From scales to symbolic rules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="JLNN_bayesian_svi_iris.html">Bayesian JLNN: Logic in an Uncertain World</a></li>
+<li class="toctree-l2"><a class="reference internal" href="JLNN_NS_Bayesian_GraphSAGE.html">Neuro-Symbolic Bayesian GraphSAGE + JLNN</a></li>
+<li class="toctree-l2"><a class="reference internal" href="JLNN_gpu_tpu_acceleration.html">JLNN – Accelerated Interval Logic</a></li>
+<li class="toctree-l2"><a class="reference internal" href="JLNN_quantum_bell_inequalities.html">Quantum Logic and Bell Inequalities with JLNN</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">LLM Rule Refinement (The Grand Cycle)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../theory.html">Theoretical foundations of JLNN</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../testing.html">Testing</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../modules/core/index.html">Core Logic Engine (jlnn.core)</a><input aria-label="Toggle navigation of Core Logic Engine (jlnn.core)" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../modules/core/activations.html">Activation Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules/core/intervals.html">Interval Arithmetic</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules/core/logic.html">Logical Kernels</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../modules/export/index.html">Model Export &amp; Deployment (jlnn.export)</a><input aria-label="Toggle navigation of Model Export &amp; Deployment (jlnn.export)" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../modules/export/data.html">Metadata &amp; State Export</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules/export/onnx.html">ONNX Export</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules/export/stablehlo.html">StableHLO Integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules/export/torch_map.html">PyTorch Mapping</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../modules/nn/index.html">Neural Network Components (jlnn.nn)</a><input aria-label="Toggle navigation of Neural Network Components (jlnn.nn)" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../modules/nn/base.html">Base Logical Elements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules/nn/constraints.html">Parameter Constraints</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules/nn/functional.html">Functional Logic Kernels</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules/nn/gates.html">Logical Gates (Stateful)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules/nn/predicates.html">Learned Predicates</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../modules/reasoning/index.html">Reasoning &amp; Inference Engine (jlnn.reasoning)</a><input aria-label="Toggle navigation of Reasoning &amp; Inference Engine (jlnn.reasoning)" class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../modules/reasoning/engine.html">JAX Execution Engine</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules/reasoning/inspector.html">Reasoning Inspector &amp; Audit</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules/reasoning/temporal.html">Temporal Logic Operators</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../modules/storage/index.html">Model Storage &amp; Persistence (jlnn.storage)</a><input aria-label="Toggle navigation of Model Storage &amp; Persistence (jlnn.storage)" class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../modules/storage/checkpoints.html">Model Checkpoints</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules/storage/metadata.html">Model Metadata</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../modules/symbolic/index.html">Symbolic Front-end (jlnn.symbolic)</a><input aria-label="Toggle navigation of Symbolic Front-end (jlnn.symbolic)" class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" role="switch" type="checkbox"/><label for="toctree-checkbox-7"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../modules/symbolic/parser.html">Formula Parser</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules/symbolic/compiler.html">JLNN Compiler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules/symbolic/graph.html">Graph &amp; NetworkX Integration</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../modules/training/index.html">Training &amp; Optimization (jlnn.training)</a><input aria-label="Toggle navigation of Training &amp; Optimization (jlnn.training)" class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" role="switch" type="checkbox"/><label for="toctree-checkbox-8"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../modules/training/losses.html">Logical Loss Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules/training/optimizers.html">Projected Optimizers</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../modules/utils/index.html">Utilities &amp; Visualization (jlnn.utils)</a><input aria-label="Toggle navigation of Utilities &amp; Visualization (jlnn.utils)" class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" role="switch" type="checkbox"/><label for="toctree-checkbox-9"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../modules/utils/helpers.html">Helper Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules/utils/metrics.html">Logical Metrics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules/utils/visualize.html">Visualization Tools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules/utils/xarray_utils.html">Xarray Integration</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">About the Project:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing to JLNN</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="../_sources/tutorials/JLNN_llm_rule_refinement.rst.txt" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="llm-rule-refinement-the-grand-cycle">
+<h1>LLM Rule Refinement (The Grand Cycle)<a class="headerlink" href="#llm-rule-refinement-the-grand-cycle" title="Link to this heading">¶</a></h1>
+<p>This tutorial introduces the advanced concept of the <strong>Grand Cycle</strong> – an architecture where statistical inference, interval logic, and a Large Language Model (LLM) converge into a single autonomous system that learns and refines its knowledge base.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The interactive notebook is hosted externally to ensure the best viewing experience
+and to allow immediate execution in the cloud.</p>
+</div>
+<div class="sd-container-fluid sd-sphinx-override sd-mb-4 docutils">
+<div class="sd-row sd-row-cols-2 sd-row-cols-xs-2 sd-row-cols-sm-2 sd-row-cols-md-2 sd-row-cols-lg-2 docutils">
+<div class="sd-col sd-d-flex-row docutils">
+<div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-sm sd-card-hover docutils">
+<div class="sd-card-body docutils">
+<div class="sd-card-title sd-font-weight-bold docutils">
+Run in Google Colab</div>
+<p class="sd-card-text">Execute the code directly in your browser without any local setup.</p>
+</div>
+<a class="sd-stretched-link sd-hide-link-text reference external" href="https://colab.research.google.com/github/RadimKozl/JLNN/blob/main/examples/JLNN_llm_rule_refinement.ipynb"><span>https://colab.research.google.com/github/RadimKozl/JLNN/blob/main/examples/JLNN_llm_rule_refinement.ipynb</span></a></div>
+</div>
+<div class="sd-col sd-d-flex-row docutils">
+<div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-sm sd-card-hover docutils">
+<div class="sd-card-body docutils">
+<div class="sd-card-title sd-font-weight-bold docutils">
+View on GitHub</div>
+<p class="sd-card-text">View source code and outputs in the GitHub notebook browser.</p>
+</div>
+<a class="sd-stretched-link sd-hide-link-text reference external" href="https://github.com/RadimKozl/JLNN/blob/main/examples/JLNN_llm_rule_refinement.ipynb"><span>https://github.com/RadimKozl/JLNN/blob/main/examples/JLNN_llm_rule_refinement.ipynb</span></a></div>
+</div>
+</div>
+</div>
+<section id="theoretical-introduction">
+<h2>Theoretical Introduction<a class="headerlink" href="#theoretical-introduction" title="Link to this heading">¶</a></h2>
+<p>The Grand Cycle stands on three fundamental pillars:</p>
+<ol class="arabic simple">
+<li><p><strong>Statistical Grounding (NumPyro):</strong> Logical variables are not mere abstract symbols; they are anchored in real-world data using Bayesian inference.</p></li>
+<li><p><strong>Epistemic Reasoning (JLNN):</strong> The system operates with truth intervals, allowing it to distinguish between “known falsehood” and “complete ignorance” (epistemic uncertainty).</p></li>
+<li><p><strong>LLM Refinement (Ollama/DeepSeek):</strong> The model acts as a creative agent that analyzes logical gaps and suggests new rules to fill them.</p></li>
+</ol>
+</section>
+<section id="implementation">
+<h2>Implementation<a class="headerlink" href="#implementation" title="Link to this heading">¶</a></h2>
+<p>In this tutorial, we use the <code class="docutils literal notranslate"><span class="pre">deepseek-r1:1.5b</span></code> model running locally via Ollama. The system undergoes an iterative process:</p>
+<ul class="simple">
+<li><p><strong>Analysis:</strong> MCMC (NumPyro) determines statistical thresholds for botanical features (e.g., petal length).</p></li>
+<li><p><strong>Evaluation:</strong> JLNN assesses the current knowledge base and identifies areas of high uncertainty.</p></li>
+<li><p><strong>Innovation:</strong> The LLM suggests a new symbolic rule (e.g., <code class="docutils literal notranslate"><span class="pre">PetalLength_Small</span> <span class="pre">&amp;</span> <span class="pre">SepalWidth_Wide</span> <span class="pre">-&gt;</span> <span class="pre">Is_Setosa</span></code>).</p></li>
+<li><p><strong>Validation:</strong> The new rule is tested against data and either accepted into the Knowledge Base (KB) or rejected.</p></li>
+</ul>
+</section>
+<section id="convergence-analysis-and-llm-limits">
+<h2>Convergence Analysis and LLM Limits<a class="headerlink" href="#convergence-analysis-and-llm-limits" title="Link to this heading">¶</a></h2>
+<p>A key contribution of this tutorial is the observation of system behavior upon reaching <strong>logical saturation</strong>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Observe that around the 8th iteration, the Accuracy reaches ~100% and the Epistemic Gap falls to near zero.</p>
+</div>
+<section id="observed-phenomena-and-model-limits">
+<h3>Observed Phenomena and Model Limits:<a class="headerlink" href="#observed-phenomena-and-model-limits" title="Link to this heading">¶</a></h3>
+<p>During the experiment, the <code class="docutils literal notranslate"><span class="pre">deepseek-r1:1.5b</span></code> model reached a clear “cognitive ceiling.” This manifested in several ways:</p>
+<ul class="simple">
+<li><p><strong>Semantic Degradation:</strong> As the logical space became exhausted, the LLM began producing syntactic errors and duplicates. This is caused by an increase in <strong>informational entropy</strong> within the model’s context.</p></li>
+<li><p><strong>Collapse of Self-Correction:</strong> Despite being a “reasoning” model, the 1.5b version lost its ability to self-correct within its <code class="docutils literal notranslate"><span class="pre">&lt;think&gt;</span></code> blocks under high load and complex constraints. It began suggesting forbidden rules despite explicit instructions.</p></li>
+<li><p><strong>Cartesian Mapping Failure:</strong> The LLM lacks a geometric understanding of the feature space. It cannot “see” the remaining empty squares in a grid; it merely predicts the next most likely token.</p></li>
+<li><p><strong>Return to High-Probability Bias:</strong> When pushed to its limits, the model defaults to the simplest known patterns (e.g., <code class="docutils literal notranslate"><span class="pre">PetalLength_Medium</span> <span class="pre">-&gt;</span> <span class="pre">Is_Setosa</span></code>), effectively falling into an energetic minimum of data entropy.</p></li>
+</ul>
+</section>
+</section>
+<section id="results">
+<h2>Results<a class="headerlink" href="#results" title="Link to this heading">¶</a></h2>
+<p>The final Symbolic Knowledge Base represents a highly compressed and human-readable logic that defines the Iris dataset with absolute precision.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Example of a discovered complex rule</span>
+<span class="mf">0.95</span> <span class="p">::</span> <span class="p">(</span><span class="n">PetalLength_Small</span> <span class="o">&amp;</span> <span class="n">SepalWidth_Narrow</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">SepalWidth_Wide</span> <span class="o">&amp;</span> <span class="n">PetalLength_Medium</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Is_Setosa</span>
+</pre></div>
+</div>
+</section>
+<section id="conclusion">
+<h2>Conclusion<a class="headerlink" href="#conclusion" title="Link to this heading">¶</a></h2>
+<p>This experiment demonstrates that <strong>JLNN</strong> serves as a robust “logical anchor” for LLM agents. It prevents uncontrolled hallucinations and provides a rigorous mathematical framework that remains stable even when the LLM agent begins to fail due to its physical and architectural limitations.</p>
+<p>The “crash” or stagnation observed in later iterations is not a failure of the system, but a diagnostic signal that the knowledge space is fully saturated.</p>
+</section>
+<section id="example">
+<h2>Example<a class="headerlink" href="#example" title="Link to this heading">¶</a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">try:</span>
+<span class="sd">    import jlnn</span>
+<span class="sd">    import jraph</span>
+<span class="sd">    import numpyro</span>
+<span class="sd">    import ollama</span>
+<span class="sd">    from flax import nnx</span>
+<span class="sd">    import jax.numpy as jnp</span>
+<span class="sd">    import numpy as np</span>
+<span class="sd">    import xarray as xr</span>
+<span class="sd">    import pandas as pd</span>
+<span class="sd">    import qutip as qt</span>
+<span class="sd">    import optuna</span>
+<span class="sd">    import matplotlib.pyplot as plt</span>
+<span class="sd">    import sklearn</span>
+<span class="sd">    print(&quot;✅ JLNN and JAX are ready.&quot;)</span>
+<span class="sd">except ImportError:</span>
+<span class="sd">    print(&quot;🚀 Installing JLNN from GitHub and fixing JAX for Colab...&quot;)</span>
+<span class="sd">    # Instalace frameworku</span>
+<span class="sd">    #!pip install jax-lnn --quiet</span>
+<span class="sd">    !pip install git+https://github.com/RadimKozl/JLNN.git --quiet</span>
+<span class="sd">    !pip install optuna optuna-dashboard pandas scikit-learn matplotlib --quiet</span>
+<span class="sd">    !pip install arviz --quiet</span>
+<span class="sd">    !pip install seaborn --quiet</span>
+<span class="sd">    !pip install numpyro jraph --quiet</span>
+<span class="sd">    !pip install qutip --quiet</span>
+<span class="sd">    !pip install ollama --quiet</span>
+<span class="sd">    # Fix JAX/CUDA compatibility for 2026 in Colab</span>
+<span class="sd">    !pip install --upgrade &quot;jax[cuda12_pip]&quot; -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html --quiet</span>
+<span class="sd">    !pip install  scikit-learn pandas --quiet</span>
+
+<span class="sd">    import os</span>
+<span class="sd">    print(&quot;\n🔄 RESTARTING ENVIRONMENT... Please wait a second and then run the cell again.&quot;)</span>
+<span class="sd">    os.kill(os.getpid(), 9)</span>
+<span class="sd">    os.kill(os.getpid(), 9) # After this line, the cell stops and the environment restarts</span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span><span class="o">,</span><span class="w"> </span><span class="nn">sys</span>
+<span class="c1"># for solving collision of CPU for Numpyro, JLNN and GPU for ollama</span>
+
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;JAX_PLATFORM_NAME&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;cpu&quot;</span>
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;JAX_PLATFORMS&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;cpu&quot;</span>
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;CUDA_VISIBLE_DEVICES&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;JAX_SKIP_PJRT_C_API_GPU&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;1&quot;</span>
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;TF_CPP_MIN_LOG_LEVEL&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;3&quot;</span>
+
+<span class="c1"># Installing system dependencies and Ollam</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">print(&quot;📥 Installing system dependencies...&quot;)</span>
+<span class="sd">!sudo apt update &amp;&amp; sudo apt install pciutils zstd -y</span>
+<span class="sd">!curl -fsSL https://ollama.com/install.sh | sh</span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="c1"># Imports</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">subprocess</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">jax</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">jax.numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">jnp</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">jax</span><span class="w"> </span><span class="kn">import</span> <span class="n">random</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flax</span><span class="w"> </span><span class="kn">import</span> <span class="n">nnx</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpyro</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpyro.distributions</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">dist</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">numpyro.infer</span><span class="w"> </span><span class="kn">import</span> <span class="n">MCMC</span><span class="p">,</span> <span class="n">NUTS</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">arviz</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">az</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ollama</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.ticker</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">mticker</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.datasets</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_iris</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.preprocessing</span><span class="w"> </span><span class="kn">import</span> <span class="n">MinMaxScaler</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.metrics</span><span class="w"> </span><span class="kn">import</span> <span class="n">accuracy_score</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">threading</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">jlnn.symbolic.compiler</span><span class="w"> </span><span class="kn">import</span> <span class="n">LNNFormula</span>
+
+<span class="n">numpyro</span><span class="o">.</span><span class="n">set_platform</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;XLA_PYTHON_CLIENT_PREALLOCATE&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;false&quot;</span>
+
+<span class="c1"># --- 2. LAUNCHING OLLAM AND DOWNLOADING THE GEMMA 3 MODEL ---</span>
+
+<span class="n">OLLAMA_MODEL</span> <span class="o">=</span> <span class="s1">&#39;deepseek-r1:1.5b&#39;</span> <span class="c1"># gemma3:4b, deepseek-r1:1.5b, llama3.2:3b, qwen3:1.7b</span>
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;OLLAMA_HOST&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;0.0.0.0:11434&#39;</span>
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;OLLAMA_ORIGINS&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;*&#39;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">start_ollama_server</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Starts the Ollama server in the background.&quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">([</span><span class="s1">&#39;ollama&#39;</span><span class="p">,</span> <span class="s1">&#39;serve&#39;</span><span class="p">])</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;🚀 Ollama server launched!&quot;</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error starting Ollama server: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">pull_ollama_model</span><span class="p">(</span><span class="n">model_name</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Downloads the specified model after a short delay.&quot;&quot;&quot;</span>
+    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span> <span class="c1"># Longer pause for server start</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;⬇️ Starting to download model: </span><span class="si">{</span><span class="n">model_name</span><span class="si">}</span><span class="s2"> (this may take a few minutes)...&quot;</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;ollama pull </span><span class="si">{</span><span class="n">model_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">check</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">capture_output</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;✅ Model </span><span class="si">{</span><span class="n">model_name</span><span class="si">}</span><span class="s2"> successfully downloaded!&quot;</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">CalledProcessError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;❌ Error downloading model </span><span class="si">{</span><span class="n">model_name</span><span class="si">}</span><span class="s2">:</span><span class="se">\n</span><span class="si">{</span><span class="n">e</span><span class="o">.</span><span class="n">stderr</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">start_ollama_server</span><span class="p">)</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+<span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span> <span class="c1"># Longer pause for server start</span>
+<span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">pull_ollama_model</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">OLLAMA_MODEL</span><span class="p">,))</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">!ollama list</span>
+<span class="sd">print(&quot;\n⏳ Wait for confirmation: &#39;✅ Model successfully downloaded!&#39;&quot;)</span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="c1"># --- 3. DATA PREPARATION (IRIS SETOSA) ---</span>
+
+<span class="n">iris</span> <span class="o">=</span> <span class="n">load_iris</span><span class="p">()</span>
+<span class="c1"># We will use Petal Length (index 2) and Sepal Width (index 1)</span>
+<span class="n">X_raw</span> <span class="o">=</span> <span class="n">iris</span><span class="o">.</span><span class="n">data</span><span class="p">[:,</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">]]</span>
+<span class="n">y_data</span> <span class="o">=</span> <span class="p">(</span><span class="n">iris</span><span class="o">.</span><span class="n">target</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span> <span class="c1"># Objective: Is it Setosa?</span>
+
+<span class="c1"># Normalize to interval [0, 1]</span>
+<span class="n">X_min</span><span class="p">,</span> <span class="n">X_max</span> <span class="o">=</span> <span class="n">X_raw</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="n">X_raw</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">X_scaled</span> <span class="o">=</span> <span class="p">(</span><span class="n">X_raw</span> <span class="o">-</span> <span class="n">X_min</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">X_max</span> <span class="o">-</span> <span class="n">X_min</span><span class="p">)</span>
+
+<span class="c1"># --- 4. STATISTICAL MODEL (NumPyro) ---</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">iris_interaction_model</span><span class="p">(</span><span class="n">data_x</span><span class="p">,</span> <span class="n">data_y</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Statistical model with interaction between two traits.&quot;&quot;&quot;</span>
+    <span class="c1"># PetalLength (Probably small for Setosa)</span>
+    <span class="n">th_p</span> <span class="o">=</span> <span class="n">numpyro</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="s2">&quot;threshold_p&quot;</span><span class="p">,</span> <span class="n">dist</span><span class="o">.</span><span class="n">Uniform</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">))</span>
+    <span class="n">st_p</span> <span class="o">=</span> <span class="n">numpyro</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="s2">&quot;steep_p&quot;</span><span class="p">,</span> <span class="n">dist</span><span class="o">.</span><span class="n">Exponential</span><span class="p">(</span><span class="mf">5.0</span><span class="p">))</span>
+
+    <span class="c1"># SepalWidth (Probably wide for Setosa)</span>
+    <span class="n">th_s</span> <span class="o">=</span> <span class="n">numpyro</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="s2">&quot;threshold_s&quot;</span><span class="p">,</span> <span class="n">dist</span><span class="o">.</span><span class="n">Uniform</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">))</span>
+    <span class="n">st_s</span> <span class="o">=</span> <span class="n">numpyro</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="s2">&quot;steep_s&quot;</span><span class="p">,</span> <span class="n">dist</span><span class="o">.</span><span class="n">Exponential</span><span class="p">(</span><span class="mf">5.0</span><span class="p">))</span>
+
+    <span class="c1"># Interaction weight (allows the model to combine both features)</span>
+    <span class="n">w_inter</span> <span class="o">=</span> <span class="n">numpyro</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="s2">&quot;w_inter&quot;</span><span class="p">,</span> <span class="n">dist</span><span class="o">.</span><span class="n">Beta</span><span class="p">(</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">))</span>
+
+    <span class="c1"># Fuzzy affiliation</span>
+    <span class="n">mem_p</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">sigmoid</span><span class="p">(</span><span class="n">st_p</span> <span class="o">*</span> <span class="p">(</span><span class="n">th_p</span> <span class="o">-</span> <span class="n">data_x</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]))</span>
+    <span class="n">mem_s</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">sigmoid</span><span class="p">(</span><span class="n">st_s</span> <span class="o">*</span> <span class="p">(</span><span class="n">data_x</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">th_s</span><span class="p">))</span>
+
+    <span class="c1"># Combination: linear mix between &quot;Petal only&quot; and &quot;Petal AND Sepal&quot;</span>
+    <span class="n">probs</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">w_inter</span><span class="p">)</span> <span class="o">*</span> <span class="n">mem_p</span> <span class="o">+</span> <span class="n">w_inter</span> <span class="o">*</span> <span class="p">(</span><span class="n">mem_p</span> <span class="o">*</span> <span class="n">mem_s</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="n">numpyro</span><span class="o">.</span><span class="n">plate</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="n">data_x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+        <span class="n">numpyro</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="s2">&quot;obs&quot;</span><span class="p">,</span> <span class="n">dist</span><span class="o">.</span><span class="n">Bernoulli</span><span class="p">(</span><span class="n">probs</span><span class="o">=</span><span class="n">probs</span><span class="p">),</span> <span class="n">obs</span><span class="o">=</span><span class="n">data_y</span><span class="p">)</span>
+
+<span class="c1"># --- 5. LOGIC MODEL (JLNN + NNX) ---</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">BotanicalAgent</span><span class="p">(</span><span class="n">nnx</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A logical agent processing a dynamic list of rules.&quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rule_list</span><span class="p">,</span> <span class="n">rngs</span><span class="p">:</span> <span class="n">nnx</span><span class="o">.</span><span class="n">Rngs</span><span class="p">):</span>
+        <span class="c1"># nnx.List is required for Flax/JAX compatibility</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">formulas</span> <span class="o">=</span> <span class="n">nnx</span><span class="o">.</span><span class="n">List</span><span class="p">([</span><span class="n">LNNFormula</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">rngs</span><span class="o">=</span><span class="n">rngs</span><span class="p">)</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">rule_list</span><span class="p">])</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">grounding</span><span class="p">):</span>
+        <span class="c1"># Gradual application of all rules</span>
+        <span class="n">outputs</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span><span class="p">(</span><span class="n">grounding</span><span class="p">)</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">formulas</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">outputs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="c1"># Return the result of the last (target) node</span>
+
+<span class="c1"># --- 6. GRAND CYCLE EXECUTION ---</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">run_grand_cycle</span><span class="p">(</span><span class="n">model_name</span><span class="p">,</span> <span class="n">max_iterations</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Autonomous Neuro-Symbolic Loop:</span>
+<span class="sd">    Stats (NumPyro) -&gt; Logic (JLNN) -&gt; Reasoning (LLM)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Initial knowledge base</span>
+    <span class="n">current_rules</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;0.85 :: PetalLength_Small -&gt; Is_Setosa&quot;</span><span class="p">]</span>
+    <span class="n">history</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1"># Definition of allowed atoms for validation</span>
+    <span class="n">allowed_atoms</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;PetalLength_Small&quot;</span><span class="p">,</span> <span class="s2">&quot;PetalLength_Medium&quot;</span><span class="p">,</span> <span class="s2">&quot;SepalWidth_Wide&quot;</span><span class="p">,</span> <span class="s2">&quot;SepalWidth_Narrow&quot;</span><span class="p">,</span> <span class="s2">&quot;Is_Setosa&quot;</span><span class="p">]</span>
+
+    <span class="k">for</span> <span class="n">iteration</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_iterations</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;=&quot;</span><span class="o">*</span><span class="mi">60</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;🌀 GRAND CYCLE ITERATION </span><span class="si">{</span><span class="n">iteration</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">max_iterations</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="o">*</span><span class="mi">60</span><span class="p">)</span>
+
+        <span class="c1"># --- STEP 1: STATISTICAL GROUNDING (NumPyro) ---</span>
+        <span class="c1"># (Assumes existing iris_interaction_model, X_scaled and y_data in namespace)</span>
+        <span class="n">mcmc</span> <span class="o">=</span> <span class="n">MCMC</span><span class="p">(</span><span class="n">NUTS</span><span class="p">(</span><span class="n">iris_interaction_model</span><span class="p">),</span> <span class="n">num_samples</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span> <span class="n">num_warmup</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">mcmc</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">PRNGKey</span><span class="p">(</span><span class="n">iteration</span><span class="p">),</span> <span class="n">data_x</span><span class="o">=</span><span class="n">X_scaled</span><span class="p">,</span> <span class="n">data_y</span><span class="o">=</span><span class="n">y_data</span><span class="p">)</span>
+        <span class="n">samples</span> <span class="o">=</span> <span class="n">mcmc</span><span class="o">.</span><span class="n">get_samples</span><span class="p">()</span>
+
+        <span class="c1"># HDI estimation for threshold values</span>
+        <span class="n">hdi_p</span> <span class="o">=</span> <span class="n">az</span><span class="o">.</span><span class="n">hdi</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">samples</span><span class="p">[</span><span class="s1">&#39;threshold_p&#39;</span><span class="p">]),</span> <span class="n">hdi_prob</span><span class="o">=</span><span class="mf">0.95</span><span class="p">)</span>
+        <span class="n">hdi_s</span> <span class="o">=</span> <span class="n">az</span><span class="o">.</span><span class="n">hdi</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">samples</span><span class="p">[</span><span class="s1">&#39;threshold_s&#39;</span><span class="p">]),</span> <span class="n">hdi_prob</span><span class="o">=</span><span class="mf">0.95</span><span class="p">)</span>
+        <span class="n">L_p</span><span class="p">,</span> <span class="n">U_p</span><span class="p">,</span> <span class="n">L_s</span><span class="p">,</span> <span class="n">U_s</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">hdi_p</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">float</span><span class="p">(</span><span class="n">hdi_p</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="nb">float</span><span class="p">(</span><span class="n">hdi_s</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">float</span><span class="p">(</span><span class="n">hdi_s</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+        <span class="c1"># Calculation of the current Accuracy of the statistical model</span>
+        <span class="n">th_p_m</span><span class="p">,</span> <span class="n">th_s_m</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">samples</span><span class="p">[</span><span class="s1">&#39;threshold_p&#39;</span><span class="p">]),</span> <span class="n">jnp</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">samples</span><span class="p">[</span><span class="s1">&#39;threshold_s&#39;</span><span class="p">])</span>
+        <span class="n">st_p_m</span><span class="p">,</span> <span class="n">st_s_m</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">samples</span><span class="p">[</span><span class="s1">&#39;steep_p&#39;</span><span class="p">]),</span> <span class="n">jnp</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">samples</span><span class="p">[</span><span class="s1">&#39;steep_s&#39;</span><span class="p">])</span>
+        <span class="n">w_i_m</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">samples</span><span class="p">[</span><span class="s1">&#39;w_inter&#39;</span><span class="p">])</span>
+        <span class="n">m_p</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">sigmoid</span><span class="p">(</span><span class="n">st_p_m</span> <span class="o">*</span> <span class="p">(</span><span class="n">th_p_m</span> <span class="o">-</span> <span class="n">X_scaled</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]))</span>
+        <span class="n">m_s</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">sigmoid</span><span class="p">(</span><span class="n">st_s_m</span> <span class="o">*</span> <span class="p">(</span><span class="n">X_scaled</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">th_s_m</span><span class="p">))</span>
+        <span class="n">acc</span> <span class="o">=</span> <span class="n">accuracy_score</span><span class="p">(</span><span class="n">y_data</span><span class="p">,</span> <span class="p">((</span><span class="mi">1</span> <span class="o">-</span> <span class="n">w_i_m</span><span class="p">)</span> <span class="o">*</span> <span class="n">m_p</span> <span class="o">+</span> <span class="n">w_i_m</span> <span class="o">*</span> <span class="p">(</span><span class="n">m_p</span> <span class="o">*</span> <span class="n">m_s</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">0.5</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">))</span>
+
+        <span class="c1"># --- STEP 2: LOGICAL INFERENCE (JLNN) ---</span>
+        <span class="c1"># Create an agent with the current ruleset</span>
+        <span class="n">agent</span> <span class="o">=</span> <span class="n">BotanicalAgent</span><span class="p">(</span><span class="n">current_rules</span><span class="p">,</span> <span class="n">nnx</span><span class="o">.</span><span class="n">Rngs</span><span class="p">(</span><span class="n">iteration</span><span class="p">))</span>
+
+        <span class="c1"># Mapping statistical intervals to logical atoms</span>
+        <span class="n">grounding</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;PetalLength_Small&quot;</span><span class="p">:</span>  <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">L_p</span><span class="p">,</span> <span class="n">U_p</span><span class="p">]]),</span>
+            <span class="s2">&quot;PetalLength_Medium&quot;</span><span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">U_p</span><span class="p">,</span> <span class="n">U_p</span> <span class="o">+</span> <span class="mf">0.15</span><span class="p">]]),</span>
+            <span class="s2">&quot;SepalWidth_Wide&quot;</span><span class="p">:</span>    <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">L_s</span><span class="p">,</span> <span class="n">U_s</span><span class="p">]]),</span>
+            <span class="s2">&quot;SepalWidth_Narrow&quot;</span><span class="p">:</span>  <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">L_s</span><span class="p">]]),</span>
+            <span class="s2">&quot;Is_Setosa&quot;</span><span class="p">:</span>          <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]])</span>
+        <span class="p">}</span>
+
+        <span class="c1"># Forward symbolic network (calculation of the truth interval for the target predicate)</span>
+        <span class="n">prediction</span> <span class="o">=</span> <span class="n">agent</span><span class="p">(</span><span class="n">grounding</span><span class="p">)</span>
+        <span class="n">res_L</span><span class="p">,</span> <span class="n">res_U</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">prediction</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]),</span> <span class="nb">float</span><span class="p">(</span><span class="n">prediction</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+        <span class="n">gap</span> <span class="o">=</span> <span class="n">res_U</span> <span class="o">-</span> <span class="n">res_L</span>
+
+        <span class="c1"># --- STEP 3: LLM REFINEMENT (Anti-repetition and anti-hallucination strategies) ---</span>
+
+        <span class="c1"># List of existing prompt formulas to avoid repeating LLM</span>
+        <span class="n">existing_kb_str</span> <span class="o">=</span> <span class="nb">chr</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">current_rules</span><span class="p">)</span>
+
+        <span class="c1"># --- PRE-PROCESSING FOR LLM ---</span>
+        <span class="c1"># We create a list of purely logical structures without weights so that the model sees that they are forbidden</span>
+        <span class="n">forbidden_logic</span> <span class="o">=</span> <span class="p">[</span><span class="n">r</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;::&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;-&gt;&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">current_rules</span><span class="p">]</span>
+
+        <span class="c1"># List of allowed atoms as a string for the prompt</span>
+        <span class="n">atoms_str</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">allowed_atoms</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="c1"># without Is_Setos</span>
+
+        <span class="n">report</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;You are a Senior Logic Engineer for the JLNN neuro-symbolic system.</span>
+<span class="s2">Your job is to propose precise, high-quality logical rules based on current performance.</span>
+
+<span class="s2">THESE FORMULAS ARE ALREADY KNOWN AND FORBIDDEN (DO NOT REPEAT THEM):</span>
+<span class="s2">Knowledge base:</span>
+<span class="si">{</span><span class="n">existing_kb_str</span><span class="si">}</span>
+
+<span class="s2">Forbidden logic:</span>
+<span class="si">{</span><span class="nb">chr</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">forbidden_logic</span><span class="p">)</span><span class="si">}</span>
+
+<span class="s2">STATISTICS:</span>
+<span class="s2">- Statistical Accuracy: </span><span class="si">{</span><span class="n">acc</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span>
+<span class="s2">- Logical Epistemic Gap: </span><span class="si">{</span><span class="n">gap</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span>
+
+<span class="s2">TASK:</span>
+<span class="s2">Suggest ONE NEW COMPLEX RULE that is NOT in the list above.</span>
+<span class="s2">Try to combine 2 or 3 atoms using &#39;&amp;&#39; (AND) to create a more precise rule.</span>
+
+<span class="s2">CRITICAL RULES FOR NEW RULE GENERATION:</span>
+<span class="s2">1. If you suggest a formula like &#39;PetalLength_Small &amp; SepalWidth_Wide&#39;, it is considered a DUPLICATE even if you use a different weight (e.g., 0.99 instead of 0.85).</span>
+<span class="s2">2. You MUST change the logical structure (add/remove atoms, change operators).</span>
+<span class="s2">3. A &amp; B is the same as B &amp; A. Be creative!</span>
+<span class="s2">4. Use combinations of PetalLength_Medium, SepalWidth_Narrow, or use &#39;|&#39; (OR) to break the cycle.</span>
+
+<span class="s2">ALLOWED ATOMS: </span><span class="si">{</span><span class="n">atoms_str</span><span class="si">}</span>
+<span class="s2">ALLOWED OPERATORS: &amp; | -&gt;</span>
+<span class="s2">TARGET: Is_Setosa</span>
+
+<span class="s2">STRATEGY:</span>
+<span class="s2">- If accuracy is flat, try a more specific rule (e.g., combining Petal and Sepal).</span>
+<span class="s2">- Use weights between 0.70 and 0.98 based on your confidence.</span>
+<span class="s2">- DO NOT suggest any formula that is already in the Current KB.</span>
+
+<span class="s2">FORMAT:</span>
+<span class="s2">Return **only one line** in exactly this format. No explanation, no quotes, no extra text.</span>
+
+<span class="s2">weight :: formula -&gt; Is_Setosa</span>
+
+<span class="s2">Example of correct output:</span>
+<span class="s2">0.93 :: PetalLength_Small &amp; SepalWidth_Wide -&gt; Is_Setosa</span>
+
+<span class="s2">EXAMPLES OF GOOD RULES (different complexity levels):</span>
+<span class="s2">0.85 :: PetalLength_Small -&gt; Is_Setosa</span>
+<span class="s2">0.92 :: PetalLength_Small &amp; SepalWidth_Wide -&gt; Is_Setosa</span>
+<span class="s2">0.81 :: PetalLength_Medium | SepalWidth_Wide -&gt; Is_Setosa</span>
+<span class="s2">0.89 :: PetalLength_Small &amp; SepalWidth_Narrow &amp; PetalLength_Medium -&gt; Is_Setosa</span>
+<span class="s2">0.94 :: (PetalLength_Small &amp; SepalWidth_Wide) -&gt; Is_Setosa</span>
+<span class="s2">0.75 :: (PetalLength_Small &amp; SepalWidth_Narrow) | PetalLength_Medium -&gt; Is_Setosa</span>
+<span class="s2">&quot;&quot;&quot;</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;🤖 </span><span class="si">{</span><span class="n">model_name</span><span class="si">}</span><span class="s2"> analyzing logical gaps...&quot;</span><span class="p">)</span>
+        <span class="n">new_rule</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">for</span> <span class="n">attempt</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="c1"># Calling LLM</span>
+                <span class="n">resp</span> <span class="o">=</span> <span class="n">ollama</span><span class="o">.</span><span class="n">chat</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">model_name</span><span class="p">,</span> <span class="n">messages</span><span class="o">=</span><span class="p">[{</span><span class="s1">&#39;role&#39;</span><span class="p">:</span> <span class="s1">&#39;user&#39;</span><span class="p">,</span> <span class="s1">&#39;content&#39;</span><span class="p">:</span> <span class="n">report</span><span class="p">}])</span>
+                <span class="n">raw</span> <span class="o">=</span> <span class="n">resp</span><span class="p">[</span><span class="s1">&#39;message&#39;</span><span class="p">][</span><span class="s1">&#39;content&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;   [Attempt </span><span class="si">{</span><span class="n">attempt</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">] LLM Raw Output: </span><span class="si">{</span><span class="n">raw</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+                <span class="c1"># Extracting a rule using regex</span>
+                <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;(\d*\.?\d+)\s*::\s*(.+?)\s*-&gt;\s*Is_Setosa&#39;</span><span class="p">,</span> <span class="n">raw</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+                    <span class="n">weight</span><span class="p">,</span> <span class="n">formula</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">(),</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                    <span class="n">candidate</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">weight</span><span class="si">}</span><span class="s2"> :: </span><span class="si">{</span><span class="n">formula</span><span class="si">}</span><span class="s2"> -&gt; Is_Setosa&quot;</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;&quot;&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;&#39;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+                    <span class="c1"># Check if LLM has not used disallowed atoms (KeyError prevention)</span>
+                    <span class="n">found_atoms</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;[a-zA-Z_]+&#39;</span><span class="p">,</span> <span class="n">formula</span><span class="p">)</span>
+                    <span class="n">invalid_atoms</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">found_atoms</span> <span class="k">if</span> <span class="n">a</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">allowed_atoms</span><span class="p">]</span>
+
+                    <span class="k">if</span> <span class="n">invalid_atoms</span><span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;   ❌ Rejected: Unknown atoms </span><span class="si">{</span><span class="n">invalid_atoms</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                        <span class="k">continue</span>
+
+                    <span class="c1"># Check if the rule is not already in the database (exact formula match)</span>
+                    <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">formula</span> <span class="ow">in</span> <span class="n">r</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">current_rules</span><span class="p">):</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;   ❌ Rejected: Rule already exists in KB.&quot;</span><span class="p">)</span>
+                        <span class="k">continue</span>
+
+                    <span class="c1"># Validation of syntactic correctness by JLNN parser</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">LNNFormula</span><span class="p">(</span><span class="n">candidate</span><span class="p">,</span> <span class="n">rngs</span><span class="o">=</span><span class="n">nnx</span><span class="o">.</span><span class="n">Rngs</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+                        <span class="n">new_rule</span> <span class="o">=</span> <span class="n">candidate</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;   ✅ Accepted: </span><span class="si">{</span><span class="n">new_rule</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                        <span class="k">break</span>
+                    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;   ❌ Parser rejected candidate -&gt; </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                        <span class="k">continue</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;   ⚠️ Regex failed: Output format incorrect.&quot;</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;   ❌ LLM Error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="c1"># Knowledge base update</span>
+        <span class="k">if</span> <span class="n">new_rule</span><span class="p">:</span>
+            <span class="n">current_rules</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_rule</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;⚠️ Iteration finished without a new rule (Keeping current KB).&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Save history with correct keys for visualization</span>
+        <span class="n">history</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+            <span class="s2">&quot;iteration&quot;</span><span class="p">:</span> <span class="n">iteration</span><span class="p">,</span>
+            <span class="s2">&quot;acc&quot;</span><span class="p">:</span> <span class="n">acc</span><span class="p">,</span>
+            <span class="s2">&quot;gap&quot;</span><span class="p">:</span> <span class="n">gap</span><span class="p">,</span>
+            <span class="s2">&quot;truth&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">res_L</span><span class="p">,</span> <span class="n">res_U</span><span class="p">),</span>
+            <span class="s2">&quot;rules&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">current_rules</span><span class="p">)</span>
+        <span class="p">})</span>
+
+    <span class="k">return</span> <span class="n">history</span><span class="p">,</span> <span class="n">current_rules</span>
+
+<span class="c1"># 5. VISUALIZATION OF DEVELOPMENT</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="c1"># 1. START CALCULATION (we will save the result in &#39;history_data&#39;)</span>
+    <span class="c1"># Make sure you have OLLAMA_MODEL defined</span>
+    <span class="n">history_data</span><span class="p">,</span> <span class="n">final_kb</span> <span class="o">=</span> <span class="n">run_grand_cycle</span><span class="p">(</span><span class="n">model_name</span><span class="o">=</span><span class="n">OLLAMA_MODEL</span><span class="p">,</span> <span class="n">max_iterations</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+
+    <span class="c1"># 2. DATA EXTRACTION</span>
+    <span class="n">iters</span>       <span class="o">=</span> <span class="p">[</span><span class="n">h</span><span class="p">[</span><span class="s1">&#39;iteration&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="n">history_data</span><span class="p">]</span>
+    <span class="n">accs</span>        <span class="o">=</span> <span class="p">[</span><span class="n">h</span><span class="p">[</span><span class="s1">&#39;acc&#39;</span><span class="p">]</span>       <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="n">history_data</span><span class="p">]</span>
+    <span class="n">gaps</span>        <span class="o">=</span> <span class="p">[</span><span class="n">h</span><span class="p">[</span><span class="s1">&#39;gap&#39;</span><span class="p">]</span>       <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="n">history_data</span><span class="p">]</span>
+    <span class="n">truth_L</span>     <span class="o">=</span> <span class="p">[</span><span class="n">h</span><span class="p">[</span><span class="s1">&#39;truth&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>  <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="n">history_data</span><span class="p">]</span>
+    <span class="n">truth_U</span>     <span class="o">=</span> <span class="p">[</span><span class="n">h</span><span class="p">[</span><span class="s1">&#39;truth&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>  <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="n">history_data</span><span class="p">]</span>
+    <span class="n">rule_counts</span> <span class="o">=</span> <span class="p">[</span><span class="n">h</span><span class="p">[</span><span class="s1">&#39;rules&#39;</span><span class="p">]</span>     <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="n">history_data</span><span class="p">]</span>
+
+    <span class="c1"># 3. VISUALIZATION (Improved &quot;clean&quot; look)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s1">&#39;seaborn-v0_8-whitegrid&#39;</span><span class="p">)</span>
+    <span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">16</span><span class="p">),</span> <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">ax1</span><span class="p">,</span> <span class="n">ax2</span><span class="p">,</span> <span class="n">ax3</span> <span class="o">=</span> <span class="n">axes</span>
+
+    <span class="c1"># --- CHART 1: Evolution of logical truth ---</span>
+    <span class="n">ax1</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span><span class="n">iters</span><span class="p">,</span> <span class="n">truth_L</span><span class="p">,</span> <span class="n">truth_U</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;#3498db&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Epistemic Uncertainty (Gap)&#39;</span><span class="p">)</span>
+    <span class="n">ax1</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">iters</span><span class="p">,</span> <span class="n">truth_L</span><span class="p">,</span> <span class="s1">&#39;o-&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;#2980b9&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Truth Lower Bound&#39;</span><span class="p">)</span>
+    <span class="n">ax1</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">iters</span><span class="p">,</span> <span class="n">truth_U</span><span class="p">,</span> <span class="s1">&#39;o-&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;#8e44ad&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Truth Upper Bound&#39;</span><span class="p">)</span>
+    <span class="n">ax1</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Neuro-Symbolic Convergence: Logical Truth Evolution&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">)</span>
+    <span class="n">ax1</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Truth Value [0, 1]&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+    <span class="n">ax1</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="o">-</span><span class="mf">0.05</span><span class="p">,</span> <span class="mf">1.05</span><span class="p">)</span>
+    <span class="n">ax1</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s1">&#39;upper left&#39;</span><span class="p">,</span> <span class="n">frameon</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">shadow</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="c1"># --- CHART 2: Accuracy ---</span>
+    <span class="n">ax2</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">iters</span><span class="p">,</span> <span class="n">accs</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;#e74c3c&#39;</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;D&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">2.5</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Statistical Accuracy&#39;</span><span class="p">)</span>
+    <span class="n">ax2</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span><span class="n">iters</span><span class="p">,</span> <span class="n">accs</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="n">accs</span><span class="p">)</span><span class="o">-</span><span class="mf">0.02</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;#e74c3c&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.05</span><span class="p">)</span>
+    <span class="n">ax2</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="n">accs</span><span class="p">)</span> <span class="o">-</span> <span class="mf">0.05</span><span class="p">),</span> <span class="nb">min</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">max</span><span class="p">(</span><span class="n">accs</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.05</span><span class="p">))</span>
+    <span class="n">ax2</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">set_major_formatter</span><span class="p">(</span><span class="n">mticker</span><span class="o">.</span><span class="n">PercentFormatter</span><span class="p">(</span><span class="mf">1.0</span><span class="p">))</span>
+    <span class="n">ax2</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Statistical Grounding Quality (NumPyro)&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">)</span>
+    <span class="n">ax2</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Accuracy (%)&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+    <span class="n">ax2</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s1">&#39;lower right&#39;</span><span class="p">,</span> <span class="n">frameon</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="c1"># --- CHART 3: KB growth vs. Gap ---</span>
+    <span class="n">color_gap</span> <span class="o">=</span> <span class="s1">&#39;#27ae60&#39;</span>
+    <span class="n">color_rules</span> <span class="o">=</span> <span class="s1">&#39;#f39c12&#39;</span>
+    <span class="n">ax3</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span><span class="n">iters</span><span class="p">,</span> <span class="n">gaps</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">color_gap</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Uncertainty Gap&#39;</span><span class="p">)</span>
+    <span class="n">ax3</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">iters</span><span class="p">,</span> <span class="n">gaps</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">color_gap</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+    <span class="n">ax3</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Uncertainty Width&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">color_gap</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">)</span>
+    <span class="n">ax3</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="n">labelcolor</span><span class="o">=</span><span class="n">color_gap</span><span class="p">)</span>
+
+    <span class="n">ax3_twin</span> <span class="o">=</span> <span class="n">ax3</span><span class="o">.</span><span class="n">twinx</span><span class="p">()</span>
+    <span class="n">ax3_twin</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">iters</span><span class="p">,</span> <span class="n">rule_counts</span><span class="p">,</span> <span class="n">where</span><span class="o">=</span><span class="s1">&#39;post&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">color_rules</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;KB Size (Rules)&#39;</span><span class="p">)</span>
+    <span class="n">ax3_twin</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span><span class="n">iters</span><span class="p">,</span> <span class="n">rule_counts</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="s2">&quot;post&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">color_rules</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+    <span class="n">ax3_twin</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Number of Rules in KB&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">color_rules</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">)</span>
+    <span class="n">ax3_twin</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="n">labelcolor</span><span class="o">=</span><span class="n">color_rules</span><span class="p">)</span>
+
+    <span class="n">ax3</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Knowledge Accumulation Impact&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">)</span>
+    <span class="n">ax3</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Grand Cycle Iteration&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+    <span class="n">h1</span><span class="p">,</span> <span class="n">l1</span> <span class="o">=</span> <span class="n">ax3</span><span class="o">.</span><span class="n">get_legend_handles_labels</span><span class="p">()</span>
+    <span class="n">h2</span><span class="p">,</span> <span class="n">l2</span> <span class="o">=</span> <span class="n">ax3_twin</span><span class="o">.</span><span class="n">get_legend_handles_labels</span><span class="p">()</span>
+    <span class="n">ax3</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">h1</span><span class="o">+</span><span class="n">h2</span><span class="p">,</span> <span class="n">l1</span><span class="o">+</span><span class="n">l2</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="s1">&#39;upper right&#39;</span><span class="p">,</span> <span class="n">frameon</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="c1"># Removing excess edges</span>
+    <span class="k">for</span> <span class="n">ax</span> <span class="ow">in</span> <span class="n">axes</span><span class="p">:</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.6</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">spines</span><span class="p">[</span><span class="s1">&#39;top&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">spines</span><span class="p">[</span><span class="s1">&#39;right&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">iters</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+    <span class="c1"># List of rules</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="si">{</span><span class="s1">&#39;=&#39;</span><span class="o">*</span><span class="mi">85</span><span class="si">}</span><span class="se">\n</span><span class="s2"> 🧠 FINAL SYMBOLIC KNOWLEDGE BASE</span><span class="se">\n</span><span class="si">{</span><span class="s1">&#39;=&#39;</span><span class="o">*</span><span class="mi">85</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">rule</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">final_kb</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; Iter </span><span class="si">{</span><span class="n">i</span><span class="si">:</span><span class="s2">2d</span><span class="si">}</span><span class="s2"> | </span><span class="si">{</span><span class="n">rule</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="download">
+<h2>Download<a class="headerlink" href="#download" title="Link to this heading">¶</a></h2>
+<p>You can also download the raw notebook file for local use:
+<a class="reference download external" download="" href="https://github.com/RadimKozl/JLNN/blob/main/examples/JLNN_llm_rule_refinement.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">JLNN_llm_rule_refinement.ipynb</span></code></a></p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>To run the notebook locally, make sure you have installed the package using <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-e</span> <span class="pre">.[test]</span></code>.</p>
+</div>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="../theory.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">Theoretical foundations of JLNN</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="JLNN_quantum_bell_inequalities.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Quantum Logic and Bell Inequalities with JLNN</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2026, Ing. Radim Közl
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">LLM Rule Refinement (The Grand Cycle)</a><ul>
+<li><a class="reference internal" href="#theoretical-introduction">Theoretical Introduction</a></li>
+<li><a class="reference internal" href="#implementation">Implementation</a></li>
+<li><a class="reference internal" href="#convergence-analysis-and-llm-limits">Convergence Analysis and LLM Limits</a><ul>
+<li><a class="reference internal" href="#observed-phenomena-and-model-limits">Observed Phenomena and Model Limits:</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#results">Results</a></li>
+<li><a class="reference internal" href="#conclusion">Conclusion</a></li>
+<li><a class="reference internal" href="#example">Example</a></li>
+<li><a class="reference internal" href="#download">Download</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../_static/documentation_options.js?v=b4547066"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/scripts/furo.js?v=46bd48cc"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    </body>
+</html>
