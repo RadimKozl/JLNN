@@ -143,7 +143,7 @@ JLNN is inspired by and builds upon the foundations laid by several pioneering n
 
 
 <p align="left">
-  <img src="docs/source/_static/URL_QR_Code_def.png" width="200" alt="Discord link: https://discord.gg/ADehdYCM">
+  <img src="docs/source/_static/URL_QR_Code_def.png" width="200" alt="Discord link: https://discord.gg/CRJXGm4WGV">
 </p>
 
 ------------------------------------
