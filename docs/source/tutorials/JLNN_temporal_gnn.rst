@@ -33,7 +33,7 @@ Theoretical Introduction: Physics as Logic
 In pneumatics, pressure corresponds to logical truth. However, in the real world, pressure constantly fluctuates, leaks, or builds up with latency. JLNN allows these phenomena to be modeled using:
 
 * **Weighted operators (Łukasiewicz):** They allow modeling of leakage (weights) and valve trigger thresholds (beta).
-* **Temporal logic (LTL):** The $\mathcal{G}$ (Always) and $\mathcal{F}$ (Eventually) operators monitor the stability and time limits of the sequence.
+* **Temporal logic (LTL):** The G (Always) and F (Eventually) operators monitor the stability and time limits of the sequence.
 * **STGNN (Symbolic Temporal GNN):** The physical interconnection of components (hoses, valves) is defined by an adjacency matrix through which "logical pressure" propagates.
 
 STGNN Implementation
