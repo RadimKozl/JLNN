@@ -3,7 +3,7 @@ JLNN: Temporal Symbolic GNN for Pneumatic Digital Twin
 
 This tutorial demonstrates the use of the **JLNN** library for modeling and diagnosing complex pneumatic systems. Unlike classic PLCs (binary logic), JLNN uses **interval truth** and **temporal operators** to detect anomalies before a crash occurs.
 
-.. image:: _static/img_pneumatic_diagram.png
+.. image:: ../_static/img_pneumatic_diagram.png
    :align: center
    :alt: JLNN Architecture Diagram
 
