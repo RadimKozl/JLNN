@@ -22,3 +22,4 @@ Examples & Tutorials
    JLNN_gpu_tpu_acceleration
    JLNN_quantum_bell_inequalities
    JLNN_llm_rule_refinement
+   JLNN_temporal_gnn
