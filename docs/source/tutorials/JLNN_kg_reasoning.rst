@@ -14,7 +14,7 @@ JLNN + Knowledge Graphs: RAG-like Reasoning over FB15k-237
        Execute the code directly in your browser without any local setup.
 
     .. grid-item-card::  View on GitHub
-       :link: https://github.com/RadimKozl/JLNN/blob/main/examples/JLNN_kg_reasoning.ipynb
+       :link: https://github.com/RadimKozl/JLNN/blob/main/examples/JLNN_kg_reasoning_github.ipynb
        :link-type: url
 
        View source code and outputs in the GitHub notebook browser.
