@@ -18,7 +18,7 @@ Instead of simple classification, we are creating a system that critically asses
        Execute the code directly in your browser without any local setup.
 
     .. grid-item-card::  View on GitHub
-       :link: https://github.com/RadimKozl/JLNN/blob/main/examples/JLNN_NS_Bayesian_GraphSAGE.ipynb
+       :link: https://github.com/RadimKozl/JLNN/blob/main/examples/JLNN_NS_Bayesian_GraphSAGE_github.ipynb
        :link-type: url
 
        View source code and outputs in the GitHub notebook browser.
