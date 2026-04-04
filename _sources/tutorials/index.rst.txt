@@ -23,3 +23,4 @@ Examples & Tutorials
    JLNN_quantum_bell_inequalities
    JLNN_llm_rule_refinement
    JLNN_temporal_gnn
+   JLNN_kg_reasoning
