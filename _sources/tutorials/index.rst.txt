@@ -24,3 +24,4 @@ Examples & Tutorials
    JLNN_llm_rule_refinement
    JLNN_temporal_gnn
    JLNN_kg_reasoning
+   JLNN_pointcloud_classification
