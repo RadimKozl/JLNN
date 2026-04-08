@@ -22,6 +22,7 @@ Introduction
 ---------------
 
 Traditional 3D deep learning models act as "black boxes". By using JLNN, we can define objects using logical constraints:
+
 * A **Chair** must have a backrest and legs.
 * A **Table** has a large horizontal plane and legs, but *no* backrest.
 * A **Sofa** shares features with a chair but is typically larger in scale.
@@ -33,7 +34,7 @@ The architecture consists of two main components:
 
 1. **Neural Feature Extractor (PointNet):** Consists of shared multi-layer perceptrons (MLPs) and a global max-pooling layer to extract a global feature vector from raw $(N, 3)$ point coordinates.
 
-2. **Symbolic Logic Layer (JLNN):** A differentiable logic circuit that maps neural activations to truth intervals $[L, U]$.
+2. **Symbolic Logic Layer (JLNN):** A differentiable logic circuit that maps neural activations to truth intervals *[L, U]*.
 
 .. code-block:: python
 
