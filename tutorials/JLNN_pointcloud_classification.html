@@ -355,7 +355,7 @@ View on GitHub</div>
 <h2>Model Architecture<a class="headerlink" href="#model-architecture" title="Link to this heading">¶</a></h2>
 <p>The architecture consists of two main components:</p>
 <ol class="arabic simple">
-<li><p><strong>Neural Feature Extractor (PointNet):</strong> Consists of shared multi-layer perceptrons (MLPs) and a global max-pooling layer to extract a global feature vector from raw $(N, 3)$ point coordinates.</p></li>
+<li><p><strong>Neural Feature Extractor (PointNet):</strong> Consists of shared multi-layer perceptrons (MLPs) and a global max-pooling layer to extract a global feature vector from raw <em>(N, 3)</em> point coordinates.</p></li>
 <li><p><strong>Symbolic Logic Layer (JLNN):</strong> A differentiable logic circuit that maps neural activations to truth intervals <em>[L, U]</em>.</p></li>
 </ol>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">NSModelNet</span><span class="p">(</span><span class="n">nnx</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
@@ -376,7 +376,7 @@ View on GitHub</div>
 <h2>Training Strategy<a class="headerlink" href="#training-strategy" title="Link to this heading">¶</a></h2>
 <p>To ensure the neuro-symbolic bridge learns effectively, we use a hybrid loss function and gradient clipping.</p>
 <p><strong>Loss Function:</strong>
-We combine Binary Cross Entropy (BCE) on the lower bounds ($L$) with an uncertainty penalty to push the truth intervals towards crisp values.</p>
+We combine Binary Cross Entropy (BCE) on the lower bounds <em>(L)</em> with an uncertainty penalty to push the truth intervals towards crisp values.</p>
 <div class="math-wrapper docutils container">
 <div class="math notranslate nohighlight">
 \[\mathcal{L} = \text{BCE}(L, y) + \lambda \sum_{i} (U_i - L_i)\]</div>
