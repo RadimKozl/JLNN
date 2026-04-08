@@ -32,7 +32,7 @@ Model Architecture
 
 The architecture consists of two main components:
 
-1. **Neural Feature Extractor (PointNet):** Consists of shared multi-layer perceptrons (MLPs) and a global max-pooling layer to extract a global feature vector from raw $(N, 3)$ point coordinates.
+1. **Neural Feature Extractor (PointNet):** Consists of shared multi-layer perceptrons (MLPs) and a global max-pooling layer to extract a global feature vector from raw *(N, 3)* point coordinates.
 
 2. **Symbolic Logic Layer (JLNN):** A differentiable logic circuit that maps neural activations to truth intervals *[L, U]*.
 
@@ -56,7 +56,7 @@ Training Strategy
 To ensure the neuro-symbolic bridge learns effectively, we use a hybrid loss function and gradient clipping.
 
 **Loss Function:**
-We combine Binary Cross Entropy (BCE) on the lower bounds ($L$) with an uncertainty penalty to push the truth intervals towards crisp values.
+We combine Binary Cross Entropy (BCE) on the lower bounds *(L)* with an uncertainty penalty to push the truth intervals towards crisp values.
 
 .. math::
 
