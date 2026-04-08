@@ -344,17 +344,19 @@ View on GitHub</div>
 </div>
 <section id="introduction">
 <h2>Introduction<a class="headerlink" href="#introduction" title="Link to this heading">¶</a></h2>
-<p>Traditional 3D deep learning models act as “black boxes”. By using JLNN, we can define objects using logical constraints:
-* A <strong>Chair</strong> must have a backrest and legs.
-* A <strong>Table</strong> has a large horizontal plane and legs, but <em>no</em> backrest.
-* A <strong>Sofa</strong> shares features with a chair but is typically larger in scale.</p>
+<p>Traditional 3D deep learning models act as “black boxes”. By using JLNN, we can define objects using logical constraints:</p>
+<ul class="simple">
+<li><p>A <strong>Chair</strong> must have a backrest and legs.</p></li>
+<li><p>A <strong>Table</strong> has a large horizontal plane and legs, but <em>no</em> backrest.</p></li>
+<li><p>A <strong>Sofa</strong> shares features with a chair but is typically larger in scale.</p></li>
+</ul>
 </section>
 <section id="model-architecture">
 <h2>Model Architecture<a class="headerlink" href="#model-architecture" title="Link to this heading">¶</a></h2>
 <p>The architecture consists of two main components:</p>
 <ol class="arabic simple">
 <li><p><strong>Neural Feature Extractor (PointNet):</strong> Consists of shared multi-layer perceptrons (MLPs) and a global max-pooling layer to extract a global feature vector from raw $(N, 3)$ point coordinates.</p></li>
-<li><p><strong>Symbolic Logic Layer (JLNN):</strong> A differentiable logic circuit that maps neural activations to truth intervals $[L, U]$.</p></li>
+<li><p><strong>Symbolic Logic Layer (JLNN):</strong> A differentiable logic circuit that maps neural activations to truth intervals <em>[L, U]</em>.</p></li>
 </ol>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">NSModelNet</span><span class="p">(</span><span class="n">nnx</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rngs</span><span class="p">:</span> <span class="n">nnx</span><span class="o">.</span><span class="n">Rngs</span><span class="p">):</span>
