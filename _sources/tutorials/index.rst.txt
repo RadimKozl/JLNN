@@ -26,3 +26,4 @@ Examples & Tutorials
    JLNN_kg_reasoning
    JLNN_pointcloud_classification
    JLNN_safety_verification
+   JLNN_xarray_rule_monitoring_moe
