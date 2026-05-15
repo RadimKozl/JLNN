@@ -16,7 +16,7 @@ This tutorial demonstrates the integration of a **Vision Transformer (ViT)** bac
         Execute the from-scratch training on CIFAR-10 directly in your browser.
 
     .. grid-item-card::  View on GitHub
-        :link: https://github.com/RadimKozl/JLNN/blob/main/examples/JLNN_vit_training.ipynb
+        :link: https://github.com/RadimKozl/JLNN/blob/main/examples/JLNN_vit_training_github.ipynb
         :link-type: url
 
         View source code, logic monitoring graphs, and training outputs.
