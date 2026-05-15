@@ -27,3 +27,4 @@ Examples & Tutorials
    JLNN_pointcloud_classification
    JLNN_safety_verification
    JLNN_xarray_rule_monitoring_moe
+   JLNN_vit_training
