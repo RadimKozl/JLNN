@@ -29,7 +29,7 @@ dependencies = [
 [project.optional-dependencies]
 
 gpu =[
-    "jax[cuda12_pip]>=0.8.2"
+    "jax[cuda12]>=0.8.2"
 ]
 
 tpu = [
