@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html"><link rel="next" title="Quickstart" href="quickstart.html"><link rel="prev" title="JLNN: JAX Logical Neural Networks" href="index.html">
 
     <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
-        <title>Installation - JLNN 0.1.1.post1 documentation</title>
+        <title>Installation - JLNN 0.1.2 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
@@ -162,7 +162,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="index.html"><div class="brand">JLNN 0.1.1.post1 documentation</div></a>
+      <a href="index.html"><div class="brand">JLNN 0.1.2 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -183,7 +183,7 @@
       
       <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
   
-  <span class="sidebar-brand-text">JLNN 0.1.1.post1 documentation</span>
+  <span class="sidebar-brand-text">JLNN 0.1.2 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -322,10 +322,10 @@
         <article role="main" id="furo-main-content">
           <section id="installation">
 <h1>Installation<a class="headerlink" href="#installation" title="Link to this heading">¶</a></h1>
-<p>JLNN requires Python 3.11 or later. Since the framework is built on the <strong>JAX</strong> stack, we recommend paying attention to choosing the correct version based on your hardware.</p>
+<p>JLNN requires Python 3.11 or later. Since the framework is built natively on the modern <strong>JAX (0.8.2+)</strong> stack, the installation is split into hardware-specific targets to optimize performance and prevent runtime environment conflicts.</p>
 <section id="standard-installation">
 <h2>Standard Installation<a class="headerlink" href="#standard-installation" title="Link to this heading">¶</a></h2>
-<p>You can install the latest stable version directly from PyPI:</p>
+<p>You can install the lightweight core library directly from PyPI:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>jax-lnn
 </pre></div>
 </div>
@@ -334,60 +334,82 @@
 </pre></div>
 </div>
 </section>
+<section id="hardware-acceleration-recommended">
+<h2>Hardware Acceleration (Recommended)<a class="headerlink" href="#hardware-acceleration-recommended" title="Link to this heading">¶</a></h2>
+<p>To leverage the full power of GPUs or TPUs without manually dealing with low-level Nvidia or Google Cloud drivers, use our built-in hardware targets:</p>
+<p><strong>For NVIDIA GPU (CUDA 12+) support:</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;jax-lnn[gpu,export]&quot;</span>
+</pre></div>
+</div>
+<p><strong>For Google Cloud TPU support:</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;jax-lnn[tpu,export]&quot;</span>
+</pre></div>
+</div>
+<p><strong>For CPU-only machines:</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;jax-lnn[cpu]&quot;</span>
+</pre></div>
+</div>
+</section>
 <section id="development-installation">
 <h2>Development Installation<a class="headerlink" href="#development-installation" title="Link to this heading">¶</a></h2>
-<p>If you want to contribute to JLNN, run benchmarks, or modify the source code, we recommend a development installation.</p>
-<p>Using <strong>uv</strong> (recommended):</p>
+<p>If you want to contribute to JLNN, run benchmarks, or modify the source code, clone the repository and install the development extras.</p>
+<p>Using <strong>uv</strong> (recommended for blistering speed):</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/RadimKozl/JLNN.git
 <span class="nb">cd</span><span class="w"> </span>JLNN
-uv<span class="w"> </span>sync
+uv<span class="w"> </span>sync<span class="w"> </span>--all-extras
 </pre></div>
 </div>
 <p>Using <strong>pip</strong>:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/RadimKozl/JLNN.git
 <span class="nb">cd</span><span class="w"> </span>JLNN
-pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;.[test]&quot;</span>
+pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;.[test,docs,export,extra]&quot;</span>
 </pre></div>
 </div>
 </section>
-<section id="jax-cuda-specifics">
-<h2>JAX &amp; CUDA Specifics<a class="headerlink" href="#jax-cuda-specifics" title="Link to this heading">¶</a></h2>
-<p>JLNN runs best on accelerators (GPU/TPU). In <strong>Google Colab</strong>, the default installation might require a runtime restart to initialize CUDA correctly.</p>
-<p><strong>Example for GPU (CUDA 12) support:</strong></p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>--upgrade<span class="w"> </span><span class="s2">&quot;jax[cuda12_pip]&quot;</span><span class="w"> </span>-f<span class="w"> </span>https://storage.googleapis.com/jax-releases/jax_cuda_releases.html
+<section id="google-colab-quickstart">
+<h2>Google Colab Quickstart<a class="headerlink" href="#google-colab-quickstart" title="Link to this heading">¶</a></h2>
+<p>JLNN is fully optimized for <strong>Google Colab</strong> (T4, V100, and premium A100 instances). To set up your environment cleanly without triggering WebSocket disconnects:</p>
+<ol class="arabic simple">
+<li><p>Create a new notebook and set your Runtime type to <strong>GPU</strong> or <strong>TPU</strong> (<em>Runtime -&gt; Change runtime type</em>).</p></li>
+<li><p>Run the following command in the first cell:</p></li>
+</ol>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>!pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;jax-lnn[gpu,export]&quot;</span><span class="w"> </span>--quiet
 </pre></div>
 </div>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>If you are using Google Colab, remember to restart your session after installation to ensure JAX can access the GPU. You can do this programmatically:
-<code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">os;</span> <span class="pre">os.kill(os.getpid(),</span> <span class="pre">9)</span></code></p>
+<ol class="arabic simple" start="3">
+<li><p><strong>CRITICAL STEP:</strong> In the top menu, click <strong>Runtime -&gt; Restart session</strong> (or press <code class="docutils literal notranslate"><span class="pre">Ctrl</span> <span class="pre">+</span> <span class="pre">M</span> <span class="pre">.</span></code>) to allow Python to initialize the newly installed CUDA/XLA layers.</p></li>
+</ol>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Do <strong>not</strong> use automated hard-kill commands like <code class="docutils literal notranslate"><span class="pre">os.kill(os.getpid(),</span> <span class="pre">9)</span></code> on premium Colab instances (like A100). Due to high-speed virtualized network IO connections, killing the kernel process abruptly will crash the underlying WebSocket connection, throwing a terminal <code class="docutils literal notranslate"><span class="pre">[object</span> <span class="pre">CloseEvent]</span></code> error in your browser. Always restart the session gracefully via the UI menu.</p>
 </div>
 </section>
-<section id="dependencies">
-<h2>Dependencies<a class="headerlink" href="#dependencies" title="Link to this heading">¶</a></h2>
-<p>The framework automatically installs these key libraries:
-* <strong>jax &amp; jaxlib</strong>: Computing core.
-* <strong>flax</strong>: For managing the state of neural networks (we use the modern NNX API).
-* <strong>lark</strong>: For parsing logical formulas.
-* <strong>networkx</strong>: For working with the graph structure of the model.
-* <strong>optax</strong>: For optimization and learning.</p>
+<section id="core-dependencies">
+<h2>Core Dependencies<a class="headerlink" href="#core-dependencies" title="Link to this heading">¶</a></h2>
+<p>The framework automatically manages its modular ecosystem:
+* <strong>flax (&gt;=0.12.2)</strong>: For managing neural network states using the modern NNX API.
+* <strong>lark</strong>: For parsing symbolic logical formulas.
+* <strong>networkx</strong>: For handling hierarchical graph structures of formulas.
+* <strong>optax</strong>: For neuro-symbolic parameter optimization.
+* <strong>orbax-checkpoint</strong>: Included in <code class="docutils literal notranslate"><span class="pre">[extra]</span></code> for high-performance weight checkpointing (100% TensorFlow-free, eliminating C++ symbol collision issues).</p>
 </section>
 <section id="verification">
 <h2>Verification<a class="headerlink" href="#verification" title="Link to this heading">¶</a></h2>
-<p>To verify that everything works correctly, try a simple import:</p>
+<p>To verify that your installation successfully hooked into your hardware backend, execute:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">jlnn</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">jax</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;JLNN version: </span><span class="si">{</span><span class="n">jlnn</span><span class="o">.</span><span class="n">__version__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Available devices: </span><span class="si">{</span><span class="n">jax</span><span class="o">.</span><span class="n">devices</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;✅ JLNN version: </span><span class="si">{</span><span class="n">jlnn</span><span class="o">.</span><span class="n">__version__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;🔥 Active backend: </span><span class="si">{</span><span class="n">jax</span><span class="o">.</span><span class="n">devices</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">platform</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;📊 Available devices: </span><span class="si">{</span><span class="n">jax</span><span class="o">.</span><span class="n">devices</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
-<section id="support-for-os">
-<h2>Support for OS<a class="headerlink" href="#support-for-os" title="Link to this heading">¶</a></h2>
+<section id="os-support">
+<h2>OS Support<a class="headerlink" href="#os-support" title="Link to this heading">¶</a></h2>
 <ul class="simple">
-<li><p><strong>Linux</strong>: Full support (recommended).</p></li>
-<li><p><strong>macOS</strong>: Support for Apple Silicon processors (M1/M2/M3) via Metal acceleration.</p></li>
-<li><p><strong>Windows</strong>: Support via WSL2 (Windows Subsystem for Linux) is recommended for GPU acceleration.</p></li>
+<li><p><strong>Linux</strong>: Full native support (highly recommended for production training).</p></li>
+<li><p><strong>macOS</strong>: Support for Apple Silicon chips (M1/M2/M3) via Metal shader acceleration.</p></li>
+<li><p><strong>Windows</strong>: Supported natively via standard CPU wheels. For multi-GPU hardware training on Windows, using <strong>WSL2 (Windows Subsystem for Linux)</strong> is strictly recommended.</p></li>
 </ul>
 </section>
 </section>
@@ -449,11 +471,12 @@ pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </s
             <ul>
 <li><a class="reference internal" href="#">Installation</a><ul>
 <li><a class="reference internal" href="#standard-installation">Standard Installation</a></li>
+<li><a class="reference internal" href="#hardware-acceleration-recommended">Hardware Acceleration (Recommended)</a></li>
 <li><a class="reference internal" href="#development-installation">Development Installation</a></li>
-<li><a class="reference internal" href="#jax-cuda-specifics">JAX &amp; CUDA Specifics</a></li>
-<li><a class="reference internal" href="#dependencies">Dependencies</a></li>
+<li><a class="reference internal" href="#google-colab-quickstart">Google Colab Quickstart</a></li>
+<li><a class="reference internal" href="#core-dependencies">Core Dependencies</a></li>
 <li><a class="reference internal" href="#verification">Verification</a></li>
-<li><a class="reference internal" href="#support-for-os">Support for OS</a></li>
+<li><a class="reference internal" href="#os-support">OS Support</a></li>
 </ul>
 </li>
 </ul>
@@ -465,7 +488,7 @@ pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </s
       
     </aside>
   </div>
-</div><script src="_static/documentation_options.js?v=b4547066"></script>
+</div><script src="_static/documentation_options.js?v=92734c54"></script>
     <script src="_static/doctools.js?v=fd6eb6e6"></script>
     <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/scripts/furo.js?v=46bd48cc"></script>

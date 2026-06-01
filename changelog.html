@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html"><link rel="prev" title="Contributing to JLNN" href="contributing.html">
 
     <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
-        <title>Changelog - JLNN 0.1.1.post1 documentation</title>
+        <title>Changelog - JLNN 0.1.2 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
@@ -162,7 +162,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="index.html"><div class="brand">JLNN 0.1.1.post1 documentation</div></a>
+      <a href="index.html"><div class="brand">JLNN 0.1.2 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -183,7 +183,7 @@
       
       <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
   
-  <span class="sidebar-brand-text">JLNN 0.1.1.post1 documentation</span>
+  <span class="sidebar-brand-text">JLNN 0.1.2 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -323,6 +323,31 @@
           <section id="changelog">
 <h1>Changelog<a class="headerlink" href="#changelog" title="Link to this heading">¶</a></h1>
 <p>All significant changes to the JLNN project will be documented in this file. The project adheres to semantic versioning.</p>
+<section id="id1">
+<h2>[0.1.2] - 2026-06-01<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h2>
+<p>This release completely overhauls the deployment and hardware compatibility ecosystem, resolving critical import conflicts in environments like Google Colab (T4/V100/A100) and optimizing performance across CPU, GPU, and TPU.</p>
+<section id="added">
+<h3>Added<a class="headerlink" href="#added" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Hardware-Specific Extras:</strong> Introduced modular install targets (<cite>[cpu]</cite>, <cite>[gpu]</cite>, <cite>[tpu]</cite>) in <em>pyproject.toml</em> to decouple core logic from heavy, environment-sensitive hardware runtimes.</p></li>
+<li><p><strong>TPU Acceleration Support:</strong> Added explicit configuration for Google Cloud TPUs via <cite>jax[tpu]</cite>.</p></li>
+</ul>
+</section>
+<section id="changed">
+<h3>Changed<a class="headerlink" href="#changed" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Dependency Decoupling (TensorFlow Removal):</strong> Replaced the monolithic <cite>orbax</cite> package with <cite>orbax-checkpoint</cite> in auxiliary dependencies. This entirely removes the hidden dependency on TensorFlow/TFLite, eliminating C++ symbol collision issues (<cite>undefined symbol: Wrapped_PyInit…</cite>) and circular import bugs in PyTorch.</p></li>
+<li><p><strong>Modern JAX Baseline:</strong> Upgraded minimum JAX ecosystem requirements to <cite>&gt;=0.8.2</cite> across all target backends to support latest compiler optimizations.</p></li>
+</ul>
+</section>
+<section id="fixed">
+<h3>Fixed<a class="headerlink" href="#fixed" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Google Colab Disconnections:</strong> Fixed a fatal issue where unhandled automated install scripts forced hard kernel drops (<cite>os.kill</cite>), which triggered browser WebSocket disconnections (<cite>[object CloseEvent]</cite>) on premium hardware (A100 instances).</p></li>
+<li><p><strong>Pip vs UV Resolver Conflicts:</strong> Restructured package optional dependencies to allow clean, side-effect-free installation using both traditional <cite>pip</cite> and high-speed <cite>uv</cite> package managers.</p></li>
+</ul>
+</section>
+</section>
 <section id="post1-2026-03-09">
 <h2>[1.0.0.post1] - 2026-03-09<a class="headerlink" href="#post1-2026-03-09" title="Link to this heading">¶</a></h2>
 <section id="fixes">
@@ -340,27 +365,27 @@
 </ul>
 </section>
 </section>
-<section id="id1">
-<h2>[1.0.0] - 2026-03-07<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h2>
+<section id="id2">
+<h2>[1.0.0] - 2026-03-07<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h2>
 <p>First stable version (Production-Ready). This version concludes the phase of intensive tuning on real bioinformatics data and brings a robust API for neuro-symbolic learning.</p>
-<section id="added">
-<h3>Added<a class="headerlink" href="#added" title="Link to this heading">¶</a></h3>
+<section id="id3">
+<h3>Added<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h3>
 <ul class="simple">
 <li><p><strong>Basic tutorials</strong>: A set of educational materials has been created (including toxicity screening on the ToxCast dataset) that demonstrate the practical use of JLNN from data processing to interpretation of results.</p></li>
 <li><p><strong>Validation on real data</strong>: The core of the library has been successfully tested on massive datasets using GPU/TPU acceleration.</p></li>
 <li><p><strong>Improved gradient stability</strong>: Implemented forced preservation of structural keys in NNX modules, which ensures the stability of <code class="docutils literal notranslate"><span class="pre">jax.grad</span></code> even for complex logical formulas.</p></li>
 </ul>
 </section>
-<section id="fixed">
-<h3>Fixed<a class="headerlink" href="#fixed" title="Link to this heading">¶</a></h3>
+<section id="id4">
+<h3>Fixed<a class="headerlink" href="#id4" title="Link to this heading">¶</a></h3>
 <ul class="simple">
 <li><p><strong>Symbolic Initialization</strong>: Fixed an error (KeyError) where dynamically defined symbols in formulas were not correctly mapped to input grounding dictionaries.</p></li>
 <li><p><strong>Logical Integrity</strong>: Fixed edge states in the implementation of Łukasiewicz logic that could cause numerical instability at very narrow intervals.</p></li>
 <li><p><strong>Shape Resolution</strong>: Fixed the mechanism for deriving dimensions (shapes) in hierarchical graphs, which solves problems with tensor incompatibility during visualization and export.</p></li>
 </ul>
 </section>
-<section id="changed">
-<h3>Changed<a class="headerlink" href="#changed" title="Link to this heading">¶</a></h3>
+<section id="id5">
+<h3>Changed<a class="headerlink" href="#id5" title="Link to this heading">¶</a></h3>
 <ul class="simple">
 <li><p><strong>API Stabilization</strong>: Tested on tutorials</p></li>
 </ul>
@@ -378,19 +403,19 @@
 </section>
 </section>
 </section>
-<section id="id2">
-<h2>[0.1.rc2] - 2026-02-15<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h2>
+<section id="id6">
+<h2>[0.1.rc2] - 2026-02-15<a class="headerlink" href="#id6" title="Link to this heading">¶</a></h2>
 <p>This Release Candidate brings a major fix to the export pipeline and refines the core logical consistency of the framework.</p>
-<section id="id3">
-<h3><strong>Added</strong><a class="headerlink" href="#id3" title="Link to this heading">¶</a></h3>
+<section id="id7">
+<h3><strong>Added</strong><a class="headerlink" href="#id7" title="Link to this heading">¶</a></h3>
 <ul class="simple">
 <li><p><strong>FixedPredicate:</strong> Introduced a non-trainable identity predicate specifically for crisp (exact 0/1) logic examples.</p></li>
 <li><p><strong>Robust PyTree Support:</strong> The export pipeline now fully supports dictionary-based predicate inputs (e.g., <cite>{“A”: tensor, “B”: tensor}</cite>) using <cite>jax.tree.map</cite>.</p></li>
 <li><p><strong>Metadata Resolution:</strong> Added <cite>get_representative_shape</cite> helper to ensure correct ONNX <cite>value_info</cite> metadata generation even for complex nested inputs.</p></li>
 </ul>
 </section>
-<section id="id4">
-<h3><strong>Changed</strong><a class="headerlink" href="#id4" title="Link to this heading">¶</a></h3>
+<section id="id8">
+<h3><strong>Changed</strong><a class="headerlink" href="#id8" title="Link to this heading">¶</a></h3>
 <ul class="simple">
 <li><p><strong>Export Pipeline Refactoring:</strong> Updated <cite>export_to_stablehlo</cite> and <cite>export_to_onnx</cite> to handle structured PyTrees instead of requiring flat <cite>jnp.ndarray</cite> inputs.</p></li>
 <li><p><strong>Negation Axiom (weighted_not):</strong> Corrected the order of operations to apply pure negation ([1-U, 1-L]) before weight scaling.</p></li>
@@ -398,8 +423,8 @@
 <li><p><strong>Interval Enforcement:</strong> Ensured consistent L≤U after every logical operation via the <cite>ensure_interval</cite> mechanism.</p></li>
 </ul>
 </section>
-<section id="id5">
-<h3><strong>Fixed</strong><a class="headerlink" href="#id5" title="Link to this heading">¶</a></h3>
+<section id="id9">
+<h3><strong>Fixed</strong><a class="headerlink" href="#id9" title="Link to this heading">¶</a></h3>
 <ul class="simple">
 <li><p><strong>AttributeError in Export:</strong> Resolved the critical error where the exporter attempted to call <cite>.shape</cite> on dictionary objects.</p></li>
 <li><p><strong>AttributeError in Visualization:</strong> Fixed key handling for fuzzy inputs within visualization loops.</p></li>
@@ -408,11 +433,11 @@
 </ul>
 </section>
 </section>
-<section id="id6">
-<h2>[0.1.rc1] - 2026-02-10<a class="headerlink" href="#id6" title="Link to this heading">¶</a></h2>
+<section id="id10">
+<h2>[0.1.rc1] - 2026-02-10<a class="headerlink" href="#id10" title="Link to this heading">¶</a></h2>
 <p>Release Candidate 1 – significant improvements in negation logic, crisp mode support, and documentation.</p>
-<section id="id7">
-<h3><strong>Added</strong><a class="headerlink" href="#id7" title="Link to this heading">¶</a></h3>
+<section id="id11">
+<h3><strong>Added</strong><a class="headerlink" href="#id11" title="Link to this heading">¶</a></h3>
 <ul class="simple">
 <li><p><strong>FixedPredicate</strong> – non-trainable identity predicate for crisp (exact 0/1) logic examples</p></li>
 <li><p><strong>Two new tutorials</strong>:
@@ -422,16 +447,16 @@
 <li><p>Support for crisp logic mode (bypassing LearnedPredicate ramps)</p></li>
 </ul>
 </section>
-<section id="id8">
-<h3><strong>Changed</strong><a class="headerlink" href="#id8" title="Link to this heading">¶</a></h3>
+<section id="id12">
+<h3><strong>Changed</strong><a class="headerlink" href="#id12" title="Link to this heading">¶</a></h3>
 <ul class="simple">
 <li><p><strong>weighted_not</strong> – corrected negation axiom: pure negation first ([1-U, 1-L]), then weight scaling</p></li>
 <li><p>Ensured consistent L ≤ U after every logical operation (via ensure_interval)</p></li>
 <li><p>Improved documentation structure with dedicated Tutorials section</p></li>
 </ul>
 </section>
-<section id="id9">
-<h3><strong>Fixed</strong><a class="headerlink" href="#id9" title="Link to this heading">¶</a></h3>
+<section id="id13">
+<h3><strong>Fixed</strong><a class="headerlink" href="#id13" title="Link to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>Negation width preservation – fuzzy inputs now correctly transfer uncertainty (e.g. [0.95,1.0] → ~ = [0.0,0.05])</p></li>
 <li><p>AttributeError in visualization loop (fixed key handling for fuzzy inputs)</p></li>
@@ -439,28 +464,28 @@
 </ul>
 </section>
 </section>
-<section id="id10">
-<h2>[0.1.0] - 2026-02-06<a class="headerlink" href="#id10" title="Link to this heading">¶</a></h2>
+<section id="id14">
+<h2>[0.1.0] - 2026-02-06<a class="headerlink" href="#id14" title="Link to this heading">¶</a></h2>
 <p>First public release (Alpha Release). Implementation of the core framework built on JAX and Flax NNX.</p>
-<section id="id11">
-<h3>Added<a class="headerlink" href="#id11" title="Link to this heading">¶</a></h3>
+<section id="id15">
+<h3>Added<a class="headerlink" href="#id15" title="Link to this heading">¶</a></h3>
 <ul class="simple">
 <li><p><strong>Example Notebooks</strong>: Added Jupyter notebooks demonstrating basic usage, training, and reasoning with JLNN.</p></li>
 <li><p><strong>README</strong>: Created a comprehensive README with installation instructions and quickstart guide.</p></li>
 </ul>
 </section>
-<section id="id12">
-<h3>Changed<a class="headerlink" href="#id12" title="Link to this heading">¶</a></h3>
+<section id="id16">
+<h3>Changed<a class="headerlink" href="#id16" title="Link to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>Updated documentation structure to include user guide and tutorials.</p></li>
 </ul>
 </section>
 </section>
-<section id="id13">
-<h2>[0.0.2] - 2026-01-27<a class="headerlink" href="#id13" title="Link to this heading">¶</a></h2>
+<section id="id17">
+<h2>[0.0.2] - 2026-01-27<a class="headerlink" href="#id17" title="Link to this heading">¶</a></h2>
 <p>First public release (Alpha Release). Implementation of the core framework built on JAX and Flax NNX.</p>
-<section id="id14">
-<h3>Added<a class="headerlink" href="#id14" title="Link to this heading">¶</a></h3>
+<section id="id18">
+<h3>Added<a class="headerlink" href="#id18" title="Link to this heading">¶</a></h3>
 <ul class="simple">
 <li><p><strong>Core Engine</strong>: Implementation of Łukasiewicz logic for interval arithmetic <span class="math notranslate nohighlight">\([L, U]\)</span>.</p></li>
 <li><p><strong>Symbolic Compiler</strong>: Parser for logical formulas (Lark) and automatic compiler to hierarchical NNX modules.</p></li>
@@ -471,23 +496,23 @@
 <li><p><strong>Xarray Integration</strong>: Support for scientific data formats and labeled outputs.</p></li>
 </ul>
 </section>
-<section id="id15">
-<h3>Changed<a class="headerlink" href="#id15" title="Link to this heading">¶</a></h3>
+<section id="id19">
+<h3>Changed<a class="headerlink" href="#id19" title="Link to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>Created on the basis of modern <strong>Flax NNX</strong>.</p></li>
 <li><p>Optimization of recursive graph traversal for full compatibility with <code class="docutils literal notranslate"><span class="pre">jax.jit</span></code>.</p></li>
 </ul>
 </section>
-<section id="id16">
-<h3>Fixed<a class="headerlink" href="#id16" title="Link to this heading">¶</a></h3>
+<section id="id20">
+<h3>Fixed<a class="headerlink" href="#id20" title="Link to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>Fix numeric instability in XOR gate when intervals are very narrow.</p></li>
 <li><p>Add base documentation.</p></li>
 </ul>
 </section>
 </section>
-<section id="id17">
-<h2>[0.0.1] - 2026-01-17<a class="headerlink" href="#id17" title="Link to this heading">¶</a></h2>
+<section id="id21">
+<h2>[0.0.1] - 2026-01-17<a class="headerlink" href="#id21" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Create a project</p></li>
 <li><p>Basic framework concept</p></li>
@@ -543,45 +568,51 @@
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">Changelog</a><ul>
+<li><a class="reference internal" href="#id1">[0.1.2] - 2026-06-01</a><ul>
+<li><a class="reference internal" href="#added">Added</a></li>
+<li><a class="reference internal" href="#changed">Changed</a></li>
+<li><a class="reference internal" href="#fixed">Fixed</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#post1-2026-03-09">[1.0.0.post1] - 2026-03-09</a><ul>
 <li><a class="reference internal" href="#fixes">Fixes:</a></li>
 <li><a class="reference internal" href="#technical-changes">Technical changes:</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#id1">[1.0.0] - 2026-03-07</a><ul>
-<li><a class="reference internal" href="#added">Added</a></li>
-<li><a class="reference internal" href="#fixed">Fixed</a></li>
-<li><a class="reference internal" href="#changed">Changed</a><ul>
+<li><a class="reference internal" href="#id2">[1.0.0] - 2026-03-07</a><ul>
+<li><a class="reference internal" href="#id3">Added</a></li>
+<li><a class="reference internal" href="#id4">Fixed</a></li>
+<li><a class="reference internal" href="#id5">Changed</a><ul>
 <li><a class="reference internal" href="#rc2-2026-02-15"><strong>[0.1.rc2] - 2026-02-15</strong></a></li>
 <li><a class="reference internal" href="#rc1-2026-02-10"><strong>[0.1.rc1] - 2026-02-10</strong></a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a class="reference internal" href="#id2">[0.1.rc2] - 2026-02-15</a><ul>
-<li><a class="reference internal" href="#id3"><strong>Added</strong></a></li>
-<li><a class="reference internal" href="#id4"><strong>Changed</strong></a></li>
-<li><a class="reference internal" href="#id5"><strong>Fixed</strong></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#id6">[0.1.rc1] - 2026-02-10</a><ul>
+<li><a class="reference internal" href="#id6">[0.1.rc2] - 2026-02-15</a><ul>
 <li><a class="reference internal" href="#id7"><strong>Added</strong></a></li>
 <li><a class="reference internal" href="#id8"><strong>Changed</strong></a></li>
 <li><a class="reference internal" href="#id9"><strong>Fixed</strong></a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#id10">[0.1.0] - 2026-02-06</a><ul>
-<li><a class="reference internal" href="#id11">Added</a></li>
-<li><a class="reference internal" href="#id12">Changed</a></li>
+<li><a class="reference internal" href="#id10">[0.1.rc1] - 2026-02-10</a><ul>
+<li><a class="reference internal" href="#id11"><strong>Added</strong></a></li>
+<li><a class="reference internal" href="#id12"><strong>Changed</strong></a></li>
+<li><a class="reference internal" href="#id13"><strong>Fixed</strong></a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#id13">[0.0.2] - 2026-01-27</a><ul>
-<li><a class="reference internal" href="#id14">Added</a></li>
-<li><a class="reference internal" href="#id15">Changed</a></li>
-<li><a class="reference internal" href="#id16">Fixed</a></li>
+<li><a class="reference internal" href="#id14">[0.1.0] - 2026-02-06</a><ul>
+<li><a class="reference internal" href="#id15">Added</a></li>
+<li><a class="reference internal" href="#id16">Changed</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#id17">[0.0.1] - 2026-01-17</a></li>
+<li><a class="reference internal" href="#id17">[0.0.2] - 2026-01-27</a><ul>
+<li><a class="reference internal" href="#id18">Added</a></li>
+<li><a class="reference internal" href="#id19">Changed</a></li>
+<li><a class="reference internal" href="#id20">Fixed</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id21">[0.0.1] - 2026-01-17</a></li>
 </ul>
 </li>
 </ul>
@@ -593,7 +624,7 @@
       
     </aside>
   </div>
-</div><script src="_static/documentation_options.js?v=b4547066"></script>
+</div><script src="_static/documentation_options.js?v=92734c54"></script>
     <script src="_static/doctools.js?v=fd6eb6e6"></script>
     <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/scripts/furo.js?v=46bd48cc"></script>
