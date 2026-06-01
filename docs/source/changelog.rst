@@ -3,6 +3,26 @@ Changelog
 
 All significant changes to the JLNN project will be documented in this file. The project adheres to semantic versioning.
 
+[0.1.2] - 2026-06-01
+--------------------
+
+This release completely overhauls the deployment and hardware compatibility ecosystem, resolving critical import conflicts in environments like Google Colab (T4/V100/A100) and optimizing performance across CPU, GPU, and TPU.
+
+Added
+^^^^^
+* **Hardware-Specific Extras:** Introduced modular install targets (`[cpu]`, `[gpu]`, `[tpu]`) in *pyproject.toml* to decouple core logic from heavy, environment-sensitive hardware runtimes.
+* **TPU Acceleration Support:** Added explicit configuration for Google Cloud TPUs via `jax[tpu]`.
+
+Changed
+^^^^^^^
+* **Dependency Decoupling (TensorFlow Removal):** Replaced the monolithic `orbax` package with `orbax-checkpoint` in auxiliary dependencies. This entirely removes the hidden dependency on TensorFlow/TFLite, eliminating C++ symbol collision issues (`undefined symbol: Wrapped_PyInit...`) and circular import bugs in PyTorch.
+* **Modern JAX Baseline:** Upgraded minimum JAX ecosystem requirements to `>=0.8.2` across all target backends to support latest compiler optimizations.
+
+Fixed
+^^^^^
+* **Google Colab Disconnections:** Fixed a fatal issue where unhandled automated install scripts forced hard kernel drops (`os.kill`), which triggered browser WebSocket disconnections (`[object CloseEvent]`) on premium hardware (A100 instances).
+* **Pip vs UV Resolver Conflicts:** Restructured package optional dependencies to allow clean, side-effect-free installation using both traditional `pip` and high-speed `uv` package managers.
+
 [1.0.0.post1] - 2026-03-09
 ---------------------------
 

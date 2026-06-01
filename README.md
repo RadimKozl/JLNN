@@ -9,6 +9,7 @@ Neuro-symbolic framework for interval-based Łukasiewicz logic built on **JAX** 
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.10+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/release/python-3110/)
+[![Version](https://img.shields.io/badge/Version-v0.1.2-green.svg)](https://pypi.org/project/jax-lnn/)
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/RadimKozl/JLNN/blob/main/examples/Jax_lnn_base.ipynb)
 
 JLNN enables turning symbolic logical rules into differentiable neural networks for training on data while maintaining interpretability and logical consistency.
@@ -21,22 +22,44 @@ JLNN enables turning symbolic logical rules into differentiable neural networks 
 - **Temporal Logic**: Experimental support for temporal operators (G, F, X).
 - **Logical Constraints**: Built-in enforcement of axioms (e.g., weights $w \geq 1.0$).
 - **High Performance**: JIT-compilation and hardware acceleration via JAX.
-- **Interoperability**: Export trained models to ONNX, StableHLO, or PyTorch.
+- **Interoperability & Export**: Native support for **[StableHLO](https://openxla.org/#stablehlo)** and **[MLIR](https://mlir.llvm.org/users/)** pipelines (recommended for production deployment). Export to **[ONNX](https://onnx.ai/)** and **[PyTorch](https://pytorch.org/)** is available with certain architectural limitations due to ONNX's lack of native structures for interval logic propagation.
 
-## **Installation**
+## **Standard Installation (CPU Core)**
 
 ```bash
 # From PyPI
-pip install jax-lnn
+pip install jax-lnn[cpu,export]
 
-# From GitHub
-pip install git+[https://github.com/RadimKozl/JLNN.git](https://github.com/RadimKozl/JLNN.git)
-
-# For development
-git clone [https://github.com/RadimKozl/JLNN.git](https://github.com/RadimKozl/JLNN.git)
-cd JLNN
-uv sync  # or pip install -e ".[test]"
+# From GitHub (Bleeding-edge)
+pip install git+https://github.com/RadimKozl/JLNN.git
 ```
+
+## **Hardware Accelerated (Recommended)**
+
+```bash
+# For NVIDIA GPU (CUDA 12+) and export pipelines (Colab T4/V100/A100)
+pip install "jax-lnn[gpu,export]"
+
+# For Google Cloud TPU support
+pip install "jax-lnn[tpu,export]"
+```
+
+## **For Development**
+
+```bash
+# For development
+git clone https://github.com/RadimKozl/JLNN.git
+cd JLNN
+
+# Using uv (recommended for blistering speed)
+uv sync --all-extras
+
+# Using standard pip
+pip install -e ".[test,docs,export,extra]"
+```
+
+⚠️ Google Colab Note: After running the installation on premium GPU instances (like A100), always restart your session gracefully via the UI menu (Runtime -> Restart session). Avoid using automated hard-kill lines like os.kill(os.getpid(), 9), as they crash virtualized XLA network sockets and cause browser WebSocket disconnections.
+
 
 ## **Quickstart**
 
