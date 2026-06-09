@@ -7,23 +7,24 @@ import jax.numpy as jnp
 
 def identity_activation(x: jnp.ndarray) -> jnp.ndarray:
     """
-    It realizes the identity truncated to the closed interval [0, 1].
+    Realizes the identity function truncated to the closed interval [0, 1].
     
-    This activation function is used in JLNN primarily as 
-    a numerical safeguard in places where inputs already semantically represent truth values 
-    ​(e.g., outputs from predicates or other gates).
+    This activation function is used in JLNN primarily as a numerical safeguard 
+    in places where inputs already semantically represent truth values (e.g., 
+    outputs from predicates or downstream logical gates).
     
-    It ensures that minor numerical inaccuracies arising from floating point calculations 
-    do not lead to values ​​outside the valid logical range.
-    
-    In the context of interval logic, [L, U] helps maintain axiomatic integrity 
-    by enforcing saturation at the boundaries of 0.0 (absolute falsehood) and 1.0 (absolute truth).
+    It ensures that minor numerical inaccuracies arising from floating-point 
+    computations do not leak outside the valid logical boundary. In the context 
+    of interval logic, it maintains axiomatic integrity by enforcing strict 
+    saturation at 0.0 (absolute falsehood) and 1.0 (absolute truth).
     
     Args:
-        x (jnp.ndarray): Input tensor of arbitrary shape containing truth values ​​or logical potentials.
+        x (jnp.ndarray): Input tensor of arbitrary shape containing truth values 
+            or raw logical potentials.
         
     Returns:
-        jnp.ndarray: A tensor of the same shape as the input, where each value v_i satisfies the condition 0.0 <= v_i <= 1.0.
+        jnp.ndarray: A tensor of the same shape as the input, where each 
+            element v_i satisfies the constraint 0.0 <= v_i <= 1.0.
     """
     
     # Using jnp.clip is an efficient operation in JAX that defines
@@ -129,3 +130,98 @@ def ramp_sigmoid(x: jnp.ndarray, slope: float = 1.0, offset: float = 0.5) -> jnp
     # Calculation of a linear relationship followed by clipping.
     # The value 0.5 ensures that when x = offset the result is exactly the middle of the logical interval.
     return jnp.clip(slope * (x - offset) + 0.5, 0.0, 1.0)
+
+
+# =====================================================================
+# SPACE-CURVED PHYSICAL FUZZY LOGIK (PFL) MODULE EXTENSION
+# =====================================================================
+
+# ---------------------------------------------------------------------
+# INTERNAL ENTROPIC KERNEL (SHANNON)
+# ---------------------------------------------------------------------
+
+def entropy_raw(val: jnp.ndarray) -> jnp.ndarray:
+    """
+    Calculates the normalized binary Shannon entropy over the interval [0, 1].
+    
+    Acts as an exported framework utility for measuring local fuzzy uncertainty.
+    The output is normalized such that H(0.5) = 1.0 and H(0.0) = H(1.0) = 0.0.
+    
+    Args:
+        val (jnp.ndarray): Input logical tensor containing values nominally in [0, 1].
+        
+    Returns:
+        jnp.ndarray: Computed Shannon entropy values.
+    """
+    eps = 1e-7
+    # Safe clipping to avoid log(0) and log(negative number)
+    v_clipped = jnp.clip(val, eps, 1.0 - eps)
+    
+    # Shannon entropy formula: -p*log2(p) - (1-p)*log2(1-p)
+    h = -v_clipped * jnp.log2(v_clipped) - (1.0 - v_clipped) * jnp.log2(1.0 - v_clipped)
+    
+    # Numerical safeguard for extreme edges where entropy is analytically zero
+    return jnp.where((val <= eps) | (val >= 1.0 - eps), 0.0, h)
+
+
+def get_entropic_weight(val: jnp.ndarray) -> jnp.ndarray:
+    """
+    Computes the logical stability (entropic weight) of a state: 1.0 - H(val).
+    
+    This function is exported for use across interval-valued physical implication 
+    operators (PFL) to dynamically adjust truth bounds based on systemic chaos.
+    
+    Args:
+        val (jnp.ndarray): Input logical truth value or interval bound.
+        
+    Returns:
+        jnp.ndarray: Logical stability weight in the range [0, 1].
+    """
+    return 1.0 - entropy_raw(val)
+
+
+def gravitational_bend_activation(
+    z: jnp.ndarray, 
+    gamma: float = 0.2, 
+    mode: str = 'sigmoid',
+    slope: float = 1.0,
+    offset: float = 0.5
+) -> jnp.ndarray:
+    """
+    PFL activation function that deforms the standard truth potential space [0, 1].
+    
+    Around the logical center (0.5), it simulates a gravitational well via local entropy, 
+    attracting unstable, highly uncertain states. Near the deterministic edges (0, 1), 
+    the gravitational influence decays naturally, behaving like standard saturation.
+    
+    Args:
+        z (jnp.ndarray): Input logical potential (linear combination or raw input features).
+        gamma (float): Strength of the gravitational bending, bounded in the interval [0, 1].
+        mode (str): Base compression method. Options are 'sigmoid' (smooth physical field) 
+            or 'ramp' (truncated linear mapping).
+        slope (float): Stringency parameter used exclusively if mode='ramp'. Default is 1.0.
+        offset (float): Center shift parameter used exclusively if mode='ramp'. Default is 0.5.
+        
+    Returns:
+        jnp.ndarray: Truth value in the interval [0, 1] after gravitational deformation.
+    """
+    # 1. Base compression to logical interval [0, 1] based on user configuration
+    if mode == 'sigmoid':
+        # Smooth physical field simulation
+        base_truth = 1.0 / (1.0 + jnp.exp(-z))
+    elif mode == 'ramp':
+        # Sharper transitions with explicit saturation bounds - calling the sibling function directly
+        base_truth = ramp_sigmoid(z, slope=slope, offset=offset)
+    else:
+        raise ValueError(f"Unknown PFL activation mode: '{mode}'. Choose 'sigmoid' or 'ramp'.")
+    
+    # 2. Calculation of local Shannon entropy at the compressed point using the local public function
+    h = entropy_raw(base_truth)
+    
+    # 3. Application of the restoring gravitational force towards the center (0.5)
+    restoring_force = 0.5 - base_truth
+    
+    # 4. Resulting space bending around the entropic singularity
+    a = base_truth + gamma * h * restoring_force
+    
+    return jnp.clip(a, 0.0, 1.0)
