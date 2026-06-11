@@ -7,50 +7,136 @@ from jlnn.nn import functional as F
 
 class WeightedOr(nnx.Module):
     """
-    Trainable weighted OR gate implemented using Łukasiewicz t-conorm.
+    Trainable or self-adaptive OR gate supporting multiple logical semantics.
 
     In the JLNN framework, this gate aggregates truth intervals from multiple inputs.
-    It learns the relative importance of each input through weights and adjusts
-    the activation threshold via the beta parameter.
+    For standard semantics, it learns input importance via weights and sensitivity via beta.
+    For physical semantics (PFL), it operates in a parameter-free manner guided by entropy.
 
     Attributes:
-        weights (nnx.Param): Importance weights for each input signal.
-        beta (nnx.Param): Sensitivity threshold (bias) of the disjunction.
+        weights (Optional[nnx.Param]): Importance weights for each input signal.
+        beta (Optional[nnx.Param]): Sensitivity threshold (bias) of the disjunction.
+        method (str): Logical semantics ('lukasiewicz', 'godel', 'product', 'drastic', 'physical_kleene_dienes').
     """
-    def __init__(self, num_inputs: int, rngs: nnx.Rngs):
-        self.weights = nnx.Param(jnp.ones((num_inputs,)))
-        self.beta = nnx.Param(jnp.array(1.0))
+    def __init__(self, num_inputs: int, rngs: nnx.Rngs, method: str = 'lukasiewicz'):
+        self.method = method
+        
+        # Physical methods (PFL) are inherently parameter-free.
+        if not self.method.startswith('physical_'):
+            self.weights = nnx.Param(jnp.ones((num_inputs,)))
+            self.beta = nnx.Param(jnp.array(1.0))
+        else:
+            self.weights = None
+            self.beta = None
 
     def __call__(self, x: jnp.ndarray) -> jnp.ndarray:
         """
-        Executes the weighted OR operation.
-
-        Args:
-            x (jnp.ndarray): Input interval tensor of shape (..., num_inputs, 2).
-
-        Returns:
-            jnp.ndarray: The resulting truth interval [L, U].
+        Executes the OR operation across the input dimension.
         """
-        # Note: Using [...] for parameter access ensures compatibility with NNX 
-        # and avoids DeprecationWarnings associated with the .value property.
-        return F.weighted_or(x, self.weights[...], self.beta[...])
+        if self.method == 'lukasiewicz':
+            return F.weighted_or(x, self.weights[...], self.beta[...])
+        elif self.method == 'godel':
+            return F.weighted_or_godel(x, self.weights[...])
+        elif self.method == 'product':
+            return F.weighted_or_product(x, self.weights[...])
+        elif self.method == 'drastic':
+            # Drastic logic reduction uses the bulk/pure stateless implementation
+            return F.bulk_or_drastic(x)
+        elif self.method == 'physical_kleene_dienes':
+            # Physical OR operates binary reductions or can be mapped natively.
+            # For multi-input consistency, we reduce using the core physical binary operator.
+            # JAX reduction across the input features axis (-2)
+            def reduce_fn(carry, current):
+                return F.or_physical_kleene_dienes(carry, current)
+            
+            # Unstack along the input features axis to iterate
+            inputs = [x[..., i, :] for i in range(x.shape[-2])]
+            res = inputs[0]
+            for item in inputs[1:]:
+                res = reduce_fn(res, item)
+            return res
+        else:
+            raise ValueError(f"OR method '{self.method}' is not supported.")
 
 
 class WeightedAnd(nnx.Module):
     """
-    Trainable weighted AND gate implemented using Łukasiewicz t-norm.
+    Trainable or self-adaptive AND gate supporting multiple logical semantics.
     """
-    def __init__(self, num_inputs: int, rngs: nnx.Rngs):
-        self.weights = nnx.Param(jnp.ones((num_inputs,)))
-        self.beta = nnx.Param(jnp.array(1.0))
+    def __init__(self, num_inputs: int, rngs: nnx.Rngs, method: str = 'lukasiewicz'):
+        self.method = method
+        
+        if not self.method.startswith('physical_'):
+            self.weights = nnx.Param(jnp.ones((num_inputs,)))
+            self.beta = nnx.Param(jnp.array(1.0))
+        else:
+            self.weights = None
+            self.beta = None
 
     def __call__(self, x: jnp.ndarray) -> jnp.ndarray:
-        return F.weighted_and(x, self.weights[...], self.beta[...])
+        """
+        Executes the AND operation across the input dimension.
+        """
+        if self.method == 'lukasiewicz':
+            return F.weighted_and(x, self.weights[...], self.beta[...])
+        elif self.method == 'godel':
+            return F.weighted_and_godel(x, self.weights[...])
+        elif self.method == 'product':
+            return F.weighted_and_product(x, self.weights[...])
+        elif self.method == 'drastic':
+            return F.bulk_and_drastic(x)
+        elif self.method == 'physical_kleene_dienes':
+            # Sequential physical reduction across the feature dimensions
+            inputs = [x[..., i, :] for i in range(x.shape[-2])]
+            res = inputs[0]
+            for item in inputs[1:]:
+                res = F.and_physical_kleene_dienes(res, item)
+            return res
+        else:
+            raise ValueError(f"AND method '{self.method}' is not supported.")
+
+
+class BulkAnd(nnx.Module):
+    """
+    Non-trainable pure stateless bulk AND reduction gate.
+    Directly collapses a feature dimension using structural structural logical semantics.
+    """
+    def __init__(self, method: str = 'godel'):
+        self.method = method
+
+    def __call__(self, x: jnp.ndarray) -> jnp.ndarray:
+        if self.method == 'godel':
+            return F.bulk_and_godel(x)
+        elif self.method == 'product':
+            return F.bulk_and_product(x)
+        elif self.method == 'drastic':
+            return F.bulk_and_drastic(x)
+        else:
+            raise ValueError(f"Bulk AND method '{self.method}' is not recognized or requires weights.")
+
+
+class BulkOr(nnx.Module):
+    """
+    Non-trainable pure stateless bulk OR reduction gate.
+    Directly collapses a feature dimension using structural logical semantics.
+    """
+    def __init__(self, method: str = 'godel'):
+        self.method = method
+
+    def __call__(self, x: jnp.ndarray) -> jnp.ndarray:
+        if self.method == 'godel':
+            return F.bulk_or_godel(x)
+        elif self.method == 'product':
+            return F.bulk_or_product(x)
+        elif self.method == 'drastic':
+            return F.bulk_or_drastic(x)
+        else:
+            raise ValueError(f"Bulk OR method '{self.method}' is not recognized or requires weights.")
 
 
 class WeightedNand(nnx.Module):
     """
-    Weighted NAND gate (Negated AND).
+    Weighted NAND gate (Negated AND) utilizing Łukasiewicz core.
     """
     def __init__(self, num_inputs: int, rngs: nnx.Rngs):
         self.weights = nnx.Param(jnp.ones((num_inputs,)))
@@ -62,7 +148,7 @@ class WeightedNand(nnx.Module):
 
 class WeightedNor(nnx.Module):
     """
-    Weighted NOR gate (Negated OR).
+    Weighted NOR gate (Negated OR) utilizing Łukasiewicz core.
     """
     def __init__(self, num_inputs: int, rngs: nnx.Rngs):
         self.weights = nnx.Param(jnp.ones((num_inputs,)))
@@ -74,35 +160,49 @@ class WeightedNor(nnx.Module):
 
 class WeightedXor(nnx.Module):
     """
-    Trainable n-ary XOR gate implemented via recursive tree reduction.
+    Trainable or structural n-ary XOR gate implemented via recursive tree reduction.
+    Supports Łukasiewicz, Gödel, and Product logic XOR variants.
     """
-    def __init__(self, num_inputs: int, rngs: nnx.Rngs):
+    def __init__(self, num_inputs: int, rngs: nnx.Rngs, method: str = 'lukasiewicz'):
         if num_inputs < 2:
             raise ValueError("An XOR gate requires at least 2 inputs.")
         self.num_inputs = num_inputs
+        self.method = method
 
         if num_inputs == 2:
-            self.weights_or = nnx.Param(jnp.ones((2,)))
-            self.weights_nand = nnx.Param(jnp.ones((2,)))
-            self.weights_and = nnx.Param(jnp.ones((2,)))
-            self.beta = nnx.Param(jnp.array(1.0))
-            self.left_child = None
-            self.right_child = None
+            if self.method == 'lukasiewicz':
+                self.weights_or = nnx.Param(jnp.ones((2,)))
+                self.weights_nand = nnx.Param(jnp.ones((2,)))
+                self.weights_and = nnx.Param(jnp.ones((2,)))
+                self.beta = nnx.Param(jnp.array(1.0))
+            else:
+                # Godel and Product XOR use analytical pure functions from functional.py
+                self.weights_or = None
         else:
-            # Tree reduction setup
+            # Recursive tree division
             mid = num_inputs // 2
-            self.left_child = WeightedXor(num_inputs=mid, rngs=rngs)
-            self.right_child = WeightedXor(num_inputs=num_inputs - mid, rngs=rngs)
-            self.combiner = WeightedXor(num_inputs=2, rngs=rngs)
+            self.left_child = WeightedXor(num_inputs=mid, rngs=rngs, method=method)
+            self.right_child = WeightedXor(num_inputs=num_inputs - mid, rngs=rngs, method=method)
+            self.combiner = WeightedXor(num_inputs=2, rngs=rngs, method=method)
 
     def __call__(self, x: jnp.ndarray) -> jnp.ndarray:
         if self.num_inputs == 2:
-            res_or = F.weighted_or(x, self.weights_or[...], self.beta[...])
-            res_nand = F.weighted_nand(x, self.weights_nand[...], self.beta[...])
-            combined = jnp.stack([res_or, res_nand], axis=-2)
-            return F.weighted_and(combined, self.weights_and[...], self.beta[...])
+            # Access the individual binary interval components
+            int_a = x[..., 0, :]
+            int_b = x[..., 1, :]
+            
+            if self.method == 'lukasiewicz':
+                res_or = F.weighted_or(x, self.weights_or[...], self.beta[...])
+                res_nand = F.weighted_nand(x, self.weights_nand[...], self.beta[...])
+                combined = jnp.stack([res_or, res_nand], axis=-2)
+                return F.weighted_and(combined, self.weights_and[...], self.beta[...])
+            elif self.method == 'godel':
+                return F.xor_godel(int_a, int_b)
+            elif self.method == 'product':
+                return F.xor_product(int_a, int_b)
+            else:
+                raise ValueError(f"XOR method '{self.method}' is not supported.")
         else:
-            # Tree traversal: pass data through sub-modules
             mid = self.num_inputs // 2
             res_left = self.left_child(x[..., :mid, :])
             res_right = self.right_child(x[..., mid:, :])
@@ -118,18 +218,8 @@ class WeightedImplication(nnx.Module):
     as well as advanced space-curved Physical Fuzzy Logic (PFL) variants.
     """
     def __init__(self, rngs: nnx.Rngs, method: str = 'lukasiewicz'):
-        """
-        Initializes the implication gate.
-
-        Args:
-            rngs (nnx.Rngs): Flax NNX random number generator collection.
-            method (str): Logical method to use ('lukasiewicz', 'kleene_dienes', 'reichenbach', 
-                'goguen', 'godel', 'physical_kleene_dienes', 'physical_reichenbach', 'physical_lukasiewicz').
-        """
         self.method = method
         
-        # Physical methods do not utilize optimization weights as they bend the space dynamically 
-        # using entropy. We only instantiate trainable parameters for traditional methods.
         if not self.method.startswith('physical_'):
             self.weights = nnx.Param(jnp.ones((2,)))
             self.beta = nnx.Param(jnp.array(1.0))
@@ -145,8 +235,7 @@ class WeightedImplication(nnx.Module):
             w = self.weights[...]
             b = self.beta[...]
         else:
-            # For physical rules, we feed neutral weights to F.weighted_implication 
-            # so that it bypasses the preprocessing step without distorting values or throwing errors.
+            # Neutral mask bypass to keep function signature uniform
             w = jnp.ones((2,))
             b = jnp.array(1.0)
 
@@ -157,10 +246,7 @@ class WeightedImplication(nnx.Module):
 
 class WeightedNot(nnx.Module):
     """
-    Trainable weighted negation (NOT) gate.
-
-    Allows the model to learn the degree of certainty or strictness 
-    associated with logical inversion.
+    Trainable weighted negation (NOT) gate with adjustable structural confidence scaling.
     """
     def __init__(self, rngs: nnx.Rngs):
         self.weight = nnx.Param(jnp.array(1.0))
