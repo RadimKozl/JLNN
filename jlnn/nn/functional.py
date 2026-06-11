@@ -271,11 +271,11 @@ def weighted_implication(
     """
     Functional calculation of logical implication (A -> B).
     """
-    # 1. Łukasiewicz odbočuje okamžitě (přijímá raw intervaly, váhy řeší vnitřně)
+    # 1. Łukasiewicz branches immediately (accepts raw intervals, solves weights internally)
     if method == 'lukasiewicz':
         return logic.implies_lukasiewicz(int_a, int_b, weights, beta)
     
-    # 2. Fyzikální metody (PFL) odbočují OKAMŽITĚ s čistými intervaly (ignorují parametrické váhy)
+    # 2. Physical methods (PFL) branch immediately with clean intervals (ignore parametric weights)
     if method == 'physical_kleene_dienes':
         results = logic.implies_physical_kleene_dienes(int_a, int_b)
         return intervals.ensure_interval(results)
@@ -286,8 +286,8 @@ def weighted_implication(
         results = logic.implies_physical_gravitational_lukasiewicz(int_a, int_b)
         return intervals.ensure_interval(results)
 
-    # 3. Tradiční parametrické metody (kleene_dienes, reichenbach, goguen, godel)
-    # Pro ně plně aplikujeme původní kontrakt předzpracování vah:
+    # 3. Traditional parametric methods (kleene_dienes, reichenbach, goguen, godel)
+    # For them, we fully apply the original contract for preprocessing weights:
     weighted_a = intervals.create_interval(
         jnp.minimum(1.0, intervals.get_lower(int_a) * weights[0]),
         jnp.minimum(1.0, intervals.get_upper(int_a) * weights[0])
