@@ -54,7 +54,65 @@ class LearnedPredicate(nnx.Module):
         
         # Pack lower and upper bounds into a single interval representation [L, U].
         return intervals.create_interval(lower, upper)
-      
+
+
+class PhysicalPredicate(nnx.Module):
+    """
+    Grounding layer using Space-Curved Physical Fuzzy Logic (PFL).
+    
+    Transforms real-valued input data into truth intervals [L, U] using 
+    gravitational space deformation. Unstable and highly uncertain states 
+    are naturally pulled toward the entropic singularity (0.5), while deterministic 
+    edges saturate safely.
+    
+    Attributes:
+        slope_l (nnx.Param): Steepness of the lower bound potential.
+        offset_l (nnx.Param): Center shift for the lower bound potential.
+        slope_u (nnx.Param): Steepness of the upper bound potential.
+        offset_u (nnx.Param): Center shift for the upper bound potential.
+        gamma (float): Strength of the gravitational bending towards 0.5.
+        mode (str): Base compression method ('sigmoid' or 'ramp').
+    """
+    def __init__(self, in_features: int, rngs: nnx.Rngs, gamma: float = 0.2, mode: str = 'sigmoid'):
+        """
+        Initializes trainable parameters and PFL parameters.
+        """
+        self.gamma = gamma
+        self.mode = mode
+
+        # Trainable parameters for potential landscape mapping
+        self.slope_l = nnx.Param(jnp.ones((in_features,)))
+        self.offset_l = nnx.Param(jnp.zeros((in_features,)))
+        
+        # Offset for upper bound is slightly shifted to encourage initial L <= U constraint
+        self.slope_u = nnx.Param(jnp.ones((in_features,)))
+        self.offset_u = nnx.Param(jnp.full((in_features,), -0.2))
+
+    def __call__(self, x: jnp.ndarray) -> jnp.ndarray:
+        """
+        Maps numeric inputs to physical truth intervals using gravitational deformation.
+        """
+        # 1. Compute input potentials (z) for lower and upper bounds
+        # (Standard linear mapping before entering the curved space activation)
+        z_l = self.slope_l[...] * (x - self.offset_l[...])
+        z_u = self.slope_u[...] * (x - self.offset_u[...])
+
+        # 2. Pass potentials through the physical gravitational activation function
+        # For mode='ramp', we supply the internal slope=1.0 and offset=0.5 because 
+        # the parameters were already applied during potential (z) construction.
+        lower = activations.gravitational_bend_activation(
+            z_l, gamma=self.gamma, mode=self.mode, slope=1.0, offset=0.5
+        )
+        upper = activations.gravitational_bend_activation(
+            z_u, gamma=self.gamma, mode=self.mode, slope=1.0, offset=0.5
+        )
+        
+        # 3. Enforce valid interval logic constraints [L <= U] and pack
+        # (Using safe clip/minimum check inside ensure_interval if needed, or direct creation)
+        combined = intervals.create_interval(lower, upper)
+        return intervals.ensure_interval(combined)
+    
+
 class FixedPredicate(nnx.Module):
     """
     Non-trainable predicate that returns the input interval unchanged.
