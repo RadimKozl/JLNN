@@ -270,26 +270,24 @@ def weighted_implication(
 ) -> jnp.ndarray:
     """
     Functional calculation of logical implication (A -> B).
-
-    It supports various semantics for modeling expert rules.
-
-    Args:
-        int_a (jnp.ndarray): Antecedent (presupposition).
-        int_b (jnp.ndarray): Consequent (consequence).
-        weights (jnp.ndarray): Weights for A and B.
-        beta (jnp.ndarray): Gate Threshold.
-        method (str): Method ('lukasiewicz', 'kleene_dienes', 'reichenbach', 'goguen', 'godel',
-                             'physical_kleene_dienes', 'physical_reichenbach', 'physical_lukasiewicz').
-
-    Returns:
-        jnp.ndarray: The truth of the rule as an interval.
     """
+    # 1. Łukasiewicz odbočuje okamžitě (přijímá raw intervaly, váhy řeší vnitřně)
     if method == 'lukasiewicz':
         return logic.implies_lukasiewicz(int_a, int_b, weights, beta)
     
-    # Check for pure methods that shouldn't apply weight scaling preprocessing
-    # (e.g. if weights are explicitly passed as a neutral array like [1.0, 1.0] or if we want pure logic routing)
-    # However, to perfectly respect the original script's preprocessing contract:
+    # 2. Fyzikální metody (PFL) odbočují OKAMŽITĚ s čistými intervaly (ignorují parametrické váhy)
+    if method == 'physical_kleene_dienes':
+        results = logic.implies_physical_kleene_dienes(int_a, int_b)
+        return intervals.ensure_interval(results)
+    elif method == 'physical_reichenbach':
+        results = logic.implies_physical_reichenbach(int_a, int_b)
+        return intervals.ensure_interval(results)
+    elif method == 'physical_lukasiewicz':
+        results = logic.implies_physical_gravitational_lukasiewicz(int_a, int_b)
+        return intervals.ensure_interval(results)
+
+    # 3. Tradiční parametrické metody (kleene_dienes, reichenbach, goguen, godel)
+    # Pro ně plně aplikujeme původní kontrakt předzpracování vah:
     weighted_a = intervals.create_interval(
         jnp.minimum(1.0, intervals.get_lower(int_a) * weights[0]),
         jnp.minimum(1.0, intervals.get_upper(int_a) * weights[0])
@@ -307,12 +305,6 @@ def weighted_implication(
         results = logic.implies_goguen(weighted_a, weighted_b)
     elif method == 'godel':
         results = logic.implies_godel(weighted_a, weighted_b)
-    elif method == 'physical_kleene_dienes':
-        results = logic.implies_physical_kleene_dienes(weighted_a, weighted_b)
-    elif method == 'physical_reichenbach':
-        results = logic.implies_physical_reichenbach(weighted_a, weighted_b)
-    elif method == 'physical_lukasiewicz':
-        results = logic.implies_physical_gravitational_lukasiewicz(weighted_a, weighted_b)
     else:
         raise ValueError(f"Method {method} is not supported.")
     
