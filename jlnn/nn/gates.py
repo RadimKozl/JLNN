@@ -20,7 +20,7 @@ class WeightedOr(nnx.Module):
 
     Attributes:
         method (str): Target logical framework selector ('lukasiewicz', 'godel', 'product').
-        weights (nnx.Param): Trainable input importance weights structured as (num_inputs,)
+        weights (nnx.Param): Trainable input importance weights structured as (num_inputs,).
         beta (nnx.Param): Trainable gate sensitivity threshold scalar parameter (bias).
     """
     def __init__(self, num_inputs: int, rngs: nnx.Rngs, method: str = 'lukasiewicz'):
@@ -328,10 +328,12 @@ class PhysicalNand(nnx.Module):
     """
     def __init__(self, method: str = 'physical_kleene_dienes', gamma: float = 0.2, 
                  mode: str = 'sigmoid', slope: float = 1.0, offset: float = 0.5):
+        """Initializes the parameter-free PhysicalNand gate compounding AND and NOT primitives."""
         self.and_gate = PhysicalAnd(method=method, gamma=gamma, mode=mode, slope=slope, offset=offset)
         self.not_gate = PhysicalNot()
 
     def __call__(self, x: jnp.ndarray) -> jnp.ndarray:
+        """Computes alternative denial via composition of physical gates."""
         and_res = self.and_gate(x)
         return self.not_gate(and_res)
 
@@ -345,10 +347,12 @@ class PhysicalNor(nnx.Module):
     """
     def __init__(self, method: str = 'physical_kleene_dienes', gamma: float = 0.2, 
                  mode: str = 'sigmoid', slope: float = 1.0, offset: float = 0.5):
+        """Initializes the parameter-free PhysicalNor gate compounding OR and NOT primitives."""
         self.or_gate = PhysicalOr(method=method, gamma=gamma, mode=mode, slope=slope, offset=offset)
         self.not_gate = PhysicalNot()
 
     def __call__(self, x: jnp.ndarray) -> jnp.ndarray:
+        """Computes joint denial via composition of physical gates."""
         or_res = self.or_gate(x)
         return self.not_gate(or_res)
 
@@ -362,6 +366,7 @@ class PhysicalXor(nnx.Module):
     """
     def __init__(self, num_inputs: int, method: str = 'physical_kleene_dienes', gamma: float = 0.2, 
                  mode: str = 'sigmoid', slope: float = 1.0, offset: float = 0.5):
+        """Initializes the structural PhysicalXor tree pipeline."""
         if num_inputs < 2:
             raise ValueError("A physical XOR gate requires at least 2 distinct inputs.")
         self.num_inputs = num_inputs
@@ -383,6 +388,7 @@ class PhysicalXor(nnx.Module):
             self.combiner = PhysicalXor(num_inputs=2, method=method, gamma=gamma, mode=mode, slope=slope, offset=offset)
 
     def __call__(self, x: jnp.ndarray) -> jnp.ndarray:
+        """Performs balanced binary structural reduction using PFL formulation rules."""
         if self.num_inputs == 2:
             # Input is of the form (..., 2, 2)
             res_or = self.or_combiner(x)
@@ -404,34 +410,123 @@ class PhysicalXor(nnx.Module):
 class WeightedNand(nnx.Module):
     """
     Stateful weighted NAND gate (Alternative Denial) utilizing the Łukasiewicz core logic.
+
+    This module acts as a trainable fuzzy alternative denial layer that combines feature
+    importance optimization with logical inversion. In the JLNN interval framework, it
+    evaluates multi-input conjunction and applies a strict bounded negation to the collective 
+    result, allowing the network to suppress specific compound conditions via backpropagation.
+
+    Attributes:
+        weights (nnx.Param): Trainable input importance weights structured as (num_inputs,).
+            These optimize the relative impact of individual feature streams before logical aggregation.
+        beta (nnx.Param): Trainable gate activation sensitivity threshold scalar parameter (bias).
     """
     def __init__(self, num_inputs: int, rngs: nnx.Rngs):
-        """Initializes the trainable WeightedNand gate."""
+        """
+        Initializes the stateful WeightedNand gate with optimization parameters.
+
+        Args:
+            num_inputs (int): Dimensionality of the incoming input feature sub-space.
+            rngs (nnx.Rngs): Flax NNX random number generator collection for parameter initialization.
+        """
         self.weights = nnx.Param(jnp.ones((num_inputs,)))
         self.beta = nnx.Param(jnp.array(1.0))
 
     def __call__(self, x: jnp.ndarray) -> jnp.ndarray:
+        """
+        Executes the weighted fuzzy NAND operation across the designated feature axis.
+
+        Args:
+            x (jnp.ndarray): Multi-variable truth interval tensor structured as 
+                (..., num_inputs, 2), where the last dimension holds [Lower, Upper] bounds.
+
+        Returns:
+            jnp.ndarray: Bounded and consistency-verified truth interval structured as (..., 2).
+        """
         return F.weighted_nand(x, self.weights[...], self.beta[...])
 
 
 class WeightedNor(nnx.Module):
     """
     Stateful weighted NOR gate (Joint Denial) utilizing the Łukasiewicz core logic.
+
+    This module acts as a trainable fuzzy joint denial layer that aggregates supportive 
+    evidence across multiple feature streams and subsequently inverts the accumulated potential.
+    It evaluates multi-input disjunction modulated by relative weights and sensitivity thresholds,
+    followed by an axiomatic boundary negation to project a final strict truth interval.
+
+    Attributes:
+        weights (nnx.Param): Trainable input importance weights structured as (num_inputs,).
+            These optimize the relative impact of individual feature streams before logical aggregation.
+        beta (nnx.Param): Trainable gate activation sensitivity threshold scalar parameter (bias).
     """
     def __init__(self, num_inputs: int, rngs: nnx.Rngs):
-        """Initializes the trainable WeightedNor gate."""
+        """
+        Initializes the stateful WeightedNor gate with optimization parameters.
+
+        Args:
+            num_inputs (int): Dimensionality of the incoming input feature sub-space.
+            rngs (nnx.Rngs): Flax NNX random number generator collection for parameter initialization.
+        """
         self.weights = nnx.Param(jnp.ones((num_inputs,)))
         self.beta = nnx.Param(jnp.array(1.0))
 
     def __call__(self, x: jnp.ndarray) -> jnp.ndarray:
+        """
+        Executes the weighted fuzzy NOR operation across the designated feature axis.
+
+        Args:
+            x (jnp.ndarray): Multi-variable truth interval tensor structured as 
+                (..., num_inputs, 2), where the last dimension holds [Lower, Upper] bounds.
+
+        Returns:
+            jnp.ndarray: Bounded and consistency-verified truth interval structured as (..., 2).
+        """
         return F.weighted_nor(x, self.weights[...], self.beta[...])
 
 
 class WeightedXor(nnx.Module):
     """
     Trainable structural n-ary Exclusive OR (XOR) gate implemented via recursive tree reduction.
+
+    This module evaluates multi-variable exclusive disjunction across interval-valued inputs.
+    Because multi-input fuzzy XOR does not always possess associative properties under 
+    parametric norms, this class structurally decomposes the reduction of an arbitrary 
+    number of input signals into a balanced binary tree of 2-input XOR operators.
+
+    For the 'lukasiewicz' method, the base 2-input operator is parameterized and stateful,
+    learning distinct feature importance weights and a common activation threshold bias.
+    For 'godel' and 'product' methods, the operation scales down to parameter-free analytical 
+    formulations.
+
+    Attributes:
+        num_inputs (int): Dimensionality of the incoming input feature sub-space.
+        method (str): Target logical framework selector ('lukasiewicz', 'godel', 'product').
+        weights_or (Optional[nnx.Param]): Trainable weights for the internal OR aggregator 
+            in the base 2-input Lukasiewicz operator. Shape: (2,).
+        weights_nand (Optional[nnx.Param]): Trainable weights for the internal NAND aggregator 
+            in the base 2-input Lukasiewicz operator. Shape: (2,).
+        weights_and (Optional[nnx.Param]): Trainable weights for the final AND combiner 
+            in the base 2-input Lukasiewicz operator. Shape: (2,).
+        beta (Optional[nnx.Param]): Trainable shared sensitivity threshold (bias) scalar 
+            for the base Lukasiewicz logic components.
+        left_child (Optional[WeightedXor]): Left subtree module for inputs reduction.
+        right_child (Optional[WeightedXor]): Right subtree module for inputs reduction.
+        combiner (Optional[WeightedXor]): A 2-input structural gate combining subtree outputs.
     """
     def __init__(self, num_inputs: int, rngs: nnx.Rngs, method: str = 'lukasiewicz'):
+        """
+        Initializes the stateful or structural WeightedXor gate network.
+
+        Args:
+            num_inputs (int): Dimensionality of the incoming input feature sub-space.
+            rngs (nnx.Rngs): Flax NNX random number generator collection for parameter initialization.
+            method (str, optional): Target fuzzy logic framework. Defaults to 'lukasiewicz'.
+
+        Raises:
+            ValueError: If `num_inputs` is less than 2, as a logical XOR operation requires 
+                at least a binary interaction.
+        """
         if num_inputs < 2:
             raise ValueError("A structural XOR gate requires at least 2 distinct inputs.")
         self.num_inputs = num_inputs
@@ -452,6 +547,19 @@ class WeightedXor(nnx.Module):
             self.combiner = WeightedXor(num_inputs=2, rngs=rngs, method=method)
 
     def __call__(self, x: jnp.ndarray) -> jnp.ndarray:
+        """
+        Executes the recursive exclusive disjunction over the designated terminal feature dimension.
+
+        Args:
+            x (jnp.ndarray): Multi-variable truth interval tensor structured as 
+                (..., num_inputs, 2), where the last dimension holds [Lower, Upper] bounds.
+
+        Returns:
+            jnp.ndarray: Bounded and consistency-verified truth interval structured as (..., 2).
+
+        Raises:
+            ValueError: If an unmapped or invalid logic method string is provided inside base layers.
+        """
         if self.num_inputs == 2:
             int_a = x[..., 0, :]
             int_b = x[..., 1, :]
@@ -478,10 +586,37 @@ class WeightedXor(nnx.Module):
 class WeightedNot(nnx.Module):
     """
     Trainable weighted negation (NOT) gate with adjustable structural confidence scaling.
+
+    This module acts as a stateful logical inversion layer within the JLNN framework. 
+    It applies a fuzzy negation operator to an interval-valued truth tensor while 
+    optimizing a trainable scaling weight parameter. This allows the network to learn 
+    the strictness, preservation, or relaxation of structural uncertainty during 
+    systemic logical inversion operations.
+
+    Attributes:
+        weight (nnx.Param): Trainable confidence scaling parameter scalar. It controls 
+            the interpolation and preservation of boundary uncertainty during the 
+            negation mapping.
     """
     def __init__(self, rngs: nnx.Rngs):
-        """Initializes the trainable WeightedNot inversion gate."""
+        """
+        Initializes the trainable WeightedNot inversion gate.
+
+        Args:
+            rngs (nnx.Rngs): Flax NNX random number generator collection for parameter initialization.
+        """
         self.weight = nnx.Param(jnp.array(1.0))
 
     def __call__(self, x: jnp.ndarray) -> jnp.ndarray:
+        """
+        Executes the parameterized logical negation over the input interval.
+
+        Args:
+            x (jnp.ndarray): Input truth interval tensor structured as (..., 2),
+                where the last dimension holds [Lower, Upper] bounds.
+
+        Returns:
+            jnp.ndarray: Bounded and consistency-verified inverted truth interval 
+                structured as (..., 2).
+        """
         return F.weighted_not(x, self.weight[...])
