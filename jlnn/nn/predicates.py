@@ -8,47 +8,51 @@ from jlnn.core import activations, intervals
 
 class LearnedPredicate(nnx.Module):
     """
-    Grounding layer that transforms real-valued input data into truth intervals [L, U].
+    Stateful parametric grounding layer that transforms real-valued input data 
+    into bounded truth intervals [L, U].
 
-    In Logical Neural Networks (LNN), predicates act as the interface between 
-    numeric data and logical formulas. This class learns the semantic mapping 
-    (grounding) by adjusting slopes and offsets of activation functions to 
-    produce fuzzy truth values.
+    In Logical Neural Networks (LNN), predicates function as the foundational semantic 
+    interface mapping raw empirical data streams into strict logical propositions. 
+    This class models parametric grounding profiles by independently optimizing the slopes 
+    and offsets of monotonic activation functions, thereby refining fuzzy boundaries 
+    via backpropagation while preserving structural valid intervals.
 
     Attributes:
-        slope_l (nnx.Param): Steepness of the lower bound activation.
-        offset_l (nnx.Param): Horizontal shift for the lower bound activation.
-        slope_u (nnx.Param): Steepness of the upper bound activation.
-        offset_u (nnx.Param): Horizontal shift for the upper bound activation.
+        slope_l (nnx.Param): Trainable sensitivity vector scaling the lower truth bound activation.
+        offset_l (nnx.Param): Trainable horizontal threshold vector shifting the lower truth bound.
+        slope_u (nnx.Param): Trainable sensitivity vector scaling the upper truth bound activation.
+        offset_u (nnx.Param): Trainable horizontal threshold vector shifting the upper truth bound.
     """
     def __init__(self, in_features: int, rngs: nnx.Rngs):
         """
-        Initializes trainable parameters for each input feature.
+        Initializes trainable slope and offset tracking parameters for each feature sub-space.
 
         Args:
-            in_features (int): Number of input features to be grounded.
-            rngs (nnx.Rngs): Flax NNX random number generator collection.
+            in_features (int): Total dimensionality of the incoming numerical feature vector.
+            rngs (nnx.Rngs): Flax NNX random number generator collection for parameter states.
         """
-        # Slopes determine how quickly a value transitions from False to True.
+        # Slopes control the gradient steepness of the truth transition region (False to True).
         self.slope_l = nnx.Param(jnp.ones((in_features,)))
         self.offset_l = nnx.Param(jnp.zeros((in_features,)))
         
-        # Offsets for U are initialized slightly differently to ensure initial L <= U.
+        # Offsets for the upper bound (U) are purposefully initialized with a negative
+        # translation bias to mathematically guarantee the fundamental L <= U condition at inception.
         self.slope_u = nnx.Param(jnp.ones((in_features,)))
         self.offset_u = nnx.Param(jnp.full((in_features,), -0.2))
 
     def __call__(self, x: jnp.ndarray) -> jnp.ndarray:
         """
-        Maps numeric inputs to truth intervals using learned sigmoidal ramps.
+        Maps standard numerical arrays into multi-dimensional fuzzy truth intervals.
 
         Args:
-            x (jnp.ndarray): Numeric input tensor of shape (..., in_features).
+            x (jnp.ndarray): Numerical observation tensor structured as (..., in_features).
 
         Returns:
-            jnp.ndarray: Truth interval tensor of shape (..., in_features, 2).
+            jnp.ndarray: Evaluated truth interval tensor structured as (..., in_features, 2), 
+                where the trailing dimension defines the [Lower, Upper] truth limits.
         """
-        # Note: Using Ellipsis [...] for parameter access is the modern Flax NNX 
-        # standard to retrieve the underlying JAX Array without deprecation warnings.
+        # Note: Accessing parameters via the Ellipsis [...] index operator is the standard 
+        # practice in Flax NNX to unpack raw JAX Arrays without raising future deprecation alerts.
         lower = activations.ramp_sigmoid(x, self.slope_l[...], self.offset_l[...])
         upper = activations.ramp_sigmoid(x, self.slope_u[...], self.offset_u[...])
         
@@ -58,48 +62,63 @@ class LearnedPredicate(nnx.Module):
 
 class PhysicalPredicate(nnx.Module):
     """
-    Grounding layer using Space-Curved Physical Fuzzy Logic (PFL).
+    Stateful non-Euclidean grounding layer utilizing Space-Curved Physical Fuzzy Logic (PFL).
     
-    Transforms real-valued input data into truth intervals [L, U] using 
-    gravitational space deformation. Unstable and highly uncertain states 
-    are naturally pulled toward the entropic singularity (0.5), while deterministic 
-    edges saturate safely.
+    Transforms real-valued external arrays into coherent logical truth intervals [L, U] 
+    by routing numerical potentials through an artificial gravitational space deformation field. 
+    Under this paradigm, highly unstable or contradictory information matrices are naturally 
+    drawn towards the entropic singularity core (0.5), while highly deterministic inputs 
+    converge safely into saturated axiomatic boundaries.
     
     Attributes:
-        slope_l (nnx.Param): Steepness of the lower bound potential.
-        offset_l (nnx.Param): Center shift for the lower bound potential.
-        slope_u (nnx.Param): Steepness of the upper bound potential.
-        offset_u (nnx.Param): Center shift for the upper bound potential.
-        gamma (float): Strength of the gravitational bending towards 0.5.
-        mode (str): Base compression method ('sigmoid' or 'ramp').
+        gamma (float): Coupling constant governing the intensity of the gravitational 
+            restoring force pulling states towards absolute maximum entropy (0.5).
+        mode (str): Baseline structural activation compression kernel ('sigmoid' or 'ramp').
+        slope_l (nnx.Param): Trainable directional landscape steepness for lower bound potential.
+        offset_l (nnx.Param): Trainable landscape origin shift for lower bound potential.
+        slope_u (nnx.Param): Trainable directional landscape steepness for upper bound potential.
+        offset_u (nnx.Param): Trainable landscape origin shift for upper bound potential.
     """
     def __init__(self, in_features: int, rngs: nnx.Rngs, gamma: float = 0.2, mode: str = 'sigmoid'):
         """
-        Initializes trainable parameters and PFL parameters.
+        Initializes trainable metric mapping landscapes alongside space curvature fields.
+
+        Args:
+            in_features (int): Total dimensionality of the incoming numerical feature vector.
+            rngs (nnx.Rngs): Flax NNX random number generator collection.
+            gamma (float, optional): Space bending elasticity coefficient. Defaults to 0.2.
+            mode (str, optional): Underlying kernel geometry selector. Defaults to 'sigmoid'.
         """
         self.gamma = gamma
         self.mode = mode
 
-        # Trainable parameters for potential landscape mapping
+        # Optimization states mapping input metrics to a standardized logical potential space
         self.slope_l = nnx.Param(jnp.ones((in_features,)))
         self.offset_l = nnx.Param(jnp.zeros((in_features,)))
         
-        # Offset for upper bound is slightly shifted to encourage initial L <= U constraint
+        # Upper potential boundary initialization incorporates an axiomatic safety shift
         self.slope_u = nnx.Param(jnp.ones((in_features,)))
         self.offset_u = nnx.Param(jnp.full((in_features,), -0.2))
 
     def __call__(self, x: jnp.ndarray) -> jnp.ndarray:
         """
-        Maps numeric inputs to physical truth intervals using gravitational deformation.
+        Maps numeric input arrays to curved physical truth intervals via gravitational warping.
+
+        Args:
+            x (jnp.ndarray): Numerical observation tensor structured as (..., in_features).
+
+        Returns:
+            jnp.ndarray: Consistency-verified physical truth interval tensor shaped as (..., in_features, 2).
         """
-        # 1. Compute input potentials (z) for lower and upper bounds
-        # (Standard linear mapping before entering the curved space activation)
+        # 1. Evaluate coordinate maps to derive raw logical input potentials (z)
+        # These potentials establish standard linear feature interactions prior to entering curved logic spaces.
         z_l = self.slope_l[...] * (x - self.offset_l[...])
         z_u = self.slope_u[...] * (x - self.offset_u[...])
 
-        # 2. Pass potentials through the physical gravitational activation function
-        # For mode='ramp', we supply the internal slope=1.0 and offset=0.5 because 
-        # the parameters were already applied during potential (z) construction.
+        # 2. Project calculated potentials onto the entropic gravitational field activation.
+        # When evaluating under 'ramp' geometry, we supply fixed scale factors (slope=1.0, offset=0.5)
+        # to the internal activation function because parametric tuning has already been fully
+        # absorbed during the potential (z) calculation phase above.
         lower = activations.gravitational_bend_activation(
             z_l, gamma=self.gamma, mode=self.mode, slope=1.0, offset=0.5
         )
@@ -107,39 +126,36 @@ class PhysicalPredicate(nnx.Module):
             z_u, gamma=self.gamma, mode=self.mode, slope=1.0, offset=0.5
         )
         
-        # 3. Enforce valid interval logic constraints [L <= U] and pack
-        # (Using safe clip/minimum check inside ensure_interval if needed, or direct creation)
+        # 3. Secure axiomatic consistency constraints and pack the resulting tensor slices
         combined = intervals.create_interval(lower, upper)
         return intervals.ensure_interval(combined)
     
 
 class FixedPredicate(nnx.Module):
     """
-    Non-trainable predicate that returns the input interval unchanged.
+    Stateless non-trainable identity predicate that preserves input truth intervals.
 
-    This module serves as an identity transformation for truth intervals, 
-    preserving the original lower and upper bounds. It is primarily utilized 
-    for crisp boolean logic scenarios where fixed truth values are required 
-    without neural weight updates.
+    This module acts as a rigid, static pass-through transformation layer for pre-computed 
+    truth intervals. It is primarily applied in hybrid neuro-symbolic systems, crisp Boolean 
+    boundary injections, or deterministic logic anchoring pipelines where structural parameters 
+    must remain completely shielded from gradient descent variations.
 
     Attributes:
         None
     """
     def __init__(self):
-        """
-        Initializes the FixedPredicate module.
-        """
+        """Initializes the stateless FixedPredicate structural identity layer."""
         pass
 
     def __call__(self, x: jnp.ndarray) -> jnp.ndarray:
         """
-        Passes the input interval through without modification.
+        Routes the truth interval tensor forward without altering internal value matrices.
 
         Args:
-            x (jnp.ndarray): Input truth interval tensor of the form (..., 2) 
-                representing [L, U].
+            x (jnp.ndarray): Presettled input truth interval tensor structured as (..., 2) 
+                representing explicit [Lower, Upper] bounds.
 
         Returns:
-            jnp.ndarray: The identical input interval [L, U].
+            jnp.ndarray: The identical, unaltered truth interval tensor structured as (..., 2).
         """
-        return x  # identity – [L, U] returns [L, U]
+        return x  # Identity mapping – [L, U] maps directly to [L, U]
