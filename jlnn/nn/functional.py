@@ -115,7 +115,75 @@ def weighted_nor(x: jnp.ndarray, weights: jnp.ndarray, beta: jnp.ndarray) -> jnp
 
 
 # =====================================================================
-# 2. GÖDEL LOGIC (Strict / Extremes / Min-Max)
+# 2. KLEENE-DIENES LOGIC CORE (Parametric Max-Min / Strict Threshold)
+# =====================================================================
+
+def weighted_and_kleene_dienes(x: jnp.ndarray, weights: jnp.ndarray) -> jnp.ndarray:
+    """Parametric alias routing to the underlying weighted Gödel conjunction."""
+    return weighted_and_godel(x, weights)
+
+
+def weighted_or_kleene_dienes(x: jnp.ndarray, weights: jnp.ndarray) -> jnp.ndarray:
+    """Parametric alias routing to the underlying weighted Gödel disjunction."""
+    return weighted_or_godel(x, weights)
+
+
+def weighted_nand_kleene_dienes(x: jnp.ndarray, weights: jnp.ndarray) -> jnp.ndarray:
+    """Computes a weighted alternative denial (NAND) under Kleene-Dienes semantics."""
+    res_and = weighted_and_kleene_dienes(x, weights)
+    return intervals.ensure_interval(intervals.negate(res_and))
+
+
+def weighted_nor_kleene_dienes(x: jnp.ndarray, weights: jnp.ndarray) -> jnp.ndarray:
+    """Computes a weighted joint denial (NOR) under Kleene-Dienes semantics."""
+    res_or = weighted_or_kleene_dienes(x, weights)
+    return intervals.ensure_interval(intervals.negate(res_or))
+
+
+# =====================================================================
+# 3. REICHENBACH LOGIC CORE (Parametric Smooth Product / Algebraic)
+# =====================================================================
+
+def weighted_and_reichenbach(x: jnp.ndarray, weights: jnp.ndarray) -> jnp.ndarray:
+    """Parametric alias routing to the underlying weighted Product conjunction."""
+    return weighted_and_product(x, weights)
+
+
+def weighted_or_reichenbach(x: jnp.ndarray, weights: jnp.ndarray) -> jnp.ndarray:
+    """Parametric alias routing to the underlying weighted Product disjunction."""
+    return weighted_or_product(x, weights)
+
+
+def weighted_nand_reichenbach(x: jnp.ndarray, weights: jnp.ndarray) -> jnp.ndarray:
+    """Computes a weighted alternative denial (NAND) under Reichenbach semantics."""
+    res_and = weighted_and_reichenbach(x, weights)
+    return intervals.ensure_interval(intervals.negate(res_and))
+
+
+def weighted_nor_reichenbach(x: jnp.ndarray, weights: jnp.ndarray) -> jnp.ndarray:
+    """Computes a weighted joint denial (NOR) under Reichenbach semantics."""
+    res_or = weighted_or_reichenbach(x, weights)
+    return intervals.ensure_interval(intervals.negate(res_or))
+
+
+def weighted_nor_reichenbach(x: jnp.ndarray, weights: jnp.ndarray) -> jnp.ndarray:
+    """
+    Computes a weighted parametric joint denial (NOR) under Reichenbach semantics.
+
+    Args:
+        x (jnp.ndarray): Input truth interval tensor structured as (..., num_inputs, 2).
+        weights (jnp.ndarray): Input importance weights structured as (num_inputs,).
+
+    Returns:
+        jnp.ndarray: Consistency-verified inverted probabilistic sum interval structured as (..., 2).
+    """
+    res_or = weighted_or_reichenbach(x, weights)
+    results = intervals.negate(res_or)
+    return intervals.ensure_interval(results)
+
+
+# =====================================================================
+# 4. GÖDEL LOGIC (Strict / Extremes / Min-Max)
 # =====================================================================
 
 def and_godel(int_a: jnp.ndarray, int_b: jnp.ndarray) -> jnp.ndarray:
@@ -237,7 +305,7 @@ def weighted_or_godel(x: jnp.ndarray, weights: jnp.ndarray) -> jnp.ndarray:
 
 
 # =====================================================================
-# 3. PRODUCT LOGIC (Smooth / Probabilistic / Polynomial)
+# 5. PRODUCT LOGIC (Smooth / Probabilistic / Polynomial)
 # =====================================================================
 
 def and_product(int_a: jnp.ndarray, int_b: jnp.ndarray) -> jnp.ndarray:
@@ -353,7 +421,7 @@ def weighted_or_product(x: jnp.ndarray, weights: jnp.ndarray) -> jnp.ndarray:
 
 
 # =====================================================================
-# 4. DRASTIC LOGIC (Boundary Extremes / Lower Analytical Barrier)
+# 6. DRASTIC LOGIC (Boundary Extremes / Lower Analytical Barrier)
 # =====================================================================
 
 def and_drastic(int_a: jnp.ndarray, int_b: jnp.ndarray) -> jnp.ndarray:
@@ -411,7 +479,30 @@ def bulk_or_drastic(x: jnp.ndarray) -> jnp.ndarray:
 
 
 # =====================================================================
-# 5. ATOMIC IMPLICATION ATOMS (For Internal Dispatching)
+# 7. ATOMIC DISJUNCTION ATOMS
+# =====================================================================
+
+def and_kleene_dienes(int_a: jnp.ndarray, int_b: jnp.ndarray) -> jnp.ndarray:
+    """Mathematical alias for and_godel (Kleene-Dienes utilizes Gödel Min t-norm)."""
+    return and_godel(int_a, int_b)
+
+
+def and_reichenbach(int_a: jnp.ndarray, int_b: jnp.ndarray) -> jnp.ndarray:
+    """Mathematical alias for and_product (Reichenbach utilizes Product t-norm)."""
+    return and_product(int_a, int_b)
+
+
+def or_kleene_dienes(int_a: jnp.ndarray, int_b: jnp.ndarray) -> jnp.ndarray:
+    """Mathematical alias for or_godel (Kleene-Dienes utilizes Gödel Max t-conorm)."""
+    return or_godel(int_a, int_b)
+
+
+def or_reichenbach(int_a: jnp.ndarray, int_b: jnp.ndarray) -> jnp.ndarray:
+    """Mathematical alias for or_product (Reichenbach utilizes Probabilistic Sum t-conorm)."""
+    return or_product(int_a, int_b)
+
+# =====================================================================
+# 8. ATOMIC IMPLICATION ATOMS (For Internal Dispatching)
 # =====================================================================
 
 def implication_lukasiewicz(int_a: jnp.ndarray, int_b: jnp.ndarray, weights: jnp.ndarray, beta: float) -> jnp.ndarray:
@@ -455,7 +546,7 @@ def implication_physical_lukasiewicz(int_a: jnp.ndarray, int_b: jnp.ndarray) -> 
 
 
 # =====================================================================
-# 6. SPACE-CURVED PHYSICAL FUZZY LOGIC (PFL) CONNECTIVES
+# 9. SPACE-CURVED PHYSICAL FUZZY LOGIC (PFL) CONNECTIVES
 # =====================================================================
 
 def and_physical_kleene_dienes(int_a: jnp.ndarray, int_b: jnp.ndarray) -> jnp.ndarray:
@@ -604,7 +695,7 @@ def or_physical_lukasiewicz(int_a: jnp.ndarray, int_b: jnp.ndarray) -> jnp.ndarr
     return intervals.ensure_interval(logic.or_lukasiewicz_pure(deformed_a, deformed_b))
 
 # =====================================================================
-# 7. BACKWARDS-COMPATIBLE ROUTING GATEWAY (PRESERVING ORIGINAL NAME)
+# 10. BACKWARDS-COMPATIBLE ROUTING GATEWAY (PRESERVING ORIGINAL NAME)
 # =====================================================================
 
 def weighted_implication(

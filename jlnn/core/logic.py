@@ -12,6 +12,36 @@ EPSILON = 1e-6
 # 1. ŁUKASIEWICZ'S LOGIC (Nilpotent / Accumulative)
 # =====================================================================
 
+def and_lukasiewicz_pure(int_a: jnp.ndarray, int_b: jnp.ndarray) -> jnp.ndarray:
+    """
+    Computes a pure, parameterless Łukasiewicz conjunction (t-norm) for two intervals.
+    
+    Mathematical formula: max(0.0, A + B - 1.0) evaluated over interval boundaries.
+    """
+    L_a, U_a = intervals.get_lower(int_a), intervals.get_upper(int_a)
+    L_b, U_b = intervals.get_lower(int_b), intervals.get_upper(int_b)
+    
+    # Nilpotent bounded difference interaction
+    res_L = jnp.maximum(0.0, L_a + L_b - 1.0)
+    res_U = jnp.maximum(0.0, U_a + U_b - 1.0)
+    return intervals.create_interval(res_L, res_U)
+
+
+def or_lukasiewicz_pure(int_a: jnp.ndarray, int_b: jnp.ndarray) -> jnp.ndarray:
+    """
+    Computes a pure, parameterless Łukasiewicz disjunction (t-conorm) for two intervals.
+    
+    Mathematical formula: min(1.0, A + B) evaluated over interval boundaries.
+    """
+    L_a, U_a = intervals.get_lower(int_a), intervals.get_upper(int_a)
+    L_b, U_b = intervals.get_lower(int_b), intervals.get_upper(int_b)
+    
+    # Nilpotent bounded sum interaction
+    res_L = jnp.minimum(1.0, L_a + L_b)
+    res_U = jnp.minimum(1.0, U_a + U_b)
+    return intervals.create_interval(res_L, res_U)
+
+
 def weighted_and_lukasiewicz(x: jnp.ndarray, weights: jnp.ndarray, beta: jnp.ndarray) -> jnp.ndarray:
     """
     Calculates a weighted Łukasiewicz conjunction (AND) over truth intervals.
