@@ -5,7 +5,7 @@ import jax
 import jax.numpy as jnp
 from jlnn.core import intervals, activations
 
-# Numerická tolerance pro bezpečné porovnávání hraničních stavů v float32
+# Numerical tolerance for secure boundary state comparisons in float32 precision
 EPSILON = 1e-6
 
 # =====================================================================
@@ -16,33 +16,35 @@ def weighted_and_lukasiewicz(x: jnp.ndarray, weights: jnp.ndarray, beta: jnp.nda
     """
     Calculates a weighted Łukasiewicz conjunction (AND) over truth intervals.
 
-    In LNN logic, conjunction is defined through "negative evidence". 
-    The closer the inputs are to falsehood (1 - x) and the higher their weight, 
-    the more they reduce the overall truth of the result. 
-    The parameter beta determines the threshold below which the result is considered absolutely false (0.0).
+    In LNN (Logical Neural Network) logic, conjunction is structurally formulated 
+    through "negative evidence". The closer the inputs gravitate toward falsehood (1 - x) 
+    and the higher their respective importance weight, the more aggressively they 
+    suppress the overall truth value of the result. The parameter beta governs 
+    the structural sensitivity threshold below which the output completely 
+    saturates to absolute falsehood (0.0).
 
-    Interval semantics:
-    Because negation inverts limits, to calculate the upper limit of the result (U) 
-    we use the negation of the lower limits of the inputs (L), 
-    and to calculate the lower limit of the result (L) 
-    we use the negation of the upper limits of the inputs (U).
+    Interval Semantics:
+    Because negation algebraically inverts boundary limits, computing the upper limit 
+    of the result (U) requires evaluating the negated lower limits of the inputs (L). 
+    Conversely, computing the lower limit of the result (L) requires evaluating 
+    the negated upper limits of the inputs (U).
 
     Args:
-        x (jnp.ndarray): Input interval tensor of the form (..., num_inputs, 2).
-        weights (jnp.ndarray): A tensor of weights of the form (num_inputs,).
-        beta (jnp.ndarray): Scalar threshold parameter (bias).
+        x (jnp.ndarray): Input interval tensor structured as (..., num_inputs, 2).
+        weights (jnp.ndarray): A tensor of input importance weights structured as (num_inputs,).
+        beta (jnp.ndarray): Scalar activation sensitivity threshold parameter (bias).
 
     Returns:
-        jnp.ndarray: The resulting truth interval [L, U].
+        jnp.ndarray: The resulting bounded truth interval [L, U] structured as (..., 2).
     """
-    # 1. Calculation of the sum of weighted negations (resistance) for both limits
-    # sum_l corresponds to sum(w * (1 - L_input)) -> affects the upper bound of the result
+    # 1. Compute the cumulative sum of weighted negations (logical resistance) for both boundaries
+    # sum_l aggregates w_i * (1 - L_input), directly constraining the upper bound of the result
     sum_l = jnp.sum(weights * (1.0 - intervals.get_lower(x)), axis=-1)
-    # sum_u equals sum(w * (1 - U_input)) -> affects the lower bound of the result
+    # sum_u aggregates w_i * (1 - U_input), directly constraining the lower bound of the result
     sum_u = jnp.sum(weights * (1.0 - intervals.get_upper(x)), axis=-1)
     
-    # 2. Application specific AND activation
-    # Res_u uses sum_l because less "certain truth" in the input limits the maximum truth of the output.
+    # 2. Apply the specialized Łukasiewicz AND activation functions
+    # res_u maps sum_l because a lack of absolute truth at the lower input limits caps maximum potential output truth
     res_u = activations.lukasiewicz_and_activation(sum_l, beta)
     res_l = activations.lukasiewicz_and_activation(sum_u, beta)
     
@@ -53,27 +55,29 @@ def weighted_or_lukasiewicz(x: jnp.ndarray, weights: jnp.ndarray, beta: jnp.ndar
     """
     Calculates the weighted Łukasiewicz disjunction (OR) over truth intervals.
 
-    Disjunction in LNN acts as an accumulator of "positive evidence". 
-    Each true input increases the overall truth of the result depending on its weight. 
-    The beta parameter determines how much "evidence" is needed to reach absolute truth (1.0).
+    Disjunction within the LNN framework acts as an explicit accumulator of "positive evidence". 
+    Each validating input signal increments the overall cumulative truth of the outcome proportional 
+    to its assigned weight. The beta threshold parameter regulates how much aggregate positive validation 
+    is required to establish absolute saturation at perfect truth (1.0).
 
-    Interval semantics:
-    The OR operation preserves the orientation of the limits: the lower limits of the inputs determine 
-    the lower limit of the result, and the upper limits of the inputs determine the upper limit of the result.
+    Interval Semantics:
+    The OR operation preserves standard boundary orientation: the lower limits of the inputs 
+    uniquely determine the lower limit of the result, while the upper limits of the inputs 
+    determine the corresponding upper limit of the result.
 
     Args:
-        x (jnp.ndarray): Input interval tensor of the form (..., num_inputs, 2).
-        weights (jnp.ndarray): A tensor of weights of the form (num_inputs,).
-        beta (jnp.ndarray): Scalar threshold parameter (bias).
+        x (jnp.ndarray): Input interval tensor structured as (..., num_inputs, 2).
+        weights (jnp.ndarray): A tensor of input importance weights structured as (num_inputs,).
+        beta (jnp.ndarray): Scalar activation saturation threshold parameter (bias).
 
     Returns:
-        jnp.ndarray: The resulting truth interval [L, U].
+        jnp.ndarray: The resulting bounded truth interval [L, U] structured as (..., 2).
     """
-    # 1. Weighted sum of confirmed truth
+    # 1. Accumulate the weighted sum of positive validation across boundaries
     sum_l = jnp.sum(weights * intervals.get_lower(x), axis=-1)
     sum_u = jnp.sum(weights * intervals.get_upper(x), axis=-1)
     
-    # 2. Application of specific OR activation (t-conorm)
+    # 2. Map cumulative evidence using the specialized Łukasiewicz OR t-conorm activation
     res_l = activations.lukasiewicz_or_activation(sum_l, beta)
     res_u = activations.lukasiewicz_or_activation(sum_u, beta)
     
@@ -81,40 +85,39 @@ def weighted_or_lukasiewicz(x: jnp.ndarray, weights: jnp.ndarray, beta: jnp.ndar
 
 def implies_lukasiewicz(int_a: jnp.ndarray, int_b: jnp.ndarray, weights: jnp.ndarray, beta: float) -> jnp.ndarray:
     """
-    Logical implication A -> B (S-implication) based on Łukasiewicz logic.
+    Computes the logical implication A -> B (S-implication) based on Łukasiewicz logic.
     
-    In JLNN, implication is implemented using logical equivalence:
-    (A -> B) ≡ (¬A ∨ B).
+    Within the JLNN framework, implication is modeled using classical logical equivalence:
+        (A -> B) identical to (NOT A OR B).
     
-    This implementation uses interval arithmetic, 
-    where negation (NOT) inverts the interval boundaries: NOT [L, U] = [1 - U, 1 - L]. 
-    The result is then processed by a weighted OR operator, 
-    allowing the model to learn the relevance of a given rule.
+    This routine utilizes interval arithmetic, where logical negation (NOT) inverts 
+    the boundaries: NOT [L, U] = [1 - U, 1 - L]. The resulting expressions are then processed 
+    by a parameterized weighted OR operator, enabling the neural architecture to learn 
+    the optimization weights and structural relevance of expert-defined rules.
 
     Args:
-        int_a (jnp.ndarray): Tensor for the antecedent (presupposition A) of the form (..., 2). 
-            The last dimension contains [Lower Bound, Upper Bound].
-        int_b (jnp.ndarray): Tensor for the consequent (consequent B) of the form (..., 2). 
-            The last dimension contains [Lower Bound, Upper Bound].
-        weights (jnp.ndarray): Tensor of weights for an OR gate of the form (2,). 
-            The first weight is applied to ¬A, the second to B. Typically initialized to [1, 1].
-        beta (float): Threshold (bias) determining the stringency of the implication activation.
+        int_a (jnp.ndarray): Antecedent tensor (premise A) structured as (..., 2), 
+            where the final dimension holds [Lower Bound, Upper Bound].
+        int_b (jnp.ndarray): Consequent tensor (conclusion B) structured as (..., 2), 
+            where the final dimension holds [Lower Bound, Upper Bound].
+        weights (jnp.ndarray): Optimization weight tensor for the underlying OR gate structured as (2,). 
+            The first component scales NOT A, the second scales B. Typically initialized to [1.0, 1.0].
+        beta (float): Threshold parameter (bias) establishing the activation stringency of the implication.
 
     Returns:
-        jnp.ndarray: The resulting truth interval of the implication [L, U] of the form (..., 2).
+        jnp.ndarray: The resulting truth interval of the implication [L, U] structured as (..., 2).
     """
     
-    
-    # Apply NOT operator in interval logic: [1 - U, 1 - L]
+    # Apply the NOT operator under interval arithmetic constraints: [1 - U, 1 - L]
     not_a_L = 1.0 - intervals.get_upper(int_a)
     not_a_U = 1.0 - intervals.get_lower(int_a)
     not_a = intervals.create_interval(not_a_L, not_a_U)
     
-    # Pack NOT A and B into a cohesive tensor for bulk processing inside the OR operator
-    # axis=-2 inserts a dedicated argument dimension right before the interval dimension
+    # Package NOT A and B into a unified tensor for batch calculation inside the OR operator.
+    # axis=-2 introduces a dedicated argument dimension immediately preceding the boundary dimension.
     combined = jnp.stack([not_a, int_b], axis=-2)
     
-    # Delegate execution to the previously established weighted OR operator
+    # Delegate structural processing to the established weighted Łukasiewicz OR operator
     return weighted_or_lukasiewicz(combined, weights, beta)
 
 # =====================================================================
@@ -154,36 +157,38 @@ def bulk_or_product_raw(x: jnp.ndarray) -> jnp.ndarray:
 # --- Reichenbach Logic (Compromise / Productive) ---
 def implies_reichenbach(int_a: jnp.ndarray, int_b: jnp.ndarray) -> jnp.ndarray:
     """
-    Implements Reichenbach implication (product logic).
+    Implements the Reichenbach implication (product logic s-implication).
     
-    This method of computing the implication (A -> B) is defined by the relation 1 - A + (A * B). 
-    In the context of interval logic, JLNN represents a "compromise" approach that, 
-    unlike Łukasiewicz or Kleene-Dienes, does not contain sharp breaks caused by min/max operations.
+    This method of computing implication (A -> B) is governed by the polynomial expression:
+        1.0 - A + (A * B). 
+    In the context of interval logic, this represents a smooth "compromise" approach that, 
+    unlike Łukasiewicz or Kleene-Dienes, avoids sharp optimization boundaries caused by min/max operations.
     
-    The main advantage of this implication is that it is fully differentiable over the entire range [0, 1], 
-    which ensures stable and non-zero gradients for both arguments (A and B) simultaneously.
+    The primary mathematical advantage is that it is fully differentiable across the entire 
+    unit domain [0, 1], guaranteeing stable, non-vanishing gradients for both antecedent and 
+    consequent parameters simultaneously.
 
     Args:
-        int_a (jnp.ndarray): Input interval for antecedent (assumption) of the form (..., 2).
-        int_b (jnp.ndarray): Input interval for the consequent of the form (..., 2).
+        int_a (jnp.ndarray): Input interval for the antecedent structured as (..., 2).
+        int_b (jnp.ndarray): Input interval for the consequent structured as (..., 2).
 
     Returns:
-        jnp.ndarray: The resulting truth interval [L, U] of the form (..., 2). 
-            The calculation is performed with respect to interval arithmetic:
-                L_res = 1 - U_a + (L_a * L_b)
-                U_res = 1 - L_a + (U_a * U_b)
-                The result is treated with the clip function to keep the values ​​in the range [0, 1].
-    """    
+        jnp.ndarray: The resulting truth interval [L, U] structured as (..., 2). 
+            The boundary calculation satisfies rigorous interval arithmetic constraints:
+                L_res = 1.0 - U_a + (L_a * L_b)
+                U_res = 1.0 - L_a + (U_a * U_b)
+            Outputs are bounded using jnp.clip to shield downstream layers from floating-point overflow.
+    """   
     
-    # Extract limits for both input intervals
+    # Extract boundary limits for both input intervals
     L_a = intervals.get_lower(int_a)
     U_a = intervals.get_upper(int_a)
     L_b = intervals.get_lower(int_b)
     U_b = intervals.get_upper(int_b)
     
-    # Interval calculation for truth values
-    # This form ensures that the lower bound of the result is derived
-    # from the most pessimistic combination of inputs and vice versa.
+    # Execute boundary-safe interval operations
+    # This combination ensures that the lower output limit is derived from the most pessimistic
+    # algebraic configuration of the inputs, while the upper limit captures the most optimistic setting.
     res_L = 1.0 - U_a + (L_a * L_b)
     res_U = 1.0 - L_a + (U_a * U_b)
     
@@ -195,20 +200,27 @@ def implies_goguen(int_a: jnp.ndarray, int_b: jnp.ndarray) -> jnp.ndarray:
     """
     Computes the pure Goguen implication (Residuation R-implication).
     
-    Defined as: 1.0 if A <= B, otherwise B / A.
+    Defined algebraically as: 1.0 if A <= B, otherwise B / A.
+    
+    Args:
+        int_a (jnp.ndarray): Antecedent truth interval.
+        int_b (jnp.ndarray): Consequent truth interval.
+        
+    Returns:
+        jnp.ndarray: Bounded truth interval evaluated via Goguen residuation.
     """
     L_a, U_a = intervals.get_lower(int_a), intervals.get_upper(int_a)
     L_b, U_b = intervals.get_lower(int_b), intervals.get_upper(int_b)
     
-    # Safe division in JAX to avoid NaN on backward pass (A -> 0)
+    # Safe numerical division primitive in JAX to eliminate NaN anomalies on backpropagation paths (A -> 0.0)
     def safe_div(num, denom):
         return jnp.where(denom > 0.0, num / jnp.maximum(denom, 1e-12), 1.0)
     
-    # For the lower bound (L): the most pessimistic estimate is the ratio of the smallest B to the largest A
+    # For the lower bound (L): the most pessimistic estimate relies on the ratio of minimum B to maximum A
     L_div = safe_div(L_b, U_a)
     res_L = jnp.where(U_a <= L_b, 1.0, L_div)
     
-    # Pro horní hranici (U): nejoptimističtější odhad
+    # For the upper bound (U): the most optimistic estimate relies on the ratio of maximum B to minimum A
     U_div = safe_div(U_b, L_a)
     res_U = jnp.where(L_a <= U_b, 1.0, U_div)
     
@@ -246,35 +258,36 @@ def bulk_or_godel_raw(x: jnp.ndarray) -> jnp.ndarray:
 
 def implies_kleene_dienes(int_a: jnp.ndarray, int_b: jnp.ndarray) -> jnp.ndarray:
     """
-    Implements Kleene-Dienes implication (standard max-min logic).
+    Implements the Kleene-Dienes implication (standard max-min logical model).
     
-    This method of computing the implication (A -> B) is defined as max(1 - A, B). 
-    In the context of interval logic JLNN, this is a "pessimistic" approach, 
-    since the resulting truth depends only on the most significant extreme 
-    (either the antecedent is false or the consequent is true).
+    This implication strategy (A -> B) is explicitly defined as max(1.0 - A, B). 
+    In the context of JLNN interval logic, this represents a highly "pessimistic" approach, 
+    given that the resulting truth depends entirely on the dominant active extreme 
+    (either the complete falsity of the premise or the total truth of the conclusion).
     
-    Unlike Łukasiewicz logic, there is no linear addition of truths, 
-    which can be useful for robust systems resistant to the accumulation of small errors.
+    Unlike Łukasiewicz models, it avoids linear addition of truths, making it highly 
+    suitable for structural systems designed to be robust against cumulative edge errors.
 
     Args:
-        int_a (jnp.ndarray): Input interval for antecedent (assumption) of the form (..., 2).
-        int_b (jnp.ndarray): Input interval for the consequent of the form (..., 2).
+        int_a (jnp.ndarray): Input interval for the antecedent structured as (..., 2).
+        int_b (jnp.ndarray): Input interval for the consequent structured as (..., 2).
+        
     Returns:
-        jnp.ndarray: The resulting truth interval [L, U] of the form (..., 2). 
-            The calculation is as follows:
-                L_res = max(1 - U_a, L_b)
-                U_res = max(1 - L_a, U_b)
+        jnp.ndarray: The resulting truth interval [L, U] structured as (..., 2).
+            Algebraic boundary configurations map as follows:
+                L_res = max(1.0 - U_a, L_b)
+                U_res = max(1.0 - L_a, U_b)
     """
     
-    # Calculating the negation of the antecedent (NOT A) in interval arithmetic    
+    # Evaluate negation of the antecedent (NOT A) under strict interval logic rules   
     not_a_L = 1.0 - intervals.get_upper(int_a)
     not_a_U = 1.0 - intervals.get_lower(int_a)
     
-    # Obtaining the bounds of the consequent (B)
+    # Retrieve boundary values of the conclusion (B)
     L_b = intervals.get_lower(int_b)
     U_b = intervals.get_upper(int_b)
     
-    # Kleene-Dienes takes the maximum of (NOT A) and (B)
+    # Resolve the final Kleene-Dienes state using parallel JAX maximum primitives
     res_L = jnp.maximum(not_a_L, L_b)
     res_U = jnp.maximum(not_a_U, U_b)
     
@@ -283,9 +296,9 @@ def implies_kleene_dienes(int_a: jnp.ndarray, int_b: jnp.ndarray) -> jnp.ndarray
 
 def implies_godel(int_a: jnp.ndarray, int_b: jnp.ndarray) -> jnp.ndarray:
     """
-    Computes a pure Godel implication (R-implication residuum).
+    Computes a pure Gödel implication (R-implication residuum).
     
-    Defined as: 1.0 if A <= B, otherwise B.
+    Defined algebraically as: 1.0 if A <= B, otherwise B.
     """
     L_a, U_a = intervals.get_lower(int_a), intervals.get_upper(int_a)
     L_b, U_b = intervals.get_lower(int_b), intervals.get_upper(int_b)
@@ -301,9 +314,9 @@ def implies_godel(int_a: jnp.ndarray, int_b: jnp.ndarray) -> jnp.ndarray:
 
 def and_drastic_pure(int_a: jnp.ndarray, int_b: jnp.ndarray) -> jnp.ndarray:
     """
-    Pure drastic t-norm (AND). Represents the absolute lower bound of all valid t-norms.
+    Pure drastic t-norm (AND). Represents the absolute mathematical lower bound of all valid t-norms.
     
-    Returns the opposite argument if one equals 1.0, otherwise collapses to 0.0.
+    Returns the opposing argument if one component equals exactly 1.0, otherwise collapses completely to 0.0.
     """
     L_a, U_a = intervals.get_lower(int_a), intervals.get_upper(int_a)
     L_b, U_b = intervals.get_lower(int_b), intervals.get_upper(int_b)
@@ -315,9 +328,9 @@ def and_drastic_pure(int_a: jnp.ndarray, int_b: jnp.ndarray) -> jnp.ndarray:
 
 def or_drastic_pure(int_a: jnp.ndarray, int_b: jnp.ndarray) -> jnp.ndarray:
     """
-    Pure drastic t-conorm (OR). Represents the absolute upper bound of all valid t-conorms.
+    Pure drastic t-conorm (OR). Represents the absolute mathematical upper bound of all valid t-conorms.
     
-    Returns the opposite argument if one equals 0.0, otherwise saturates to 1.0.
+    Returns the opposing argument if one component equals exactly 0.0, otherwise saturates completely to 1.0.
     """
     L_a, U_a = intervals.get_lower(int_a), intervals.get_upper(int_a)
     L_b, U_b = intervals.get_lower(int_b), intervals.get_upper(int_b)
@@ -328,7 +341,7 @@ def or_drastic_pure(int_a: jnp.ndarray, int_b: jnp.ndarray) -> jnp.ndarray:
 
 
 def bulk_and_drastic_raw(x: jnp.ndarray) -> jnp.ndarray:
-    """Computes a pure drastic AND reduction along the designated last axis."""
+    """Computes a pure drastic AND reduction along the designated terminal axis using clean optimization masks."""
     L = intervals.get_lower(x)
     U = intervals.get_upper(x)
     
@@ -346,17 +359,19 @@ def bulk_and_drastic_raw(x: jnp.ndarray) -> jnp.ndarray:
 
 
 def bulk_or_drastic_raw(x: jnp.ndarray) -> jnp.ndarray:
-    """Computes a pure drastic OR reduction along the designated last axis."""
+    """Computes a pure drastic OR reduction along the designated terminal axis using clean optimization masks."""
     L = intervals.get_lower(x)
     U = intervals.get_upper(x)
     
-    # Safe masks only sharp '!= 0.0'
+    # Establish strict safe masks filtering sharp boundary deviations: '!= 0.0'
     not_zero_L = jnp.sum(L > EPSILON, axis=-1)
     not_zero_U = jnp.sum(U > EPSILON, axis=-1)
     
     max_L = jnp.max(L, axis=-1)
     max_U = jnp.max(U, axis=-1)
     
+    # Drastic structural reduction rules for OR:
+    # If all items are 0 -> output 0.0. If exactly one item is > 0 -> return that maximum item. Otherwise saturate to 1.0.
     res_L = jnp.where(not_zero_L == 0, 0.0, jnp.where(not_zero_L == 1, max_L, 1.0))
     res_U = jnp.where(not_zero_U == 0, 0.0, jnp.where(not_zero_U == 1, max_U, 1.0))
     return intervals.create_interval(res_L, res_U)
@@ -375,29 +390,29 @@ def implies_physical_kleene_dienes(int_a: jnp.ndarray, int_b: jnp.ndarray) -> jn
     Computes the Physical Kleene-Dienes implication modulated by localized entropic chaos.
     
     Mathematical formula:
-    max(1 - (1 - H(A)) * A, (1 - H(B)) * B)
+    max(1.0 - (1.0 - H(A)) * A, (1.0 - H(B)) * B)
     
-    Applied independently on interval bounds conforming to pessimistic interval semantics.
+    Evaluated independently on boundary limits conforming to strict pessimistic interval semantics.
     """
     L_a, U_a = intervals.get_lower(int_a), intervals.get_upper(int_a)
     L_b, U_b = intervals.get_lower(int_b), intervals.get_upper(int_b)
     
-    # Calculation of stabilizing weights (1 - H)
-    # For the negation of the antecedent (not A) in intervals, the bounds are inverted:
-    # The lower bound depends on U_a, the upper bound depends on L_a
+    # Calculate localized structural stability weights: (1.0 - H)
+    # Under pessimistic interval inversion for logical negations (NOT A):
+    # The lower bound maps from U_a uncertainty, while the upper bound maps from L_a uncertainty
     w_U_a = activations.get_entropic_weight(U_a)
     w_L_a = activations.get_entropic_weight(L_a)
     w_L_b = activations.get_entropic_weight(L_b)
     w_U_b = activations.get_entropic_weight(U_b)
     
-    # Synthesize the localized physical "NOT A" and physical "B" expressions
+    # Synthesize the physical "NOT A" and physical "B" intermediate representations
     not_a_L = 1.0 - (w_U_a * U_a)
     not_a_U = 1.0 - (w_L_a * L_a)
     
     b_weighted_L = w_L_b * L_b
     b_weighted_U = w_U_b * U_b
     
-    # Execute the traditional Kleene-Dienes MAX operator over the deformed physical truth field
+    # Resolve the implication using the traditional Kleene-Dienes maximum primitive over deformed fields
     res_L = jnp.maximum(not_a_L, b_weighted_L)
     res_U = jnp.maximum(not_a_U, b_weighted_U)
     
@@ -409,28 +424,28 @@ def implies_physical_reichenbach(int_a: jnp.ndarray, int_b: jnp.ndarray) -> jnp.
     Computes the Physical Reichenbach implication via a smooth gravitational polynomial.
     
     Mathematical formula:
-    1 - A + A * B * (1 - H(A) * H(B))
+    1.0 - A + A * B * (1.0 - H(A) * H(B))
     
-    In states of maximum system chaos (where both inputs converge near 0.5), the 
-    interactive coupling term collapses. This opens a clear linear gradient channel 
-    to facilitate uninterrupted error backpropagation.
+    During peak systemic uncertainty (where both signals approach the logical midpoint 0.5), 
+    the coupling factor collapses entirely. This dynamic space bending establishes an uninhibited 
+    linear gradient channel to facilitate highly stable error backpropagation.
     """
     L_a, U_a = intervals.get_lower(int_a), intervals.get_upper(int_a)
     L_b, U_b = intervals.get_lower(int_b), intervals.get_upper(int_b)
     
-    # Extract structural entropy fields from individual component boundaries
+    # Extract structural entropy fields from boundary coordinates
     h_L_a, h_U_a = activations.entropy_raw(L_a), activations.entropy_raw(U_a)
     h_L_b, h_U_b = activations.entropy_raw(L_b), activations.entropy_raw(U_b)
     
-    # Formulate space deformation coefficients governing the interactive product term (A * B)
-    # The pessimistic lower bound combines lower bound uncertainty estimations
+    # Formulate localized space-bending coefficients regulating the interactive product term: (A * B)
+    # The pessimistic lower bound aggregates matching lower-bound systemic uncertainties
     deform_L = 1.0 - (h_L_a * h_L_b)
     deform_U = 1.0 - (h_U_a * h_U_b)
     
-    # Evaluate interval execution of the Reichenbach polynomial: 1 - A + (A * B * Deform)
-    # Lower bound (pessimistic): Minimize truth -> subtract maximal U_a, add minimal product term
+    # Compute the Reichenbach polynomial: 1.0 - A + (A * B * Deform) over interval configurations
+    # Lower bound (pessimistic): Minimize output -> subtract maximal U_a, add minimal product term
     res_L = 1.0 - U_a + (L_a * L_b * deform_L)
-    # Upper bound (optimistic): Maximize truth -> subtract minimal L_a, add maximal product term
+    # Upper bound (optimistic): Maximize output -> subtract minimal L_a, add maximal product term
     res_U = 1.0 - L_a + (U_a * U_b * deform_U)
     
     return intervals.create_interval(jnp.clip(res_L, 0.0, 1.0), jnp.clip(res_U, 0.0, 1.0))
@@ -438,26 +453,26 @@ def implies_physical_reichenbach(int_a: jnp.ndarray, int_b: jnp.ndarray) -> jnp.
 
 def implies_physical_gravitational_lukasiewicz(int_a: jnp.ndarray, int_b: jnp.ndarray) -> jnp.ndarray:
     """
-    Computes the Physical Gravitational Lukasiewicz implication.
+    Computes the Physical Gravitational Łukasiewicz implication.
     
     Mathematical formula:
-    min(1.0, 1.0 - (1 - H(A)) * A + (1 - H(B)) * B)
+    min(1.0, 1.0 - (1.0 - H(A)) * A + (1.0 - H(B)) * B)
     
-    This operator mirrors classical truth values when states exhibit low entropy, 
-    while establishing total coherence (truth = 1.0) as inputs approach the entropic singularity [0.5, 0.5].
+    This operator strictly shadows classical truth mappings when input signals exhibit minimal entropy, 
+    while generating full structural convergence (truth = 1.0) as states enter the entropic singularity [0.5, 0.5].
     """
     L_a, U_a = intervals.get_lower(int_a), intervals.get_upper(int_a)
     L_b, U_b = intervals.get_lower(int_b), intervals.get_upper(int_b)
     
-    # Extract functional entropic weights (1.0 - H) across individual boundary bounds
+    # Extract dynamic entropic stability weights (1.0 - H) across individual boundary vectors
     w_L_a, w_U_a = activations.get_entropic_weight(L_a), activations.get_entropic_weight(U_a)
     w_L_b, w_U_b = activations.get_entropic_weight(L_b), activations.get_entropic_weight(U_b)
     
-    # Perform interval evaluation while preserving proper boundary inversion within the negative expression:
+    # Evaluate algebra over intervals ensuring rigorous limit inversion for negative expressions:
     # L_res = 1 - U_weighted_a + L_weighted_b
     # U_res = 1 - L_weighted_a + U_weighted_b
     res_L = 1.0 - (w_U_a * U_a) + (w_L_b * L_b)
     res_U = 1.0 - (w_L_a * L_a) + (w_U_b * U_b)
     
-    # Enforce standard Lukasiewicz upper boundary saturation at 1.0
+    # Enforce standard Łukasiewicz axiomatic boundary limits using parallel minimum primitives
     return intervals.create_interval(jnp.minimum(1.0, res_L), jnp.minimum(1.0, res_U))

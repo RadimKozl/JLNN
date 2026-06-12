@@ -7,28 +7,28 @@ import jax.numpy as jnp
 
 def identity_activation(x: jnp.ndarray) -> jnp.ndarray:
     """
-    Realizes the identity function truncated to the closed interval [0, 1].
+    Realizes the identity function truncated to the closed logical interval [0, 1].
     
-    This activation function is used in JLNN primarily as a numerical safeguard 
-    in places where inputs already semantically represent truth values (e.g., 
-    outputs from predicates or downstream logical gates).
+    This activation function is utilized within the JLNN framework primarily as a 
+    numerical safeguard in locations where inputs already semantically represent 
+    truth values (e.g., outputs from upstream predicates or logical gates).
     
-    It ensures that minor numerical inaccuracies arising from floating-point 
-    computations do not leak outside the valid logical boundary. In the context 
-    of interval logic, it maintains axiomatic integrity by enforcing strict 
-    saturation at 0.0 (absolute falsehood) and 1.0 (absolute truth).
+    It ensures that minor numerical inaccuracies or floating-point drifts arising 
+    from cumulative tensor operations do not leak outside the valid logical boundary. 
+    In the context of interval logic, it maintains axiomatic integrity by enforcing 
+    strict saturation at 0.0 (absolute falsehood) and 1.0 (absolute truth).
     
     Args:
         x (jnp.ndarray): Input tensor of arbitrary shape containing truth values 
             or raw logical potentials.
         
     Returns:
-        jnp.ndarray: A tensor of the same shape as the input, where each 
-            element v_i satisfies the constraint 0.0 <= v_i <= 1.0.
+        jnp.ndarray: A bounded tensor of the same shape as the input, where each 
+            element v_i satisfies the axiomatic constraint 0.0 <= v_i <= 1.0.
     """
     
-    # Using jnp.clip is an efficient operation in JAX that defines
-    # a constant zero for out-of-range values ​​in backpropagation.
+    # Using jnp.clip is highly efficient in JAX as it translates to hardware-native
+    # min/max primitives and correctly routes zero-gradients for out-of-bounds regions.
     return jnp.clip(x, 0.0, 1.0)
 
 
@@ -60,9 +60,8 @@ def lukasiewicz_and_activation(sum_val: jnp.ndarray, beta: jnp.ndarray) -> jnp.n
     Returns:
         jnp.ndarray: Resulting truth value in the interval [0, 1].
     """
-    # The implementation uses jnp.maximum to implement the lower clipping. 
-    # Upper trimming to 1.0 is not necessary for standard ANDs with positive weights, 
-    # but ensures stability during training.
+    # Clip ensures strict saturation at 0.0 and 1.0, preserving algebraic boundaries 
+    # and preventing out-of-bound gradient leakage during the optimization phase.
     return jnp.clip(1.0 - (sum_val / beta), 0.0, 1.0)
 
 
@@ -98,37 +97,39 @@ def lukasiewicz_or_activation(sum_val: jnp.ndarray, beta: jnp.ndarray) -> jnp.nd
     Returns:
         jnp.ndarray: Resulting truth value in the interval [0, 1].
     """
-    # Using clip ensures saturation to 1.0 and at the same time zeroes the gradient below 0.0,
-    # which keeps the model in a logically defined space.
+    # Utilizing jnp.clip guarantees strict compliance with the logical unit interval,
+    # mitigating minor floating-point drifts during extensive backpropagation.
     return jnp.clip(sum_val / beta, 0.0, 1.0)
 
 
 def ramp_sigmoid(x: jnp.ndarray, slope: float = 1.0, offset: float = 0.5) -> jnp.ndarray:
     """
-    It implements a linear "Ramp" activation (truncated linear function).
+    Implements a linear Ramp activation function (truncated linear mapping).
 
-    Within JLNN, this function is used in predicates (LearnedPredicate) 
-    to convert real input values ​​to logical truth values. 
-    It combines the advantages of linearity (interpretability and stable gradient) 
-    with the advantages of saturation (clear delineation of absolute truth and falsehood).
+    Within the JLNN framework, this function is primarily utilized in grounding 
+    layers (such as LearnedPredicate) to transform unconstrained real-valued input 
+    features into fuzzy truth values. It balances the computational benefits of 
+    linearity (interpretability and constant gradients) with the semantic benefits 
+    of strict boundary saturation.
 
-    Parameter semantics:
-    - offset: Specifies the point on the X-axis where the truth is exactly 0.5 (midpoint).
-    - slope: Determines the "stringency" of the predicate. 
-    A high slope means a fast transition between false and true (close to a step function).
+    Parameter Semantics:
+        - offset: Specifies the shift on the X-axis where the truth value is 
+          exactly 0.5 (the logical midpoint / decision boundary).
+        - slope: Controls the stringency of the predicate. A high slope yields 
+          a sharp transition between false and true, approximating a crisp step function.
 
     Args:
-        x (jnp.ndarray): Input tensor of real numbers (e.g. temperature, pressure, distance).
-        slope (float): Slope of the linear part. Affects the width of the transition area. 
-            Default value is 1.0.
-        offset (float): Shifts the function on the X-axis. Determines the decision boundary. 
-            Default value is 0.5.
+        x (jnp.ndarray): Input tensor of raw real-valued measurements (e.g., physical telemetry).
+        slope (float): Steepness coefficient of the linear segment. Controls transition width.
+            Defaults to 1.0.
+        offset (float): Horizontal translation factor on the X-axis. Sets the decision threshold.
+            Defaults to 0.5.
 
     Returns:
-        jnp.ndarray: Truth value in the interval [0, 1].
+        jnp.ndarray: Grounded fuzzy truth value constrained to the interval [0, 1].
     """
-    # Calculation of a linear relationship followed by clipping.
-    # The value 0.5 ensures that when x = offset the result is exactly the middle of the logical interval.
+    # The addition of 0.5 ensures that when the input x perfectly matches the offset,
+    # the resulting truth value maps precisely to the logical center of uncertainty (0.5).
     return jnp.clip(slope * (x - offset) + 0.5, 0.0, 1.0)
 
 
@@ -144,14 +145,15 @@ def entropy_raw(val: jnp.ndarray) -> jnp.ndarray:
     """
     Calculates the normalized binary Shannon entropy over the interval [0, 1].
     
-    Acts as an exported framework utility for measuring local fuzzy uncertainty.
-    The output is normalized such that H(0.5) = 1.0 and H(0.0) = H(1.0) = 0.0.
+    Acts as an exported framework utility for measuring local fuzzy uncertainty 
+    and systemic chaos. The output is normalized such that maximum entropy 
+    H(0.5) = 1.0, and deterministic edges H(0.0) = H(1.0) = 0.0.
     
     Args:
-        val (jnp.ndarray): Input logical tensor containing values nominally in [0, 1].
+        val (jnp.ndarray): Input logical tensor containing truth values nominally in [0, 1].
         
     Returns:
-        jnp.ndarray: Computed Shannon entropy values.
+        jnp.ndarray: Computed and normalized Shannon entropy values.
     """
     eps = 1e-7
     # Safe clipping to avoid log(0) and log(negative number)
@@ -169,13 +171,13 @@ def get_entropic_weight(val: jnp.ndarray) -> jnp.ndarray:
     Computes the logical stability (entropic weight) of a state: 1.0 - H(val).
     
     This function is exported for use across interval-valued physical implication 
-    operators (PFL) to dynamically adjust truth bounds based on systemic chaos.
+    operators (PFL) to dynamically adjust logical truth bounds based on local uncertainty.
     
     Args:
-        val (jnp.ndarray): Input logical truth value or interval bound.
+        val (jnp.ndarray): Input logical truth value or individual interval bound.
         
     Returns:
-        jnp.ndarray: Logical stability weight in the range [0, 1].
+        jnp.ndarray: Logical stability weight in the closed range [0, 1].
     """
     return 1.0 - entropy_raw(val)
 
@@ -190,38 +192,42 @@ def gravitational_bend_activation(
     """
     PFL activation function that deforms the standard truth potential space [0, 1].
     
-    Around the logical center (0.5), it simulates a gravitational well via local entropy, 
-    attracting unstable, highly uncertain states. Near the deterministic edges (0, 1), 
-    the gravitational influence decays naturally, behaving like standard saturation.
+    Simulates a gravitational well around the logical center (0.5) via local entropy, 
+    pulling highly unstable, uncertain states towards the center. Near the deterministic 
+    edges (0.0 and 1.0), this gravitational influence decays naturally, allowing the 
+    function to converge to standard saturation behavior.
     
     Args:
-        z (jnp.ndarray): Input logical potential (linear combination or raw input features).
-        gamma (float): Strength of the gravitational bending, bounded in the interval [0, 1].
-        mode (str): Base compression method. Options are 'sigmoid' (smooth physical field) 
-            or 'ramp' (truncated linear mapping).
-        slope (float): Stringency parameter used exclusively if mode='ramp'. Default is 1.0.
-        offset (float): Center shift parameter used exclusively if mode='ramp'. Default is 0.5.
+        z (jnp.ndarray): Input logical potential (raw input features or linear combination).
+        gamma (float): Bending strength coefficient, bounded within the interval [0, 1].
+            Defaults to 0.2.
+        mode (str): Base compression strategy. Options are 'sigmoid' (smooth physical field) 
+            or 'ramp' (truncated linear mapping). Defaults to 'sigmoid'.
+        slope (float): Stringency parameter utilized exclusively when mode='ramp'. 
+            Defaults to 1.0.
+        offset (float): Midpoint shift parameter utilized exclusively when mode='ramp'. 
+            Defaults to 0.5.
         
     Returns:
-        jnp.ndarray: Truth value in the interval [0, 1] after gravitational deformation.
+        jnp.ndarray: Bounded truth value in [0, 1] after entropic space bending.
     """
-    # 1. Base compression to logical interval [0, 1] based on user configuration
+    # 1. Compress raw potentials to the base logical interval [0, 1] using the specified mode
     if mode == 'sigmoid':
-        # Smooth physical field simulation
+        # Smooth continuous physical field simulation
         base_truth = 1.0 / (1.0 + jnp.exp(-z))
     elif mode == 'ramp':
-        # Sharper transitions with explicit saturation bounds - calling the sibling function directly
+        # Sharper transitions with explicit clipping limits
         base_truth = ramp_sigmoid(z, slope=slope, offset=offset)
     else:
         raise ValueError(f"Unknown PFL activation mode: '{mode}'. Choose 'sigmoid' or 'ramp'.")
     
-    # 2. Calculation of local Shannon entropy at the compressed point using the local public function
+    # 2. Compute local Shannon entropy at the compressed coordinate
     h = entropy_raw(base_truth)
     
-    # 3. Application of the restoring gravitational force towards the center (0.5)
+    # 3. Calculate the directional restoring gravitational force towards the center (0.5)
     restoring_force = 0.5 - base_truth
     
-    # 4. Resulting space bending around the entropic singularity
+    # 4. Apply non-linear space deformation proportional to entropy and gamma strength
     a = base_truth + gamma * h * restoring_force
     
     return jnp.clip(a, 0.0, 1.0)
