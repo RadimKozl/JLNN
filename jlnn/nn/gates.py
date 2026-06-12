@@ -210,9 +210,11 @@ class PhysicalOr(nnx.Module):
 
     Operates entirely without internal trainable neural weights or biases, mapping 
     spatial distortion directly through signal interaction governed by entropic space constants.
+    Supports physical extensions of multiple standard t-conorms.
 
     Attributes:
-        method (str): Target physical logical framework. Supported: 'physical_kleene_dienes'.
+        method (str): Target physical logical framework. 
+            Supported: 'physical_kleene_dienes', 'physical_reichenbach', 'physical_lukasiewicz'.
         gamma (float): Bending strength coefficient, bounded within the interval [0, 1].
         mode (str): Base compression strategy ('sigmoid' or 'ramp').
         slope (float): Stringency parameter utilized exclusively when mode='ramp'.
@@ -228,13 +230,33 @@ class PhysicalOr(nnx.Module):
         self.offset = offset
 
     def __call__(self, x: jnp.ndarray) -> jnp.ndarray:
-        """Executes sequential physical disjunction across the input features axis."""
+        """
+        Executes sequential physical disjunction across the input features axis.
+
+        Args:
+            x (jnp.ndarray): Multi-variable truth interval tensor structured as 
+                (..., num_inputs, 2), where the last dimension holds [Lower, Upper] bounds.
+
+        Returns:
+            jnp.ndarray: Bounded and consistency-verified truth interval structured as (..., 2).
+
+        Raises:
+            ValueError: If an unmapped or invalid physical method string is provided.
+        """
         inputs = [x[..., i, :] for i in range(x.shape[-2])]
         res = inputs[0]
         
         if self.method == 'physical_kleene_dienes':
             for item in inputs[1:]:
                 res = F.or_physical_kleene_dienes(res, item)
+            return res
+        elif self.method == 'physical_reichenbach':
+            for item in inputs[1:]:
+                res = F.or_physical_reichenbach(res, item)
+            return res
+        elif self.method == 'physical_lukasiewicz':
+            for item in inputs[1:]:
+                res = F.or_physical_lukasiewicz(res, item)
             return res
         else:
             raise ValueError(f"Physical OR method '{self.method}' is not supported.")
@@ -244,8 +266,13 @@ class PhysicalAnd(nnx.Module):
     """
     Space-curved entropic physical AND gate with localized field configurations.
 
+    Operates entirely without internal trainable neural weights or biases, mapping 
+    spatial distortion directly through signal interaction governed by entropic space constants.
+    Supports physical extensions of multiple standard t-norms.
+
     Attributes:
-        method (str): Target physical logical framework. Supported: 'physical_kleene_dienes'.
+        method (str): Target physical logical framework. 
+            Supported: 'physical_kleene_dienes', 'physical_reichenbach', 'physical_lukasiewicz'.
         gamma (float): Bending strength coefficient, bounded within the interval [0, 1].
         mode (str): Base compression strategy ('sigmoid' or 'ramp').
         slope (float): Stringency parameter utilized exclusively when mode='ramp'.
@@ -261,13 +288,33 @@ class PhysicalAnd(nnx.Module):
         self.offset = offset
 
     def __call__(self, x: jnp.ndarray) -> jnp.ndarray:
-        """Executes sequential physical conjunction across the input features axis."""
+        """
+        Executes sequential physical conjunction across the input features axis.
+
+        Args:
+            x (jnp.ndarray): Multi-variable truth interval tensor structured as 
+                (..., num_inputs, 2), where the last dimension holds [Lower, Upper] bounds.
+
+        Returns:
+            jnp.ndarray: Bounded and consistency-verified truth interval structured as (..., 2).
+
+        Raises:
+            ValueError: If an unmapped or invalid physical method string is provided.
+        """
         inputs = [x[..., i, :] for i in range(x.shape[-2])]
         res = inputs[0]
         
         if self.method == 'physical_kleene_dienes':
             for item in inputs[1:]:
                 res = F.and_physical_kleene_dienes(res, item)
+            return res
+        elif self.method == 'physical_reichenbach':
+            for item in inputs[1:]:
+                res = F.and_physical_reichenbach(res, item)
+            return res
+        elif self.method == 'physical_lukasiewicz':
+            for item in inputs[1:]:
+                res = F.and_physical_lukasiewicz(res, item)
             return res
         else:
             raise ValueError(f"Physical AND method '{self.method}' is not supported.")
@@ -281,7 +328,8 @@ class PhysicalImplication(nnx.Module):
     configured via continuous gravitational configuration parameters.
 
     Attributes:
-        method (str): Target PFL implication ('physical_kleene_dienes', 'physical_reichenbach', 'physical_lukasiewicz').
+        method (str): Target PFL implication. 
+            Supported: 'physical_kleene_dienes', 'physical_reichenbach', 'physical_lukasiewicz'.
         gamma (float): Bending strength coefficient, bounded within the interval [0, 1].
         mode (str): Base compression strategy ('sigmoid' or 'ramp').
         slope (float): Stringency parameter utilized exclusively when mode='ramp'.

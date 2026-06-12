@@ -508,6 +508,101 @@ def or_physical_kleene_dienes(int_a: jnp.ndarray, int_b: jnp.ndarray) -> jnp.nda
     return intervals.ensure_interval(logic.or_godel_pure(deformed_a, deformed_b))
 
 
+def and_physical_reichenbach(int_a: jnp.ndarray, int_b: jnp.ndarray) -> jnp.ndarray:
+    """
+    Computes a PFL Conjunction (AND) based on entropic space-curved warping over Reichenbach Product logic.
+
+    Applies boundary-specific entropic scaling to deform interval boundaries before executing 
+    an analytical, parameterless algebraic product copula.
+
+    Args:
+        int_a (jnp.ndarray): First physical truth interval structured as (..., 2).
+        int_b (jnp.ndarray): Second physical truth interval structured as (..., 2).
+
+    Returns:
+        jnp.ndarray: Bounded and consistency-verified space-warped product conjunction interval (..., 2).
+    """
+    w_L_a = activations.get_entropic_weight(intervals.get_lower(int_a))
+    w_U_a = activations.get_entropic_weight(intervals.get_upper(int_a))
+    w_L_b = activations.get_entropic_weight(intervals.get_lower(int_b))
+    w_U_b = activations.get_entropic_weight(intervals.get_upper(int_b))
+    
+    deformed_a = intervals.create_interval(w_L_a * intervals.get_lower(int_a), w_U_a * intervals.get_upper(int_a))
+    deformed_b = intervals.create_interval(w_L_b * intervals.get_lower(int_b), w_U_b * intervals.get_upper(int_b))
+    return intervals.ensure_interval(logic.and_product_pure(deformed_a, deformed_b))
+
+
+def or_physical_reichenbach(int_a: jnp.ndarray, int_b: jnp.ndarray) -> jnp.ndarray:
+    """
+    Computes a PFL Disjunction (OR) based on entropic space-curved warping over Reichenbach Probabilistic Sum logic.
+
+    Applies boundary-specific entropic scaling to deform interval boundaries before executing 
+    an analytical, parameterless algebraic probabilistic sum t-conorm.
+
+    Args:
+        int_a (jnp.ndarray): First physical truth interval structured as (..., 2).
+        int_b (jnp.ndarray): Second physical truth interval structured as (..., 2).
+
+    Returns:
+        jnp.ndarray: Bounded and consistency-verified space-warped probabilistic sum interval (..., 2).
+    """
+    w_L_a = activations.get_entropic_weight(intervals.get_lower(int_a))
+    w_U_a = activations.get_entropic_weight(intervals.get_upper(int_a))
+    w_L_b = activations.get_entropic_weight(intervals.get_lower(int_b))
+    w_U_b = activations.get_entropic_weight(intervals.get_upper(int_b))
+    
+    deformed_a = intervals.create_interval(w_L_a * intervals.get_lower(int_a), w_U_a * intervals.get_upper(int_a))
+    deformed_b = intervals.create_interval(w_L_b * intervals.get_lower(int_b), w_U_b * intervals.get_upper(int_b))
+    return intervals.ensure_interval(logic.or_product_pure(deformed_a, deformed_b))
+
+
+def and_physical_lukasiewicz(int_a: jnp.ndarray, int_b: jnp.ndarray) -> jnp.ndarray:
+    """
+    Computes a PFL Conjunction (AND) based on entropic space-curved warping over Nilpotent Łukasiewicz logic.
+
+    Applies boundary-specific entropic scaling to deform interval boundaries before executing 
+    a pure bounded-difference interaction, tracking accumulative structural contradictions.
+
+    Args:
+        int_a (jnp.ndarray): First physical truth interval structured as (..., 2).
+        int_b (jnp.ndarray): Second physical truth interval structured as (..., 2).
+
+    Returns:
+        jnp.ndarray: Bounded and consistency-verified space-warped nilpotent conjunction interval (..., 2).
+    """
+    w_L_a = activations.get_entropic_weight(intervals.get_lower(int_a))
+    w_U_a = activations.get_entropic_weight(intervals.get_upper(int_a))
+    w_L_b = activations.get_entropic_weight(intervals.get_lower(int_b))
+    w_U_b = activations.get_entropic_weight(intervals.get_upper(int_b))
+    
+    deformed_a = intervals.create_interval(w_L_a * intervals.get_lower(int_a), w_U_a * intervals.get_upper(int_a))
+    deformed_b = intervals.create_interval(w_L_b * intervals.get_lower(int_b), w_U_b * intervals.get_upper(int_b))
+    return intervals.ensure_interval(logic.and_lukasiewicz_pure(deformed_a, deformed_b))
+
+
+def or_physical_lukasiewicz(int_a: jnp.ndarray, int_b: jnp.ndarray) -> jnp.ndarray:
+    """
+    Computes a PFL Disjunction (OR) based on entropic space-curved warping over Nilpotent Łukasiewicz logic.
+
+    Applies boundary-specific entropic scaling to deform interval boundaries before executing 
+    a pure bounded-sum interaction, capturing accumulative spatial support.
+
+    Args:
+        int_a (jnp.ndarray): First physical truth interval structured as (..., 2).
+        int_b (jnp.ndarray): Second physical truth interval structured as (..., 2).
+
+    Returns:
+        jnp.ndarray: Bounded and consistency-verified space-warped nilpotent disjunction interval (..., 2).
+    """
+    w_L_a = activations.get_entropic_weight(intervals.get_lower(int_a))
+    w_U_a = activations.get_entropic_weight(intervals.get_upper(int_a))
+    w_L_b = activations.get_entropic_weight(intervals.get_lower(int_b))
+    w_U_b = activations.get_entropic_weight(intervals.get_upper(int_b))
+    
+    deformed_a = intervals.create_interval(w_L_a * intervals.get_lower(int_a), w_U_a * intervals.get_upper(int_a))
+    deformed_b = intervals.create_interval(w_L_b * intervals.get_lower(int_b), w_U_b * intervals.get_upper(int_b))
+    return intervals.ensure_interval(logic.or_lukasiewicz_pure(deformed_a, deformed_b))
+
 # =====================================================================
 # 7. BACKWARDS-COMPATIBLE ROUTING GATEWAY (PRESERVING ORIGINAL NAME)
 # =====================================================================
