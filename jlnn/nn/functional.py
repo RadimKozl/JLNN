@@ -23,9 +23,9 @@ def weighted_and(x: jnp.ndarray, weights: jnp.ndarray, beta: jnp.ndarray) -> jnp
         beta (jnp.ndarray): Scalar activation sensitivity threshold parameter (bias).
 
     Returns:
-        jnp.ndarray: Verified truth interval [L, U] structured as (..., 2).
+        jnp.ndarray: Bounded, consistency-verified truth interval [L, U] structured as (..., 2).
     """
-    # Calls low-level implementation from kernel
+    # Delegate implementation directly to the kernel layer
     results = logic.weighted_and_lukasiewicz(x, weights, beta)
     return intervals.ensure_interval(results)
 
@@ -44,9 +44,9 @@ def weighted_or(x: jnp.ndarray, weights: jnp.ndarray, beta: jnp.ndarray) -> jnp.
         beta (jnp.ndarray): Scalar activation saturation threshold parameter (bias).
 
     Returns:
-        jnp.ndarray: Verified truth interval [L, U] structured as (..., 2).
+        jnp.ndarray: Bounded, consistency-verified truth interval [L, U] structured as (..., 2).
     """
-    # Calls low-level implementation from kernel
+    # Delegate implementation directly to the kernel layer
     results = logic.weighted_or_lukasiewicz(x, weights, beta)
     return intervals.ensure_interval(results)
 
@@ -68,14 +68,14 @@ def weighted_not(x: jnp.ndarray, weight: jnp.ndarray) -> jnp.ndarray:
     Returns:
         jnp.ndarray: Bounded, consistency-verified truth interval structured as (..., 2).
     """
-    # 1. Pure negation: [L, U] -> [1-U, 1-L]
+    # 1. Execute standard pure logical inversion: [L, U] -> [1-U, 1-L]
     negated = intervals.negate(x)
     
-    # 2. Linear interpolation between negated result and maximum uncertainty [0.0, 1.0]
+    # 2. Linear interpolation between the inverted result and max entropic uncertainty [0.0, 1.0]
     l_neg = intervals.get_lower(negated) * weight + 0.0 * (1.0 - weight)
     u_neg = intervals.get_upper(negated) * weight + 1.0 * (1.0 - weight)
     
-    # 3. Merge and enforce domain [0.0, 1.0] and consistency L <= U
+    # 3. Consolidate tensor structures, enforce unit domain constraints, and verify L <= U
     combined = jnp.stack([l_neg, u_neg], axis=-1)
     return intervals.ensure_interval(jnp.clip(combined, 0.0, 1.0))
 
@@ -90,7 +90,7 @@ def weighted_nand(x: jnp.ndarray, weights: jnp.ndarray, beta: jnp.ndarray) -> jn
         beta (jnp.ndarray): Threshold sensitivity parameter (bias).
 
     Returns:
-        jnp.ndarray: Consistency-verified inverted conjunction truth interval structured as (..., 2).
+        jnp.ndarray: Bounded, consistency-verified inverted conjunction truth interval structured as (..., 2).
     """
     res_and = weighted_and(x, weights, beta)
     results = intervals.negate(res_and)
@@ -107,11 +107,68 @@ def weighted_nor(x: jnp.ndarray, weights: jnp.ndarray, beta: jnp.ndarray) -> jnp
         beta (jnp.ndarray): Threshold saturation parameter (bias).
 
     Returns:
-        jnp.ndarray: Consistency-verified inverted disjunction truth interval structured as (..., 2).
+        jnp.ndarray: Bounded, consistency-verified inverted disjunction truth interval structured as (..., 2).
     """
     res_or = weighted_or(x, weights, beta)
     results = intervals.negate(res_or)
     return intervals.ensure_interval(results)
+
+
+def weighted_xor_lukasiewicz(int_a: jnp.ndarray, int_b: jnp.ndarray, weights: jnp.ndarray, beta: jnp.ndarray) -> jnp.ndarray:
+    """
+    Computes a weighted parametric Exclusive OR (XOR) under Łukasiewicz semantics.
+    
+    Formulated compositionally using standard logical equivalence axioms: 
+        (A AND NOT B) OR (NOT A AND B)
+
+    Args:
+        int_a (jnp.ndarray): First input interval tensor structured as (..., 2).
+        int_b (jnp.ndarray): Second input interval tensor structured as (..., 2).
+        weights (jnp.ndarray): Input importance weights structured as (num_inputs,).
+        beta (jnp.ndarray): Threshold parameter managing gate sensitivity.
+
+    Returns:
+        jnp.ndarray: Verified, bounded exclusive disjunction truth interval structured as (..., 2).
+    """
+    not_a = intervals.negate(int_a)
+    not_b = intervals.negate(int_b)
+    
+    # Restructure input tensors to align with the (..., num_inputs, 2) contract for weighted reductions
+    left_branch = jnp.stack([int_a, not_b], axis=-2)
+    right_branch = jnp.stack([not_a, int_b], axis=-2)
+    
+    left_res = weighted_and(left_branch, weights, beta)
+    right_res = weighted_and(right_branch, weights, beta)
+    
+    combined = jnp.stack([left_res, right_res], axis=-2)
+    return weighted_or(combined, weights, beta)
+
+def and_lukasiewicz(int_a: jnp.ndarray, int_b: jnp.ndarray) -> jnp.ndarray:
+    """
+    Computes a pure parameterless Łukasiewicz conjunction (AND) for two truth intervals.
+
+    Args:
+        int_a (jnp.ndarray): First truth interval tensor structured as (..., 2).
+        int_b (jnp.ndarray): Second truth interval tensor structured as (..., 2).
+
+    Returns:
+        jnp.ndarray: Bounded, consistency-verified nilpotent t-norm interval structured as (..., 2).
+    """
+    return intervals.ensure_interval(logic.and_lukasiewicz_pure(int_a, int_b))
+
+
+def or_lukasiewicz(int_a: jnp.ndarray, int_b: jnp.ndarray) -> jnp.ndarray:
+    """
+    Computes a pure parameterless Łukasiewicz disjunction (OR) for two truth intervals.
+
+    Args:
+        int_a (jnp.ndarray): First truth interval tensor structured as (..., 2).
+        int_b (jnp.ndarray): Second truth interval tensor structured as (..., 2).
+
+    Returns:
+        jnp.ndarray: Bounded, consistency-verified nilpotent t-conorm interval structured as (..., 2).
+    """
+    return intervals.ensure_interval(logic.or_lukasiewicz_pure(int_a, int_b))
 
 
 # =====================================================================
@@ -140,6 +197,29 @@ def weighted_nor_kleene_dienes(x: jnp.ndarray, weights: jnp.ndarray) -> jnp.ndar
     return intervals.ensure_interval(intervals.negate(res_or))
 
 
+def weighted_xor_godel(int_a: jnp.ndarray, int_b: jnp.ndarray, weights: jnp.ndarray) -> jnp.ndarray:
+    """
+    Computes a weighted parametric Exclusive OR (XOR) under Gödel/Kleene-Dienes sémantics.
+    
+    Args:
+        int_a (jnp.ndarray): First truth interval tensor structured as (..., 2).
+        int_b (jnp.ndarray): Second truth interval tensor structured as (..., 2).
+        weights (jnp.ndarray): Input reliability importance scaling weights structured as (2,).
+
+    Returns:
+        jnp.ndarray: Verified exclusive disjunction truth interval structured as (..., 2).
+    """
+    w_a = intervals.create_interval(
+        jnp.minimum(1.0, intervals.get_lower(int_a) * weights[0]),
+        jnp.minimum(1.0, intervals.get_upper(int_a) * weights[0])
+    )
+    w_b = intervals.create_interval(
+        jnp.minimum(1.0, intervals.get_lower(int_b) * weights[1]),
+        jnp.minimum(1.0, intervals.get_upper(int_b) * weights[1])
+    )
+    return xor_godel(w_a, w_b)
+
+
 # =====================================================================
 # 3. REICHENBACH LOGIC CORE (Parametric Smooth Product / Algebraic)
 # =====================================================================
@@ -161,12 +241,6 @@ def weighted_nand_reichenbach(x: jnp.ndarray, weights: jnp.ndarray) -> jnp.ndarr
 
 
 def weighted_nor_reichenbach(x: jnp.ndarray, weights: jnp.ndarray) -> jnp.ndarray:
-    """Computes a weighted joint denial (NOR) under Reichenbach semantics."""
-    res_or = weighted_or_reichenbach(x, weights)
-    return intervals.ensure_interval(intervals.negate(res_or))
-
-
-def weighted_nor_reichenbach(x: jnp.ndarray, weights: jnp.ndarray) -> jnp.ndarray:
     """
     Computes a weighted parametric joint denial (NOR) under Reichenbach semantics.
 
@@ -180,6 +254,29 @@ def weighted_nor_reichenbach(x: jnp.ndarray, weights: jnp.ndarray) -> jnp.ndarra
     res_or = weighted_or_reichenbach(x, weights)
     results = intervals.negate(res_or)
     return intervals.ensure_interval(results)
+
+
+def weighted_xor_product(int_a: jnp.ndarray, int_b: jnp.ndarray, weights: jnp.ndarray) -> jnp.ndarray:
+    """
+    Computes a weighted parametric Exclusive OR (XOR) under Product/Reichenbach sémantics.
+    
+    Args:
+        int_a (jnp.ndarray): First truth interval tensor structured as (..., 2).
+        int_b (jnp.ndarray): Second truth interval tensor structured as (..., 2).
+        weights (jnp.ndarray): Input reliability importance scaling weights structured as (2,).
+
+    Returns:
+        jnp.ndarray: Verified smooth exclusive disjunction truth interval structured as (..., 2).
+    """
+    w_a = intervals.create_interval(
+        jnp.minimum(1.0, intervals.get_lower(int_a) * weights[0]),
+        jnp.minimum(1.0, intervals.get_upper(int_a) * weights[0])
+    )
+    w_b = intervals.create_interval(
+        jnp.minimum(1.0, intervals.get_lower(int_b) * weights[1]),
+        jnp.minimum(1.0, intervals.get_upper(int_b) * weights[1])
+    )
+    return xor_product(w_a, w_b)
 
 
 # =====================================================================
@@ -552,17 +649,6 @@ def implication_physical_lukasiewicz(int_a: jnp.ndarray, int_b: jnp.ndarray) -> 
 def and_physical_kleene_dienes(int_a: jnp.ndarray, int_b: jnp.ndarray) -> jnp.ndarray:
     """
     Computes a PFL Conjunction (AND) based on entropic space-curved warping over Gödel Min logic.
-
-    Extracts individual Shannon entropy profiles from interval boundaries to formulate 
-    stability mapping coefficients (1.0 - H). These coefficients deform the underlying 
-    truth representations before resolving their intersection using pure minimum operations.
-
-    Args:
-        int_a (jnp.ndarray): First physical truth interval structured as (..., 2).
-        int_b (jnp.ndarray): Second physical truth interval structured as (..., 2).
-
-    Returns:
-        jnp.ndarray: Bounded, consistency-verified space-warped conjunction interval structured as (..., 2).
     """
     w_L_a = activations.get_entropic_weight(intervals.get_lower(int_a))
     w_U_a = activations.get_entropic_weight(intervals.get_upper(int_a))
@@ -577,17 +663,6 @@ def and_physical_kleene_dienes(int_a: jnp.ndarray, int_b: jnp.ndarray) -> jnp.nd
 def or_physical_kleene_dienes(int_a: jnp.ndarray, int_b: jnp.ndarray) -> jnp.ndarray:
     """
     Computes a PFL Disjunction (OR) based on entropic space-curved warping over Gödel Max logic.
-
-    Extracts individual Shannon entropy profiles from interval boundaries to formulate 
-    stability mapping coefficients (1.0 - H). These coefficients deform the underlying 
-    truth representations before resolving their union using pure maximum operations.
-
-    Args:
-        int_a (jnp.ndarray): First physical truth interval structured as (..., 2).
-        int_b (jnp.ndarray): Second physical truth interval structured as (..., 2).
-
-    Returns:
-        jnp.ndarray: Bounded, consistency-verified space-warped disjunction interval structured as (..., 2).
     """
     w_L_a = activations.get_entropic_weight(intervals.get_lower(int_a))
     w_U_a = activations.get_entropic_weight(intervals.get_upper(int_a))
@@ -602,16 +677,6 @@ def or_physical_kleene_dienes(int_a: jnp.ndarray, int_b: jnp.ndarray) -> jnp.nda
 def and_physical_reichenbach(int_a: jnp.ndarray, int_b: jnp.ndarray) -> jnp.ndarray:
     """
     Computes a PFL Conjunction (AND) based on entropic space-curved warping over Reichenbach Product logic.
-
-    Applies boundary-specific entropic scaling to deform interval boundaries before executing 
-    an analytical, parameterless algebraic product copula.
-
-    Args:
-        int_a (jnp.ndarray): First physical truth interval structured as (..., 2).
-        int_b (jnp.ndarray): Second physical truth interval structured as (..., 2).
-
-    Returns:
-        jnp.ndarray: Bounded and consistency-verified space-warped product conjunction interval (..., 2).
     """
     w_L_a = activations.get_entropic_weight(intervals.get_lower(int_a))
     w_U_a = activations.get_entropic_weight(intervals.get_upper(int_a))
@@ -626,16 +691,6 @@ def and_physical_reichenbach(int_a: jnp.ndarray, int_b: jnp.ndarray) -> jnp.ndar
 def or_physical_reichenbach(int_a: jnp.ndarray, int_b: jnp.ndarray) -> jnp.ndarray:
     """
     Computes a PFL Disjunction (OR) based on entropic space-curved warping over Reichenbach Probabilistic Sum logic.
-
-    Applies boundary-specific entropic scaling to deform interval boundaries before executing 
-    an analytical, parameterless algebraic probabilistic sum t-conorm.
-
-    Args:
-        int_a (jnp.ndarray): First physical truth interval structured as (..., 2).
-        int_b (jnp.ndarray): Second physical truth interval structured as (..., 2).
-
-    Returns:
-        jnp.ndarray: Bounded and consistency-verified space-warped probabilistic sum interval (..., 2).
     """
     w_L_a = activations.get_entropic_weight(intervals.get_lower(int_a))
     w_U_a = activations.get_entropic_weight(intervals.get_upper(int_a))
@@ -650,16 +705,6 @@ def or_physical_reichenbach(int_a: jnp.ndarray, int_b: jnp.ndarray) -> jnp.ndarr
 def and_physical_lukasiewicz(int_a: jnp.ndarray, int_b: jnp.ndarray) -> jnp.ndarray:
     """
     Computes a PFL Conjunction (AND) based on entropic space-curved warping over Nilpotent Łukasiewicz logic.
-
-    Applies boundary-specific entropic scaling to deform interval boundaries before executing 
-    a pure bounded-difference interaction, tracking accumulative structural contradictions.
-
-    Args:
-        int_a (jnp.ndarray): First physical truth interval structured as (..., 2).
-        int_b (jnp.ndarray): Second physical truth interval structured as (..., 2).
-
-    Returns:
-        jnp.ndarray: Bounded and consistency-verified space-warped nilpotent conjunction interval (..., 2).
     """
     w_L_a = activations.get_entropic_weight(intervals.get_lower(int_a))
     w_U_a = activations.get_entropic_weight(intervals.get_upper(int_a))
@@ -674,16 +719,6 @@ def and_physical_lukasiewicz(int_a: jnp.ndarray, int_b: jnp.ndarray) -> jnp.ndar
 def or_physical_lukasiewicz(int_a: jnp.ndarray, int_b: jnp.ndarray) -> jnp.ndarray:
     """
     Computes a PFL Disjunction (OR) based on entropic space-curved warping over Nilpotent Łukasiewicz logic.
-
-    Applies boundary-specific entropic scaling to deform interval boundaries before executing 
-    a pure bounded-sum interaction, capturing accumulative spatial support.
-
-    Args:
-        int_a (jnp.ndarray): First physical truth interval structured as (..., 2).
-        int_b (jnp.ndarray): Second physical truth interval structured as (..., 2).
-
-    Returns:
-        jnp.ndarray: Bounded and consistency-verified space-warped nilpotent disjunction interval (..., 2).
     """
     w_L_a = activations.get_entropic_weight(intervals.get_lower(int_a))
     w_U_a = activations.get_entropic_weight(intervals.get_upper(int_a))
@@ -693,6 +728,26 @@ def or_physical_lukasiewicz(int_a: jnp.ndarray, int_b: jnp.ndarray) -> jnp.ndarr
     deformed_a = intervals.create_interval(w_L_a * intervals.get_lower(int_a), w_U_a * intervals.get_upper(int_a))
     deformed_b = intervals.create_interval(w_L_b * intervals.get_lower(int_b), w_U_b * intervals.get_upper(int_b))
     return intervals.ensure_interval(logic.or_lukasiewicz_pure(deformed_a, deformed_b))
+
+
+def logical_not(x: jnp.ndarray) -> jnp.ndarray:
+    """
+    Parameter-free physical negation (NOT).
+    Inverts intervals securely according to: NOT [L, U] = [1 - U, 1 - L]
+    """
+    return intervals.ensure_interval(intervals.negate(x))
+
+
+def implication(int_a: jnp.ndarray, int_b: jnp.ndarray, method: str = 'lukasiewicz') -> jnp.ndarray:
+    """
+    Universal proxy routing for physical or standard implication evaluations.
+    Maintains compatibility with parameter-free (PFL) gates.
+    """
+    # Create neutral dummy weights and beta arrays since weighted_implication expects them
+    dummy_weights = jnp.array([1.0, 1.0])
+    dummy_beta = jnp.array(1.0)
+    return weighted_implication(int_a, int_b, dummy_weights, dummy_beta, method=method)
+
 
 # =====================================================================
 # 10. BACKWARDS-COMPATIBLE ROUTING GATEWAY (PRESERVING ORIGINAL NAME)
@@ -707,27 +762,19 @@ def weighted_implication(
 ) -> jnp.ndarray:
     """
     Functional gateway for calculating structural logical implications (A -> B).
-
-    Coordinates mathematical execution pathways between alternative fuzzy logic semantics. 
-    Handles direct interval injection for accumulative systems (Łukasiewicz), parameterless 
-    entropy evaluations for physical modules (PFL), and explicit boundary reliability 
-    scaling for standard parametric t-norm architectures (Kleene-Dienes, Reichenbach, Goguen, Gödel).
+    
+    Supports traditional parametric mechanisms as well as advanced Space-Curved 
+    Physical Fuzzy Logic (PFL) methods.
 
     Args:
-        int_a (jnp.ndarray): Antecedent truth interval tensor structured as (..., 2).
-        int_b (jnp.ndarray): Consequent truth interval tensor structured as (..., 2).
-        weights (jnp.ndarray): Parameter optimization weights scaling structural rule validation. 
-            Formulated as a tensor of shape (2,) representing [Weight_A, Weight_B].
-        beta (jnp.ndarray): Activation threshold or sensitivity bias parameter.
-        method (str): Target semantic framework selector. Options are: 'lukasiewicz', 
-            'kleene_dienes', 'reichenbach', 'goguen', 'godel', 'physical_kleene_dienes', 
-            'physical_reichenbach', or 'physical_lukasiewicz'. Defaults to 'lukasiewicz'.
+        int_a (jnp.ndarray): Antecedent interval tensor structured as (..., 2).
+        int_b (jnp.ndarray): Consequent interval tensor structured as (..., 2).
+        weights (jnp.ndarray): Importance weights for traditional methods structured as (2,).
+        beta (jnp.ndarray): Threshold/bias sensitivity parameter tensor.
+        method (str): Logic framework selector string.
 
     Returns:
-        jnp.ndarray: Axiomatically guarded implication truth interval [L, U] structured as (..., 2).
-        
-    Raises:
-        ValueError: If an unsupported semantic method string is provided.
+        jnp.ndarray: Bounded and consistency-verified implication result interval.
     """
     # 1. Łukasiewicz branches immediately (accepts raw intervals, solves weights internally)
     if method == 'lukasiewicz':
@@ -745,7 +792,7 @@ def weighted_implication(
         return intervals.ensure_interval(results)
 
     # 3. Traditional parametric methods (kleene_dienes, reichenbach, goguen, godel)
-    # For them, we fully apply the original contract for preprocessing weights:
+    # Preprocess boundaries by weighting individual operand terms according to framework contract
     weighted_a = intervals.create_interval(
         jnp.minimum(1.0, intervals.get_lower(int_a) * weights[0]),
         jnp.minimum(1.0, intervals.get_upper(int_a) * weights[0])
@@ -764,6 +811,6 @@ def weighted_implication(
     elif method == 'godel':
         results = logic.implies_godel(weighted_a, weighted_b)
     else:
-        raise ValueError(f"Method '{method}' is not supported inside JLNN functional gateways.")
+        raise ValueError(f"Implication method '{method}' is not recognized or supported.")
     
     return intervals.ensure_interval(results)
