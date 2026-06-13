@@ -1,5 +1,5 @@
 # JLNN – JAX Logical Neural Networks
--------------------------------------
+--------------------------------------
 
 <p align="center">
   <img src="docs/source/_static/jlnn_diagram.png" width="400" alt="JLNN Logo">
@@ -9,7 +9,7 @@ Neuro-symbolic framework for interval-based Łukasiewicz logic built on **JAX** 
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.10+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/release/python-3110/)
-[![Version](https://img.shields.io/badge/Version-v0.1.2-green.svg)](https://pypi.org/project/jax-lnn/)
+[![Version](https://img.shields.io/badge/Version-v0.1.3-green.svg)](https://pypi.org/project/jax-lnn/)
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/RadimKozl/JLNN/blob/main/examples/Jax_lnn_base.ipynb)
 
 JLNN enables turning symbolic logical rules into differentiable neural networks for training on data while maintaining interpretability and logical consistency.
