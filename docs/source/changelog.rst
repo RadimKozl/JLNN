@@ -3,23 +3,63 @@ Changelog
 
 All significant changes to the JLNN project will be documented in this file. The project adheres to semantic versioning.
 
+[0.1.3] - 2026-06-14
+-----------------------
+
+This minor release brings a fundamental mathematical extension to the logical apparatus of the JLNN framework. It implements a complete set of traditional n-ary t-norms and t-conorms, limits drastic logic, and introduces a completely new concept of space-time curved physical fuzzy logic (PFL) governed by local Shannon entropy.
+
+Added
+^^^^^^^
+
+* **Spatio-temporal Curved Fuzzy Logic (PFL):**
+
+  - Introduced advanced physics activations and kernels (``entropy_raw``, ``get_entropic_weight``, ``gravitational_bend_activation``) that warp the space of truth potentials proportional to local chaos. 
+  - Added physical implications (``implies_physical_kleene_dienes``, ``implies_physical_reichenbach``, ``implies_physical_gravitational_lukasiewicz``) which eliminate the vanishing gradient problem in high uncertainty regions. 
+  - Implemented parameterless state gates (``PhysicalAnd``, ``PhysicalOr``, ``PhysicalImplication``, etc.) and ``PhysicalPredicate`` grounding layer with support for gravitational attraction of unstable states to the center (0.5).
+
+* **Extension of logical kernels (Kernels):**
+
+  - **Product (probabilistic) logic:** Added algebraic operators (including Reichenbach and Goguen implication) for smooth polynomial progression of gradients. 
+  - **Gödel logic:** Implemented strict min-max operators and Kleene-Dienes implications. 
+  - **Drastic Logic:** Added absolute mathematical bottom of t-norms (``and_drastic_pure``, ``or_drastic_pure``) for boundary barrier modeling.
+
+* **Bulk reductions (Bulk Gates):**
+
+  - Introduced stateless operators ``BulkAnd`` and ``BulkOr`` for vectorized aggregation of large tensors along any axis, used for native representation of :math:`\forall` and :math:`\exists` quantifiers.
+
+* **Test suite:**
+
+  - Created comprehensive unit tests (``test_functional.py``, ``test_gates.py``, ``test_predicates.py``) verifying stability on GPU/TPU, behavior around entropic singularity and NNX ellipsoid parameter access syntax.
+
+Changed
+^^^^^^^^^
+
+* **Flax NNX Architecture:** All state gates (``gates``) and predicates (``predicates``) have been fully rewritten into modern JAX-native syntax with ellipsis (eg ``self.weights[...]``) for error-free field injection and integration with optimizers.
+* **Axiomatic fuses:** Strict constraint consistency enforcement (``intervals.ensure_interval``) has been integrated into the functional API (``functional.py``) and grounding layers, preventing negative uncertainty widths from occurring during optimization.
+
+Fixed
+^^^^^^
+
+* Fixed gradient collapse bug when dividing by zero in residual R-implications (Goguen) by introducing numerically safe division in JAX.
+* Fixed behavior of multi-level hierarchical structures in ``WeightedXor`` gates when processing extremely narrow truth intervals.
+
 [0.1.2] - 2026-06-01
---------------------
+----------------------
 
 This release completely overhauls the deployment and hardware compatibility ecosystem, resolving critical import conflicts in environments like Google Colab (T4/V100/A100) and optimizing performance across CPU, GPU, and TPU.
 
 Added
-^^^^^
+^^^^^^
 * **Hardware-Specific Extras:** Introduced modular install targets (`[cpu]`, `[gpu]`, `[tpu]`) in *pyproject.toml* to decouple core logic from heavy, environment-sensitive hardware runtimes.
 * **TPU Acceleration Support:** Added explicit configuration for Google Cloud TPUs via `jax[tpu]`.
 
 Changed
-^^^^^^^
+^^^^^^^^
 * **Dependency Decoupling (TensorFlow Removal):** Replaced the monolithic `orbax` package with `orbax-checkpoint` in auxiliary dependencies. This entirely removes the hidden dependency on TensorFlow/TFLite, eliminating C++ symbol collision issues (`undefined symbol: Wrapped_PyInit...`) and circular import bugs in PyTorch.
 * **Modern JAX Baseline:** Upgraded minimum JAX ecosystem requirements to `>=0.8.2` across all target backends to support latest compiler optimizations.
 
 Fixed
-^^^^^
+^^^^^^
 * **Google Colab Disconnections:** Fixed a fatal issue where unhandled automated install scripts forced hard kernel drops (`os.kill`), which triggered browser WebSocket disconnections (`[object CloseEvent]`) on premium hardware (A100 instances).
 * **Pip vs UV Resolver Conflicts:** Restructured package optional dependencies to allow clean, side-effect-free installation using both traditional `pip` and high-speed `uv` package managers.
 
@@ -75,13 +115,13 @@ Changed
 This Release Candidate brings a major fix to the export pipeline and refines the core logical consistency of the framework.
 
 **Added**
-^^^^^^^^^^
+^^^^^^^^^^^
 * **FixedPredicate:** Introduced a non-trainable identity predicate specifically for crisp (exact 0/1) logic examples.
 * **Robust PyTree Support:** The export pipeline now fully supports dictionary-based predicate inputs (e.g., `{"A": tensor, "B": tensor}`) using `jax.tree.map`.
 * **Metadata Resolution:** Added `get_representative_shape` helper to ensure correct ONNX `value_info` metadata generation even for complex nested inputs.
 
 **Changed**
-^^^^^^^^^^^^
+^^^^^^^^^^^^^
 
 * **Export Pipeline Refactoring:** Updated `export_to_stablehlo` and `export_to_onnx` to handle structured PyTrees instead of requiring flat `jnp.ndarray` inputs.
 * **Negation Axiom (weighted_not):** Corrected the order of operations to apply pure negation ([1-U, 1-L]) before weight scaling.
