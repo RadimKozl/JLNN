@@ -121,10 +121,10 @@ Example
 
     # Installing system dependencies and Ollam
 
-    ```
+    '''
     !sudo apt update && sudo apt install pciutils zstd -y
     !curl -fsSL https://ollama.com/install.sh | sh
-    ```
+    '''
 
     # Setup: Imports and Simulation in QuTiP
 

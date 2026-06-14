@@ -52,10 +52,11 @@ Example
 ---------
 
 .. code-block:: python
-
+   
+   '''
    import os
    import sys
-
+   
    try:
       # Checking if everything is ready (after reboot)
       import jax
@@ -73,11 +74,11 @@ Example
       print("🚀 Initializing environment (Installing JLNN and fixing JAX)...")
 
       # A. Hardware detection
-      is_tpu = 'TPU_NAME' in os.environ
+      is_tpu = "TPU_NAME" in os.environ
       is_gpu = False
       try:
          import subprocess
-         subprocess.check_output('nvidia-smi')
+         subprocess.check_output("nvidia-smi")
          is_gpu = True
       except:
          pass
@@ -97,10 +98,11 @@ Example
       print("📦 Installing JLNN framework and chemical dependencies...")
       !pip install -q git+https://github.com/RadimKozl/JLNN.git --quiet
       !pip install -q deepchem rdkit jraph numpyro optuna pandas scikit-learn matplotlib xarray arviz --quiet
-
+      
       # D. RESTART KERNEL (Necessary to load new drivers in Colab)
       print("\n🔄 RESTARTING ENVIRONMENT... Run this cell again after the restart.")
       os.kill(os.getpid(), 9)
+   '''
 
    # Imports
 

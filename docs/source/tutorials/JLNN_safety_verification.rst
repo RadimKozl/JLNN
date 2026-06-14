@@ -98,7 +98,7 @@ We train the model using **Optax** while monitoring the **Safety Risk (U-max)** 
 
 .. code-block:: python
 
-    ```
+    '''
     try:
         import jlnn
         import jraph
@@ -139,7 +139,7 @@ We train the model using **Optax** while monitoring the **Safety Risk (U-max)** 
         print("\n🔄 RESTARTING ENVIRONMENT... Please wait a second and then run the cell again.")
         os.kill(os.getpid(), 9)
         os.kill(os.getpid(), 9) # After this line, the cell stops and the environment restarts
-    ```
+    '''
 
     # Imports
 
