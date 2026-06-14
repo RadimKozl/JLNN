@@ -190,7 +190,8 @@ def implies_reichenbach(int_a: jnp.ndarray, int_b: jnp.ndarray) -> jnp.ndarray:
     Implements the Reichenbach implication (product logic s-implication).
     
     This method of computing implication (A -> B) is governed by the polynomial expression:
-        1.0 - A + (A * B). 
+    1.0 - A + (A * B)
+     
     In the context of interval logic, this represents a smooth "compromise" approach that, 
     unlike Łukasiewicz or Kleene-Dienes, avoids sharp optimization boundaries caused by min/max operations.
     
@@ -204,10 +205,13 @@ def implies_reichenbach(int_a: jnp.ndarray, int_b: jnp.ndarray) -> jnp.ndarray:
 
     Returns:
         jnp.ndarray: The resulting truth interval [L, U] structured as (..., 2). 
-            The boundary calculation satisfies rigorous interval arithmetic constraints:
-                L_res = 1.0 - U_a + (L_a * L_b)
-                U_res = 1.0 - L_a + (U_a * U_b)
-            Outputs are bounded using jnp.clip to shield downstream layers from floating-point overflow.
+        
+        The boundary calculation satisfies rigorous interval arithmetic constraints:
+        
+        L_res = 1.0 - U_a + (L_a * L_b)
+        U_res = 1.0 - L_a + (U_a * U_b)
+        
+        Outputs are bounded using jnp.clip to shield downstream layers from floating-point overflow.
     """
     
     # Extract boundary limits for both input intervals

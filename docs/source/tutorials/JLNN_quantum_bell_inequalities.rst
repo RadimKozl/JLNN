@@ -70,9 +70,7 @@ Sample output from Gemma 3
 
 After completing the calculations, the Gemma 3 model generates an expert report:
 
-*"The L-bound is 0.0000 because at 60% noise, the Bayesian uncertainty is too wide. 
-    The model refuses to claim a 'quantum proof' when the data is indistinguishable 
-    from classical variables. This confirms the system is logically sound."*
+``"The L-bound is 0.0000 because at 60% noise, the Bayesian uncertainty is too wide. The model refuses to claim a 'quantum proof' when the data is indistinguishable from classical variables. This confirms the system is logically sound."``
 
 Example
 ---------

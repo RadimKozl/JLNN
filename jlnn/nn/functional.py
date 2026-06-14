@@ -342,7 +342,8 @@ def xor_godel(int_a: jnp.ndarray, int_b: jnp.ndarray) -> jnp.ndarray:
     Computes a pure Gödel Exclusive OR (XOR) operation over truth intervals.
 
     Structurally formulated using the standard logical equivalence:
-        (A AND NOT B) OR (NOT A AND B)
+    (A AND NOT B) OR (NOT A AND B)
+        
     evaluated via strict non-cumulative Min-Max fuzzy operators.
 
     Args:
@@ -464,7 +465,8 @@ def xor_product(int_a: jnp.ndarray, int_b: jnp.ndarray) -> jnp.ndarray:
     Computes a pure algebraic Product Exclusive OR (XOR) operation over truth intervals.
 
     Defined smoothly as: 
-        (A * (1 - B)) + ((1 - A) * B) - Overlap Coefficient
+    (A * (1 - B)) + ((1 - A) * B) - Overlap Coefficient
+        
     which guarantees active, non-vanishing optimization gradients throughout the unit domain.
 
     Args:
