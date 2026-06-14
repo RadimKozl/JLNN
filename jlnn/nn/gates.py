@@ -640,7 +640,7 @@ class PhysicalNot(nnx.Module):
         Returns:
             jnp.ndarray: Fully inverted truth interval tensor structured as (..., 2).
         """
-        return F.logical_not(x)
+        return F.weighted_not(x, jnp.ones(x.shape[:-2]))
 
 
 class PhysicalNand(nnx.Module):

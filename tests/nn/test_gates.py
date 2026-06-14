@@ -101,8 +101,11 @@ def test_physical_gates_and_singularity():
     Instead of the original 'physical_lukasiewicz' (which fails in functional.py), we will use
     parameters supported by the internal physical t-norms.
     """
-    # Input for multiple predicates (e.g., 2 inputs along axis -2)
-    x = intervals.create_interval(jnp.array([[0.5, 0.5]]), jnp.array([[0.5, 0.5]]))
+    # Proper initialization of two inputs, each with an interval [0.5, 0.5]
+    lower = jnp.array([0.5, 0.5])
+    upper = jnp.array([0.5, 0.5])
+    x = intervals.create_interval(lower, upper) # Shape (2, 2)
+    x = x[jnp.newaxis, ...] # Adding batch dimension -> (1, 2, 2)
     
     p_and = gates.PhysicalAnd(method='physical_kleene_dienes')
     p_or = gates.PhysicalOr(method='physical_reichenbach')

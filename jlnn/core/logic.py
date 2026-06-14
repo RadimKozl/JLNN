@@ -208,7 +208,7 @@ def implies_reichenbach(int_a: jnp.ndarray, int_b: jnp.ndarray) -> jnp.ndarray:
                 L_res = 1.0 - U_a + (L_a * L_b)
                 U_res = 1.0 - L_a + (U_a * U_b)
             Outputs are bounded using jnp.clip to shield downstream layers from floating-point overflow.
-    """   
+    """
     
     # Extract boundary limits for both input intervals
     L_a = intervals.get_lower(int_a)
